@@ -60,6 +60,8 @@ final class Maintenance
         // Assets and the maintenance POST handler need to load.
         if (str_starts_with($path, '/assets/')) return true;
         if ($path === '/maintenance' || $path === '/maintenance/') return true;
+        // SEO crawl files must remain reachable so robots see the indexing directive.
+        if ($path === '/robots.txt' || $path === '/sitemap.xml') return true;
         return false;
     }
 
