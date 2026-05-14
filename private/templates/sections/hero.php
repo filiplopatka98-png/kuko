@@ -5,7 +5,7 @@
     <h1 class="hero__title">Detský svet KUKO</h1>
     <p class="hero__sub">pre radosť detí &amp; pohodu rodičov</p>
     <div class="hero__cta">
-      <button type="button" class="btn" data-open-reservation data-package="">Rezervovať oslavu</button>
+      <a class="btn" href="/rezervacia">Rezervovať oslavu</a>
       <a class="btn btn--ghost" href="#cennik">Pozrieť cenník</a>
     </div>
   </div>

@@ -10,6 +10,10 @@ return [
         'debug' => false,              // set true only for local dev
         'url'   => 'https://kuko-detskysvet.sk',
         'tz'    => 'Europe/Bratislava',
+        // Maintenance mode: when true, public visitors see a branded "we're updating" page
+        // until they enter the staff password. Admin remains accessible.
+        'maintenance'          => false,
+        'maintenance_password' => '',  // plaintext password for the staff bypass form
     ],
 
     'db' => [

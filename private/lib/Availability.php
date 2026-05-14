@@ -132,6 +132,33 @@ final class Availability
         );
     }
 
+    /**
+     * Returns a status map for every day of a given month for a given package.
+     * Days outside the [today+lead, today+horizon] window are still reported but with
+     * the appropriate reason so the UI can show them as disabled.
+     *
+     * @return array<string,array{status:string,slots_count:int,reason:?string}>
+     */
+    public function forMonth(string $month, string $packageCode): array
+    {
+        if (!preg_match('/^\d{4}-\d{2}$/', $month)) return [];
+        $start = new \DateTimeImmutable($month . '-01');
+        $end   = $start->modify('last day of this month');
+        $out = [];
+        $cursor = $start;
+        while ($cursor <= $end) {
+            $iso = $cursor->format('Y-m-d');
+            $r = $this->forDate($iso, $packageCode);
+            $out[$iso] = [
+                'status'      => $r->slots === [] ? 'unavailable' : 'available',
+                'slots_count' => count($r->slots),
+                'reason'      => $r->reason,
+            ];
+            $cursor = $cursor->modify('+1 day');
+        }
+        return $out;
+    }
+
     private function minutes(string $hms): int
     {
         $parts = explode(':', $hms);

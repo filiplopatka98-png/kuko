@@ -87,4 +87,3 @@ document.addEventListener('click', e => {
 // ===== Lazy-load feature modules =====
 import('./gallery.js').catch(err => console.warn('gallery.js failed', err));
 import('./map.js').catch(err => console.warn('map.js failed', err));
-import('./reservation.js').catch(err => console.warn('reservation.js failed', err));

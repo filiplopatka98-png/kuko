@@ -14,6 +14,10 @@ if ($path === '/api/availability') {
     require __DIR__ . '/api/availability.php';
     return;
 }
+if ($path === '/api/month-availability') {
+    require __DIR__ . '/api/month-availability.php';
+    return;
+}
 
 // /admin/* → admin entry point (NOTE: dev mode bypasses Basic Auth)
 if ($path === '/admin' || $path === '/admin/' || str_starts_with($path, '/admin/')) {

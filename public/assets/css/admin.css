@@ -7,6 +7,8 @@ a { color: #5e72e4; }
 .admin-header h1 { font-size: 1.25rem; margin: 0; }
 .admin-header nav { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; }
 .admin-user { color: #888; font-size: 0.85rem; }
+.admin-logout { color: #c0392b !important; font-size: 0.85rem; padding-left: 0.5rem; border-left: 1px solid #e0e6ed; }
+.admin-logout:hover { color: #8a1e0f !important; }
 .admin-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
 .admin-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
 .admin-filter select, .admin-filter input, .admin-filter button {

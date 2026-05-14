@@ -4,17 +4,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/private/lib/App.php';
 \Kuko\App::bootstrap();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path'     => '/',
-        'secure'   => isset($_SERVER['HTTPS']),
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-    session_start();
-}
-
+use Kuko\Auth;
 use Kuko\Db;
 use Kuko\Renderer;
 use Kuko\Router;
@@ -24,6 +14,59 @@ use Kuko\PackagesRepo;
 use Kuko\OpeningHoursRepo;
 use Kuko\BlockedPeriodsRepo;
 use Kuko\Availability;
+
+$renderer = new Renderer(APP_ROOT . '/private/templates/admin');
+$router   = new Router();
+
+$path  = parse_url($_SERVER['REQUEST_URI'] ?? '/admin', PHP_URL_PATH) ?: '/admin';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+// === Login / logout routes (no auth required) ===
+
+$router->get('/admin/login', function () use ($renderer) {
+    if (Auth::isAuthenticated()) {
+        header('Location: /admin');
+        return;
+    }
+    echo $renderer->render('login', ['next' => (string) ($_GET['next'] ?? '/admin')]);
+});
+
+$router->post('/admin/login', function () use ($renderer) {
+    $user     = trim((string) ($_POST['username'] ?? ''));
+    $pass     = (string) ($_POST['password'] ?? '');
+    $remember = !empty($_POST['remember']);
+    $next     = (string) ($_POST['next'] ?? '/admin');
+    if (!preg_match('#^/admin#', $next)) $next = '/admin';
+
+    if (Auth::attempt($user, $pass, $remember)) {
+        header('Location: ' . $next);
+        return;
+    }
+    http_response_code(401);
+    echo $renderer->render('login', ['error' => true, 'next' => $next]);
+});
+
+$router->get('/admin/logout', function () {
+    Auth::logout();
+    header('Location: /admin/login');
+});
+
+$router->post('/admin/logout', function () {
+    Auth::logout();
+    header('Location: /admin/login');
+});
+
+// === All other admin routes require login ===
+
+$loginRoutePaths = ['/admin/login', '/admin/login/', '/admin/logout', '/admin/logout/'];
+$isLoginRoute = in_array(rtrim($path, '/'), array_map(fn($p) => rtrim($p, '/'), $loginRoutePaths), true);
+
+if (!$isLoginRoute) {
+    if (!Auth::isAuthenticated()) {
+        header('Location: /admin/login?next=' . rawurlencode($path));
+        return;
+    }
+}
 
 try {
     $db = Db::fromConfig();
@@ -38,12 +81,9 @@ $settings   = new SettingsRepo($db);
 $packages   = new PackagesRepo($db);
 $hours      = new OpeningHoursRepo($db);
 $blocked    = new BlockedPeriodsRepo($db);
-$renderer   = new Renderer(APP_ROOT . '/private/templates/admin');
-$router     = new Router();
-$adminUser  = $_SERVER['PHP_AUTH_USER'] ?? ($_SERVER['REMOTE_USER'] ?? 'unknown');
+$adminUser  = Auth::user() ?? 'unknown';
 
 $nowTz = new \DateTimeZone(\Kuko\Config::get('app.tz', 'Europe/Bratislava'));
-
 $availability = fn() => new Availability($db, $settings, $packages, $hours, $blocked, new \DateTimeImmutable('now', $nowTz));
 
 $flash = function (string $msg, string $type = 'ok') {
@@ -83,7 +123,7 @@ $router->get('/admin/reservation/{id}', function (array $p) use ($renderer, $rep
     echo $renderer->render('detail', ['r' => $row, 'user' => $adminUser, 'flashes' => $flashes]);
 });
 
-$router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, $audit, $flash, $renderer) {
+$router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, $audit, $flash) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
     $id = (int) $p['id'];
     $status = (string) ($_POST['status'] ?? '');
@@ -95,7 +135,6 @@ $router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, 
         $audit('set_status', 'reservations', $id, ['status' => $status]);
         $flash('Status zmenený na ' . $status . '.');
 
-        // Notify client by e-mail if status changed to confirmed/cancelled
         if ($previous !== null && $previous['status'] !== $status && in_array($status, ['confirmed', 'cancelled'], true)) {
             try {
                 $current = $repo->find($id);
@@ -129,18 +168,16 @@ $router->post('/admin/reservation/{id}/move', function (array $p) use ($repo, $a
     if ($row === null) { http_response_code(404); echo 'not found'; return; }
     $newDate = (string) ($_POST['wished_date'] ?? '');
     $newTime = (string) ($_POST['wished_time'] ?? '');
-    // Compute availability excluding this reservation (temporary cancel)
     $repo->setStatus($id, 'cancelled');
     $slots = $availability()->forDate($newDate, (string) $row['package'])->slots;
     if (!in_array($newTime, $slots, true)) {
-        // restore
         $repo->setStatus($id, (string) $row['status']);
         $flash('Termín nie je dostupný. Vyberte iný čas.', 'err');
         header('Location: /admin/reservation/' . $id);
         return;
     }
     $repo->moveTo($id, $newDate, $newTime);
-    $repo->setStatus($id, (string) $row['status']); // restore original status
+    $repo->setStatus($id, (string) $row['status']);
     $audit('move', 'reservations', $id, ['from' => $row['wished_date'] . ' ' . $row['wished_time'], 'to' => $newDate . ' ' . $newTime]);
     $flash("Termín presunutý na $newDate o $newTime.");
     header('Location: /admin/reservation/' . $id);
@@ -308,8 +345,7 @@ $router->get('/admin/calendar.ics', function () use ($db, $packages) {
     echo implode("\r\n", $lines) . "\r\n";
 });
 
-$path  = parse_url($_SERVER['REQUEST_URI'] ?? '/admin', PHP_URL_PATH) ?: '/admin';
-$match = $router->match($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
+$match = $router->match($method, $path);
 if ($match === null) {
     http_response_code(404);
     echo $renderer->render('not-found', ['user' => $adminUser, 'flashes' => $flashes]);

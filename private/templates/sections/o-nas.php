@@ -18,7 +18,7 @@
       <div class="card card--purple">
         <img class="card__icon" src="/assets/icons/balloons.svg" alt="" width="48" height="48">
         <p class="card__body"><strong>Organizujeme aj detské oslavy,</strong> ktoré pripravíme s dôrazom na radosť detí a bezstarostnosť pre rodičov.</p>
-        <button class="btn card__cta" data-open-reservation data-package="">Rezervovať oslavu</button>
+        <a class="btn card__cta" href="/rezervacia">Rezervovať oslavu</a>
       </div>
     </div>
   </div>

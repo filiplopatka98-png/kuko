@@ -16,7 +16,7 @@
           <li>✓ Občerstvenie pre deti</li>
           <li>✓ Animátorka v cene</li>
         </ul>
-        <button type="button" class="btn package__cta" data-open-reservation data-package="mini">Rezervovať balíček</button>
+        <a class="btn package__cta" href="/rezervacia?balicek=mini">Rezervovať balíček</a>
       </article>
 
       <article class="package package--purple">
@@ -33,7 +33,7 @@
           <li>✓ Animátorka + program</li>
           <li>✓ Tematická výzdoba</li>
         </ul>
-        <button type="button" class="btn package__cta" data-open-reservation data-package="maxi">Rezervovať balíček</button>
+        <a class="btn package__cta" href="/rezervacia?balicek=maxi">Rezervovať balíček</a>
       </article>
 
       <article class="package package--yellow">
@@ -50,7 +50,7 @@
           <li>✓ Pokojná atmosféra bez verejnosti</li>
           <li>✓ Plný komfort pre rodičov</li>
         </ul>
-        <button type="button" class="btn package__cta" data-open-reservation data-package="closed">Rezervovať balíček</button>
+        <a class="btn package__cta" href="/rezervacia?balicek=closed">Rezervovať balíček</a>
       </article>
     </div>
   </div>

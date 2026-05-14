@@ -20,6 +20,7 @@
       <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">📅 iCal</a>
       <a href="/" target="_blank">Web ↗</a>
       <span class="admin-user">@<?= e($user ?? '') ?></span>
+      <a href="/admin/logout" class="admin-logout">Odhlásiť</a>
     </nav>
   </div>
 </header>

@@ -1,9 +1,11 @@
-AuthType Basic
-AuthName "KUKO Admin"
-# IMPORTANT: replace with absolute path during deployment
-# AuthUserFile /full/path/to/public/admin/.htpasswd
-Require valid-user
+# Admin auth is now handled in PHP (session-based with login/logout).
+# .htpasswd is still read as the credential store, but it must be denied to HTTP.
 
+<Files ".htpasswd">
+    Require all denied
+</Files>
+
+# Stále routujeme cez admin/index.php
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
