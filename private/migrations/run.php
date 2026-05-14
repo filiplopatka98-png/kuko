@@ -18,9 +18,11 @@ foreach ($files as $file) {
         continue;
     }
     echo "+ apply $name\n";
-    $sql = file_get_contents($file);
-    foreach (array_filter(array_map('trim', explode(';', (string) $sql))) as $stmt) {
-        if ($stmt === '' || str_starts_with($stmt, '--')) continue;
+    $sql = (string) file_get_contents($file);
+    // Strip line-level SQL comments so they don't mask following statements
+    $sql = preg_replace('/^\s*--.*$/m', '', $sql);
+    foreach (array_filter(array_map('trim', explode(';', $sql))) as $stmt) {
+        if ($stmt === '') continue;
         $db->exec($stmt);
     }
     $db->execStmt('INSERT INTO migrations (name) VALUES (?)', [$name]);

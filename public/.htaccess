@@ -9,15 +9,20 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-# Front controller: route everything to index.php unless it's a real file/dir
 RewriteEngine On
+
+# Force HTTPS — WebSupport sets X-Forwarded-Proto behind their reverse proxy
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# API: pretty URLs → .php files
+RewriteRule ^api/([a-z][a-z0-9_-]*)/?$ api/$1.php [L,QSA]
+
+# Front controller: route everything to index.php unless it's a real file/dir
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
-
-# Force HTTPS (commented for local dev — uncomment on prod)
-# RewriteCond %{HTTPS} !=on
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 # Cache static assets
 <IfModule mod_expires.c>
