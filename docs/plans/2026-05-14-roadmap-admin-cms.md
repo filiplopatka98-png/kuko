@@ -129,8 +129,8 @@ Templates retain hardcoded fallbacks so deployment with empty DB still renders.
 | `/admin/packages` (rozšírené) | Pridať polia description, price_text, included_json (zoznam s + button), accent_color picker, kids_count_text, duration_text |
 | `/admin/hours` (existujúce) | Bez zmeny |
 | `/admin/social` | Form pre FB, IG, prípadne TikTok URL — momentálne v config, presunúť do `content_blocks` |
-| `/admin/seo` | Globálne SEO settings: meta title default, meta description default, OG image upload, indexing on/off |
-| `/admin/maintenance` | Toggle maintenance mode + zmena hesla z UI (dnes len v config.php) |
+| `/admin/seo` | **Detailne nižšie ↓** — globálne + per-page meta title/description/OG, indexing toggle |
+| `/admin/maintenance` | **Detailne nižšie ↓** — toggle maintenance + zmena hesla |
 | `/admin/users` | Správa admin používateľov (pridať/zmazať/zmena hesla) — momentálne ručná úprava `.htpasswd` |
 
 ### UI patterns
@@ -161,10 +161,78 @@ Templates retain hardcoded fallbacks so deployment with empty DB still renders.
 | `/admin/content` group view + inline edit | 6 | 1,5 dňa |
 | `/admin/gallery` upload/reorder/delete | 8 | 1,5 dňa |
 | Packages rozšírenie | 4 | ½ dňa |
-| `/admin/seo` global settings | 3 | ½ dňa |
+| `/admin/seo` global + per-page (detailne nižšie) | 6 | 1 deň |
 | `/admin/users` správa | 4 | ½ dňa |
-| `/admin/maintenance` toggle | 2 | ½ dňa |
-| **Spolu** | **40** | **~7 dní** |
+| `/admin/maintenance` toggle (detailne nižšie) | 3 | ½ dňa |
+| **Spolu** | **44** | **~8 dní** |
+
+---
+
+## Maintenance + SEO admin (detail)
+
+### `/admin/maintenance` — toggle UI
+
+Momentálne sa maintenance prepína editom `config/config.php` (`maintenance` flag + `maintenance_password`). Pre vlastníka chceme:
+
+- **Toggle "Maintenance mode" ON/OFF** — checkbox/switch v admine. Pri prepnutí sa zapíše do DB tabuľky `settings` (key `maintenance.enabled`, value `1`/`0`).
+- **Zmena maintenance hesla** — pole "Nové heslo" + confirm. Hash sa neukladá (heslo musí byť plaintext, lebo cookie sa generuje cez `hash_equals` proti rovnakej hodnote pri každom requeste). Bude v settings table.
+- **Status indicator** — vizuálna informácia o aktuálnom stave: zelený "LIVE" alebo žltý "MAINTENANCE ON od HH:MM".
+- **Bezpečnostná poistka** — pri toggle ON sa hlási dialóg „Naozaj zapnúť? Verejnosť uvidí maintenance page." Pri toggle OFF tiež confirmation, aby owner nevypol nedopatrením pred otestovaním.
+- **Audit log** — každý toggle sa zapíše do `admin_actions` (action=`maintenance_toggle`, payload obsahuje from→to a admin user).
+
+**Migration:** `settings` tabuľka už existuje. Stačí UPSERT 2 nových kľúčov (`maintenance.enabled`, `maintenance.password`). Hodnoty z config sa pri prvom load-e migrujú do DB (one-shot).
+
+**Code touch:**
+- `Maintenance::enabled()` → čítať zo settings cache, nie z config
+- `Maintenance::passwordMatches()` → settings.maintenance_password
+- `Auth::user()` aj počas maintenance prejde (login je whitelisted, bypass cookie funguje aj pri DB-driven flag-u)
+
+### `/admin/seo` — meta editor
+
+Momentálne sú meta title + description per stránka hardcoded v PHP templates (`pages/home.php`, `pages/privacy.php`, `pages/reservation.php`). Treba presunúť do DB tak, aby owner mohol zmeniť bez deploy.
+
+**Fields per page:**
+- `seo.home.title` (default „KUKO detský svet — herňa a kaviareň v Piešťanoch")
+- `seo.home.description` (default „Detská herňa a kaviareň v Piešťanoch…")
+- `seo.home.og_image` (URL alebo upload, default `/assets/img/og-cover.jpg`)
+- `seo.rezervacia.title` (default „Rezervácia oslavy — KUKO detský svet")
+- `seo.rezervacia.description`
+- `seo.privacy.title`
+- `seo.privacy.description`
+- `seo.default.title` (fallback ak per-page chýba)
+- `seo.default.description`
+
+**Global:**
+- `seo.public_indexing` (toggle s warning „Po zapnutí budú stránky indexovateľné v Google. Vypni len ak vieš čo robíš.") — nahradí `config.app.public_indexing`
+- `seo.og_image_default` — fallback OG image
+- `seo.robots_extras` — voliteľné directives navyše (napr. `Disallow: /admin/`)
+
+**Code touch:**
+- `head.php` → `Content::get('seo.{pageType}.title', $fallback)`
+- `Content::get()` cache → invalidácia pri save z admin UI
+
+**UI:**
+- Tabuľka per stránka s 2 textovými poliami (title 60 znakov limit + counter, description 160 znakov + counter)
+- Live preview „How will this look in Google search results?" — sniepet preview vpravo
+- "Reset to default" button per pole
+- Bulk save tlačidlo
+
+**Validácia:**
+- Title 30–60 znakov ideálne (warning ak mimo)
+- Description 120–160 znakov ideálne (warning ak mimo)
+
+**Audit:** každé save → `admin_actions` so payload-om diff (čo sa zmenilo).
+
+### Sub-tasks summary
+
+| Block | Tasks |
+|---|---|
+| Maintenance toggle UI | 3 (settings read/write, UI form, audit log) |
+| SEO global settings | 2 (indexing flag z DB, fallback titles/descriptions) |
+| SEO per-page editor | 4 (DB schema, edit form, live preview snippet, validation) |
+| **Spolu (pridané)** | **9 (cca 1,5 dňa navyše)** |
+
+---
 
 ## Out of scope (zatiaľ)
 
