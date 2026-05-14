@@ -18,6 +18,25 @@ $router->get('/ochrana-udajov', function () use ($renderer) {
     echo $renderer->render('pages/privacy');
 });
 
+$router->get('/rezervacia/{token}', function (array $p) use ($renderer) {
+    try {
+        $db = \Kuko\Db::fromConfig();
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo $renderer->render('pages/404');
+        return;
+    }
+    $repo = new \Kuko\ReservationRepo($db);
+    $token = preg_replace('/[^a-f0-9]/', '', (string) $p['token']);
+    $row = $token === '' ? null : $repo->findByToken($token);
+    if ($row === null) {
+        http_response_code(404);
+        echo $renderer->render('pages/404');
+        return;
+    }
+    echo $renderer->render('pages/reservation-status', ['r' => $row]);
+});
+
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $match = $router->match($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
 

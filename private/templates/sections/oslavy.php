@@ -38,17 +38,17 @@
 
       <article class="package package--yellow">
         <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3>Uzavretá spoločnosť</h3></header>
-        <p class="package__desc">Exkluzívna oslava — celá herňa je iba pre vás, bez verejnosti, s plným servisom.</p>
+        <p class="package__desc">Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.</p>
         <ul class="package__meta">
           <li><span class="ic" aria-hidden="true">👶</span> Počet detí: neobmedzene</li>
           <li><span class="ic" aria-hidden="true">⏰</span> Časový harmonogram: 4 hodiny</li>
         </ul>
         <p class="package__price">350 € / balíček</p>
         <ul class="package__incl">
-          <li>✓ Celá herňa</li>
-          <li>✓ Plný catering</li>
-          <li>✓ Animátorky + program</li>
-          <li>✓ Tematická výzdoba</li>
+          <li>✓ Celá herňa len pre vás</li>
+          <li>✓ Personál k dispozícii</li>
+          <li>✓ Pokojná atmosféra bez verejnosti</li>
+          <li>✓ Plný komfort pre rodičov</li>
         </ul>
         <button type="button" class="btn package__cta" data-open-reservation data-package="closed">Rezervovať balíček</button>
       </article>

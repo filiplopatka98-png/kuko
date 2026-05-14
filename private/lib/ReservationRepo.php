@@ -8,9 +8,10 @@ final class ReservationRepo
 
     public function create(array $d): int
     {
+        $token = bin2hex(random_bytes(16));
         return $this->db->insert(
-            'INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, note, ip_hash, recaptcha_score, user_agent)
-             VALUES (:package, :wished_date, :wished_time, :kids_count, :name, :phone, :email, :note, :ip_hash, :recaptcha_score, :user_agent)',
+            'INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, note, ip_hash, view_token, recaptcha_score, user_agent)
+             VALUES (:package, :wished_date, :wished_time, :kids_count, :name, :phone, :email, :note, :ip_hash, :view_token, :recaptcha_score, :user_agent)',
             [
                 ':package'         => $d['package'],
                 ':wished_date'     => $d['wished_date'],
@@ -21,10 +22,16 @@ final class ReservationRepo
                 ':email'           => $d['email'],
                 ':note'            => $d['note'] ?? null,
                 ':ip_hash'         => $d['ip_hash'],
+                ':view_token'      => $token,
                 ':recaptcha_score' => $d['recaptcha_score'] ?? null,
                 ':user_agent'      => $d['user_agent'] ?? null,
             ]
         );
+    }
+
+    public function findByToken(string $token): ?array
+    {
+        return $this->db->one('SELECT * FROM reservations WHERE view_token = ?', [$token]);
     }
 
     public function find(int $id): ?array

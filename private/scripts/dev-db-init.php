@@ -29,6 +29,7 @@ $pdo->exec("CREATE TABLE reservations (
     cancelled_at TEXT,
     cancelled_reason TEXT,
     ip_hash TEXT NOT NULL,
+    view_token TEXT UNIQUE,
     recaptcha_score REAL,
     user_agent TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),

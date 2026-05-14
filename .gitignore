@@ -5,6 +5,8 @@ Thumbs.db
 # Secrets — real config NEVER in git
 /config/config.php
 /config/*.local.php
+/config/*.local.md
+/config/secrets.local.md
 
 # Logs
 *.log

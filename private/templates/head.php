@@ -41,7 +41,7 @@ $siteKey = \Kuko\Config::get('recaptcha.site_key', '');
   "telephone": "+421915319934",
   "email": "info@kuko-detskysvet.sk",
   "openingHours": "Mo-Su 09:00-20:00",
-  "geo": { "@type": "GeoCoordinates", "latitude": 48.5916, "longitude": 17.8364 },
+  "geo": { "@type": "GeoCoordinates", "latitude": 48.58128, "longitude": 17.81575 },
   "priceRange": "€€"
 }
 </script>

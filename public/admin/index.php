@@ -83,19 +83,43 @@ $router->get('/admin/reservation/{id}', function (array $p) use ($renderer, $rep
     echo $renderer->render('detail', ['r' => $row, 'user' => $adminUser, 'flashes' => $flashes]);
 });
 
-$router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, $audit, $flash) {
+$router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, $audit, $flash, $renderer) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
     $status = (string) ($_POST['status'] ?? '');
     try {
-        $repo->setStatus((int) $p['id'], $status);
-        if ($status === 'confirmed') $repo->markConfirmed((int) $p['id']);
-        if ($status === 'cancelled') $repo->markCancelled((int) $p['id'], (string) ($_POST['reason'] ?? ''));
-        $audit('set_status', 'reservations', (int) $p['id'], ['status' => $status]);
+        $previous = $repo->find($id);
+        $repo->setStatus($id, $status);
+        if ($status === 'confirmed') $repo->markConfirmed($id);
+        if ($status === 'cancelled') $repo->markCancelled($id, (string) ($_POST['reason'] ?? ''));
+        $audit('set_status', 'reservations', $id, ['status' => $status]);
         $flash('Status zmenený na ' . $status . '.');
+
+        // Notify client by e-mail if status changed to confirmed/cancelled
+        if ($previous !== null && $previous['status'] !== $status && in_array($status, ['confirmed', 'cancelled'], true)) {
+            try {
+                $current = $repo->find($id);
+                $mailCfg = \Kuko\Config::get('mail');
+                $mailer = new \Kuko\Mailer($mailCfg);
+                $mailRenderer = new \Kuko\Renderer(APP_ROOT . '/private/templates/mail');
+                $appUrl = rtrim((string) \Kuko\Config::get('app.url', ''), '/');
+                $statusLink = $appUrl . '/rezervacia/' . (string) $current['view_token'];
+
+                $template = $status === 'confirmed' ? 'reservation_confirmed' : 'reservation_cancelled';
+                $subject  = $status === 'confirmed'
+                    ? 'Rezervácia potvrdená — KUKO detský svet'
+                    : 'Rezervácia zrušená — KUKO detský svet';
+                $html = $mailRenderer->render($template . '.html', ['r' => $current, 'statusLink' => $statusLink]);
+                $text = $mailRenderer->render($template . '.text', ['r' => $current, 'statusLink' => $statusLink]);
+                $mailer->send((string) $current['email'], $subject, $html, $text);
+            } catch (\Throwable $e) {
+                error_log('[admin/status] notify mail failed: ' . $e->getMessage());
+            }
+        }
     } catch (\InvalidArgumentException) {
         http_response_code(400); echo 'bad status'; return;
     }
-    header('Location: /admin/reservation/' . (int) $p['id']);
+    header('Location: /admin/reservation/' . $id);
 });
 
 $router->post('/admin/reservation/{id}/move', function (array $p) use ($repo, $audit, $flash, $availability) {
@@ -229,6 +253,59 @@ $router->get('/admin/calendar', function () use ($renderer, $db, $blocked, $hour
         'user'      => $adminUser,
         'flashes'   => $flashes,
     ]);
+});
+
+// iCal feed (subscribe in Google/Apple Calendar)
+$router->get('/admin/calendar.ics', function () use ($db, $packages) {
+    header('Content-Type: text/calendar; charset=utf-8');
+    header('Content-Disposition: attachment; filename="kuko-rezervacie.ics"');
+    $rows = $db->all(
+        "SELECT * FROM reservations WHERE status IN ('pending','confirmed') ORDER BY wished_date, wished_time"
+    );
+    $tz = (string) \Kuko\Config::get('app.tz', 'Europe/Bratislava');
+    $lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//KUKO detský svet//Rezervácie//SK',
+        'CALSCALE:GREGORIAN',
+        'X-WR-CALNAME:KUKO rezervácie',
+        'X-WR-TIMEZONE:' . $tz,
+    ];
+    foreach ($rows as $r) {
+        $pkg = $packages->find((string) $r['package']);
+        $duration = (int) ($pkg['duration_min'] ?? 120);
+        $startStr = (string) $r['wished_date'] . ' ' . (string) $r['wished_time'];
+        try {
+            $start = new \DateTimeImmutable($startStr, new \DateTimeZone($tz));
+        } catch (\Throwable) { continue; }
+        $end = $start->modify("+{$duration} minutes");
+        $statusLabel = match ((string) $r['status']) {
+            'pending'   => 'PENDING',
+            'confirmed' => 'CONFIRMED',
+            default     => 'TENTATIVE',
+        };
+        $summary = sprintf('%s — %s (%dx, %s)', strtoupper((string) $r['package']), $r['name'], (int) $r['kids_count'], $statusLabel);
+        $desc = sprintf("Balíček: %s\\nKlient: %s\\nTelefón: %s\\nE-mail: %s\\nDetí: %d\\nPoznámka: %s",
+            strtoupper((string) $r['package']),
+            (string) $r['name'],
+            (string) $r['phone'],
+            (string) $r['email'],
+            (int) $r['kids_count'],
+            str_replace(["\r", "\n"], ['', ' / '], (string) ($r['note'] ?? '—'))
+        );
+        $lines[] = 'BEGIN:VEVENT';
+        $lines[] = 'UID:kuko-' . (int) $r['id'] . '@kuko-detskysvet.sk';
+        $lines[] = 'DTSTAMP:' . (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Ymd\THis\Z');
+        $lines[] = 'DTSTART:' . $start->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
+        $lines[] = 'DTEND:'   . $end->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
+        $lines[] = 'SUMMARY:' . str_replace([',', ';'], ['\\,', '\\;'], $summary);
+        $lines[] = 'DESCRIPTION:' . str_replace([',', ';'], ['\\,', '\\;'], $desc);
+        $lines[] = 'STATUS:' . ($r['status'] === 'confirmed' ? 'CONFIRMED' : 'TENTATIVE');
+        $lines[] = 'LOCATION:Bratislavská 141\\, 921 01 Piešťany';
+        $lines[] = 'END:VEVENT';
+    }
+    $lines[] = 'END:VCALENDAR';
+    echo implode("\r\n", $lines) . "\r\n";
 });
 
 $path  = parse_url($_SERVER['REQUEST_URI'] ?? '/admin', PHP_URL_PATH) ?: '/admin';

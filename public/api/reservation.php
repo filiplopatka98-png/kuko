@@ -163,6 +163,9 @@ $mailer   = new \Kuko\Mailer($mailCfg);
 $renderer = new \Kuko\Renderer(APP_ROOT . '/private/templates/mail');
 
 try {
+    $appUrl = rtrim((string) \Kuko\Config::get('app.url', ''), '/');
+    $statusLink = $appUrl . '/rezervacia/' . (string) $record['view_token'];
+
     $adminHtml = $renderer->render('reservation_admin.html', ['r' => $record]);
     $adminText = $renderer->render('reservation_admin.text', ['r' => $record]);
     $mailer->send(
@@ -173,8 +176,8 @@ try {
         (string) $record['email']
     );
 
-    $custHtml = $renderer->render('reservation_customer.html', ['r' => $record]);
-    $custText = $renderer->render('reservation_customer.text', ['r' => $record]);
+    $custHtml = $renderer->render('reservation_customer.html', ['r' => $record, 'statusLink' => $statusLink]);
+    $custText = $renderer->render('reservation_customer.text', ['r' => $record, 'statusLink' => $statusLink]);
     $mailer->send(
         (string) $record['email'],
         'Potvrdenie prijatia rezervácie — KUKO detský svet',

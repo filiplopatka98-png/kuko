@@ -14,7 +14,7 @@ if (mapEl) {
   });
 
   const L = window.L;
-  const lat = 48.5916, lon = 17.8364;
+  const lat = 48.58128010400103, lon = 17.815753332069;
   const map = L.map(mapEl, { scrollWheelZoom: false }).setView([lat, lon], 16);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,

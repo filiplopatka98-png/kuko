@@ -26,6 +26,7 @@ final class ReservationRepoTest extends TestCase
               note TEXT,
               status TEXT NOT NULL DEFAULT 'pending',
               ip_hash TEXT NOT NULL,
+              view_token TEXT UNIQUE,
               recaptcha_score REAL,
               user_agent TEXT,
               created_at TEXT NOT NULL DEFAULT (datetime('now')),

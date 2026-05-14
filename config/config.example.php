@@ -56,7 +56,7 @@ return [
     ],
 
     'social' => [
-        'facebook'  => '',
-        'instagram' => '',
+        'facebook'  => 'https://www.facebook.com/profile.php?id=61587744202735',
+        'instagram' => 'https://www.instagram.com/kuko.detskysvet',
     ],
 ];

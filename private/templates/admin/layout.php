@@ -17,6 +17,7 @@
       <a href="/admin/blocked-periods">Blokácie</a>
       <a href="/admin/packages">Balíčky</a>
       <a href="/admin/settings">Nastavenia</a>
+      <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">📅 iCal</a>
       <a href="/" target="_blank">Web ↗</a>
       <span class="admin-user">@<?= e($user ?? '') ?></span>
     </nav>
