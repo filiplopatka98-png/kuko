@@ -28,6 +28,35 @@ $router->get('/', function () use ($renderer) {
     echo $renderer->render('pages/home');
 });
 
+$router->get('/robots.txt', function () {
+    header('Content-Type: text/plain; charset=utf-8');
+    $indexing = (bool) \Kuko\Config::get('app.public_indexing', false);
+    if ($indexing) {
+        echo "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /rezervacia/\n\nSitemap: " . rtrim((string) \Kuko\Config::get('app.url'), '/') . "/sitemap.xml\n";
+    } else {
+        echo "User-agent: *\nDisallow: /\n";
+    }
+});
+
+$router->get('/sitemap.xml', function () {
+    header('Content-Type: application/xml; charset=utf-8');
+    $indexing = (bool) \Kuko\Config::get('app.public_indexing', false);
+    $base = rtrim((string) \Kuko\Config::get('app.url'), '/');
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    if ($indexing) {
+        $today = date('Y-m-d');
+        foreach ([
+            ['/',                 '1.0', 'monthly'],
+            ['/rezervacia',       '0.9', 'weekly'],
+            ['/ochrana-udajov',   '0.3', 'yearly'],
+        ] as [$url, $priority, $freq]) {
+            echo "  <url>\n    <loc>{$base}{$url}</loc>\n    <lastmod>{$today}</lastmod>\n    <changefreq>{$freq}</changefreq>\n    <priority>{$priority}</priority>\n  </url>\n";
+        }
+    }
+    echo "</urlset>\n";
+});
+
 $router->get('/ochrana-udajov', function () use ($renderer) {
     echo $renderer->render('pages/privacy');
 });

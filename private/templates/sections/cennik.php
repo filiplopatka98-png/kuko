@@ -2,7 +2,7 @@
   <div class="container cennik__inner">
     <picture>
       <source srcset="/assets/img/cennik.webp" type="image/webp">
-      <img class="cennik__photo" src="/assets/img/cennik.jpg" alt="Šťastné deti v herni KUKO" loading="lazy" width="600" height="400">
+      <img class="cennik__photo" src="/assets/img/cennik.jpg" alt="Tri šťastné deti s tortou v detskej herni KUKO Piešťany" loading="lazy" width="600" height="400">
     </picture>
     <div class="cennik__panel">
       <h2>Cenník</h2>

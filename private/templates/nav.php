@@ -7,7 +7,7 @@
 <header class="nav">
   <div class="container nav__inner">
     <a href="#domov" class="nav__brand" aria-label="KUKO detský svet — domov">
-      <img src="/assets/img/logo.png" alt="" width="80" height="60">
+      <img src="/assets/img/logo.png" alt="KUKO detský svet" width="80" height="60">
     </a>
     <button class="nav__toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Otvoriť menu">
       <span></span><span></span><span></span>

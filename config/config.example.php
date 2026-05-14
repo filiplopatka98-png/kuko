@@ -14,6 +14,10 @@ return [
         // until they enter the staff password. Admin remains accessible.
         'maintenance'          => false,
         'maintenance_password' => '',  // plaintext password for the staff bypass form
+        // Indexing flag: when true, robots.txt allows all + meta robots is index,follow.
+        // When false (default during pre-launch), robots.txt disallows everything and
+        // every page emits noindex,nofollow. Flip to true ONLY after final go-live.
+        'public_indexing'      => false,
     ],
 
     'db' => [
