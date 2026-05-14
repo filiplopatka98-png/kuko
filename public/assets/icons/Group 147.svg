@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 31 31">
+  <g id="Group_147" data-name="Group 147" transform="translate(-1689 -12)">
+    <g id="Ellipse_6" data-name="Ellipse 6" transform="translate(1689 12)" fill="#d0bbda" stroke="#d0bbda" stroke-width="1">
+      <circle cx="15.5" cy="15.5" r="15.5" stroke="none"/>
+      <circle cx="15.5" cy="15.5" r="15" fill="none"/>
+    </g>
+    <g id="instagram" transform="translate(1697.958 20.958)">
+      <g id="Group_146" data-name="Group 146">
+        <path id="Path_161" data-name="Path 161" d="M9.812,0H3.271A3.28,3.28,0,0,0,0,3.271V9.812a3.281,3.281,0,0,0,3.271,3.271H9.812a3.281,3.281,0,0,0,3.271-3.271V3.271A3.28,3.28,0,0,0,9.812,0ZM6.542,9.267A2.726,2.726,0,1,1,9.267,6.542,2.726,2.726,0,0,1,6.542,9.267Zm3.543-5.451A.818.818,0,1,1,10.9,3,.817.817,0,0,1,10.085,3.816Z" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>

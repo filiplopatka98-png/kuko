@@ -1,0 +1,7 @@
+# Allow only POST to /api/reservation
+<Files "reservation.php">
+    Require all granted
+</Files>
+
+# Deny directory listing
+Options -Indexes

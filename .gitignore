@@ -1,0 +1,35 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — real config NEVER in git
+/config/config.php
+/config/*.local.php
+
+# Logs
+*.log
+/private/logs/*
+!/private/logs/.gitkeep
+
+# Vendor (if we ever add Composer)
+/vendor/
+
+# Test artifacts
+/.phpunit.cache/
+/private/lib/vendor/phpunit.phar
+
+# Auth secrets
+/public/admin/.htpasswd
+
+# Node (just in case for tooling)
+/node_modules/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Local-only build artifacts
+/public/assets/img/optimized/
+*.cache

@@ -1,0 +1,36 @@
+/* KUKO admin */
+* { box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8f9fa; color: #2c3e50; line-height: 1.5; }
+a { color: #5e72e4; }
+.admin-header { background: white; border-bottom: 1px solid #e0e6ed; }
+.admin-header__inner { max-width: 1100px; margin: 0 auto; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.admin-header h1 { font-size: 1.25rem; margin: 0; }
+.admin-header nav { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; }
+.admin-user { color: #888; font-size: 0.85rem; }
+.admin-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+.admin-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+.admin-filter select, .admin-filter input, .admin-filter button {
+  padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid #d0d7de; background: white; font: inherit;
+}
+.admin-filter button { background: #5e72e4; color: white; border-color: #5e72e4; cursor: pointer; }
+.admin-filter button:hover { background: #4c5fd1; }
+.admin-filter__reset { color: #888; font-size: 0.85rem; text-decoration: none; }
+.admin-filter__reset:hover { text-decoration: underline; }
+.admin-empty { padding: 2rem; text-align: center; color: #888; background: white; border-radius: 0.5rem; }
+.admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+.admin-table th, .admin-table td { padding: 0.65rem 0.85rem; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.admin-table th { background: #fafbfc; font-weight: 600; }
+.admin-table tr:hover td { background: #fcfcfd; }
+.admin-detail { background: white; border-radius: 0.5rem; padding: 1rem 1.5rem; max-width: 720px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+.admin-detail th { text-align: left; padding-right: 1rem; color: #777; font-weight: 600; vertical-align: top; min-width: 140px; }
+.admin-detail td { padding: 0.3rem 0; }
+.admin-status-form {
+  margin-top: 1rem; padding: 1rem; background: white; border-radius: 0.5rem;
+  display: flex; gap: 0.75rem; align-items: center; max-width: 720px; flex-wrap: wrap;
+}
+.admin-status-form select { padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #d0d7de; font: inherit; }
+.admin-status-form button { padding: 0.5rem 1rem; background: #5e72e4; color: white; border: 0; border-radius: 0.375rem; cursor: pointer; font: inherit; }
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+.badge--pending  { background: #fff3cd; color: #856404; }
+.badge--ok       { background: #d4edda; color: #155724; }
+.badge--no       { background: #f8d7da; color: #721c24; }
