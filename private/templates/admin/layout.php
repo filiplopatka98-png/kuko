@@ -12,11 +12,19 @@
     <h1>KUKO admin</h1>
     <nav>
       <a href="/admin">Rezervácie</a>
+      <a href="/admin/calendar">Kalendár</a>
+      <a href="/admin/opening-hours">Hodiny</a>
+      <a href="/admin/blocked-periods">Blokácie</a>
+      <a href="/admin/packages">Balíčky</a>
+      <a href="/admin/settings">Nastavenia</a>
       <a href="/" target="_blank">Web ↗</a>
       <span class="admin-user">@<?= e($user ?? '') ?></span>
     </nav>
   </div>
 </header>
+<?php foreach (($flashes ?? []) as $f): ?>
+  <div class="admin-flash admin-flash--<?= e($f['type'] ?? 'ok') ?>"><?= e($f['msg']) ?></div>
+<?php endforeach; ?>
 <main class="admin-main"><?= $content ?></main>
 </body>
 </html>

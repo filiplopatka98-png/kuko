@@ -319,6 +319,20 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .modal__success { text-align: center; padding: var(--s-4) 0; }
 .modal__success-emoji { font-size: 3rem; margin: 0; }
 
+/* ===== Slot picker ===== */
+.slot-picker { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 2.5rem; padding: 0.5rem; background: var(--bg-cream); border: 1px solid rgba(0,0,0,0.08); border-radius: 0.5rem; }
+.slot-picker__hint { margin: 0; color: var(--c-text-soft); font-size: 0.85rem; align-self: center; }
+.slot-chip {
+  padding: 0.4rem 0.75rem; border-radius: var(--r-btn);
+  border: 2px solid rgba(0,0,0,0.1); background: var(--c-white);
+  color: var(--c-text); font: inherit; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.slot-chip:hover { border-color: var(--c-accent); }
+.slot-chip[aria-checked="true"] { background: var(--c-accent); color: var(--c-white); border-color: var(--c-accent); }
+.slot-chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.slot-picker__error { color: #c0392b; font-size: 0.85rem; margin: 0; }
+
 /* ===== Lightbox ===== */
 .lightbox {
   position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: grid; place-items: center;

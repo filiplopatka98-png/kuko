@@ -94,19 +94,61 @@ try {
 }
 
 $repo = new \Kuko\ReservationRepo($db);
-$id = $repo->create([
-    'package'         => $data['package'],
-    'wished_date'     => $data['wished_date'],
-    'wished_time'     => $data['wished_time'],
-    'kids_count'      => (int) $data['kids_count'],
-    'name'            => trim((string) $data['name']),
-    'phone'           => trim((string) $data['phone']),
-    'email'           => trim((string) $data['email']),
-    'note'            => trim((string) ($data['note'] ?? '')) ?: null,
-    'ip_hash'         => $ipHash,
-    'recaptcha_score' => $captchaResult->score,
-    'user_agent'      => substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 250),
-]);
+
+// Availability check (inside a transaction to guard against race conditions)
+$pdo = $db->pdo();
+$pdo->beginTransaction();
+try {
+    // Lock candidate rows on the same date so two concurrent submits cannot both insert.
+    // FOR UPDATE is MySQL/Postgres-only — silently fall back on SQLite (single-writer anyway).
+    try {
+        $stmt = $pdo->prepare("SELECT id FROM reservations WHERE wished_date = ? AND status IN ('pending','confirmed') FOR UPDATE");
+        $stmt->execute([$data['wished_date']]);
+        $stmt->fetchAll();
+    } catch (\PDOException) {
+        // ignore — SQLite or driver without FOR UPDATE
+    }
+
+    $availability = new \Kuko\Availability(
+        $db,
+        new \Kuko\SettingsRepo($db),
+        new \Kuko\PackagesRepo($db),
+        new \Kuko\OpeningHoursRepo($db),
+        new \Kuko\BlockedPeriodsRepo($db),
+        new \DateTimeImmutable('now', new \DateTimeZone(\Kuko\Config::get('app.tz', 'Europe/Bratislava')))
+    );
+    $slots = $availability->forDate((string) $data['wished_date'], (string) $data['package'])->slots;
+    $wishedTimeHm = substr((string) $data['wished_time'], 0, 5);
+    if (!in_array($wishedTimeHm, $slots, true)) {
+        $pdo->rollBack();
+        http_response_code(409);
+        echo json_encode(['error' => 'slot_taken', 'available_slots' => $slots]);
+        return;
+    }
+
+    $id = $repo->create([
+        'package'         => $data['package'],
+        'wished_date'     => $data['wished_date'],
+        'wished_time'     => $data['wished_time'],
+        'kids_count'      => (int) $data['kids_count'],
+        'name'            => trim((string) $data['name']),
+        'phone'           => trim((string) $data['phone']),
+        'email'           => trim((string) $data['email']),
+        'note'            => trim((string) ($data['note'] ?? '')) ?: null,
+        'ip_hash'         => $ipHash,
+        'recaptcha_score' => $captchaResult->score,
+        'user_agent'      => substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 250),
+    ]);
+    $pdo->commit();
+} catch (\Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    error_log('[api/reservation] insert failed: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'server_error']);
+    return;
+}
 
 $record = $repo->find($id);
 if ($record === null) {

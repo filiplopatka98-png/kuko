@@ -69,4 +69,25 @@ final class ReservationRepo
         }
         return $this->db->execStmt('UPDATE reservations SET status = ? WHERE id = ?', [$status, $id]) > 0;
     }
+
+    public function markConfirmed(int $id): void
+    {
+        $this->db->execStmt('UPDATE reservations SET confirmed_at = CURRENT_TIMESTAMP WHERE id = ? AND confirmed_at IS NULL', [$id]);
+    }
+
+    public function markCancelled(int $id, string $reason = ''): void
+    {
+        $this->db->execStmt(
+            'UPDATE reservations SET cancelled_at = CURRENT_TIMESTAMP, cancelled_reason = ? WHERE id = ?',
+            [$reason !== '' ? $reason : null, $id]
+        );
+    }
+
+    public function moveTo(int $id, string $newDate, string $newTime): bool
+    {
+        return $this->db->execStmt(
+            'UPDATE reservations SET wished_date = ?, wished_time = ? WHERE id = ?',
+            [$newDate, $newTime, $id]
+        ) > 0;
+    }
 }

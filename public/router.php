@@ -10,6 +10,10 @@ if ($path === '/api/reservation') {
     require __DIR__ . '/api/reservation.php';
     return;
 }
+if ($path === '/api/availability') {
+    require __DIR__ . '/api/availability.php';
+    return;
+}
 
 // /admin/* → admin entry point (NOTE: dev mode bypasses Basic Auth)
 if ($path === '/admin' || $path === '/admin/' || str_starts_with($path, '/admin/')) {

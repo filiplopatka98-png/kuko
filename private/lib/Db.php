@@ -9,6 +9,10 @@ final class Db
     public static function fromConfig(): self
     {
         $cfg = Config::get('db');
+        // Dev convenience: if host begins with "sqlite:" treat the full host string as a DSN
+        if (is_string($cfg['host']) && str_starts_with($cfg['host'], 'sqlite:')) {
+            return self::fromDsn((string) $cfg['host']);
+        }
         $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $cfg['host'], $cfg['name'], $cfg['charset'] ?? 'utf8mb4');
         return new self(new \PDO($dsn, $cfg['user'], $cfg['pass'], [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,

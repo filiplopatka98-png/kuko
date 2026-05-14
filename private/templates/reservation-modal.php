@@ -22,19 +22,23 @@
         </select>
       </label>
 
-      <div class="field-row">
+      <div class="field-row" style="grid-template-columns: 1fr 1fr;">
         <label class="field">
           <span>Dátum</span>
-          <input type="date" name="wished_date" required min="<?= date('Y-m-d') ?>">
-        </label>
-        <label class="field">
-          <span>Čas</span>
-          <input type="time" name="wished_time" required step="1800" value="14:00">
+          <input type="date" name="wished_date" required min="<?= date('Y-m-d', strtotime('+1 day')) ?>">
         </label>
         <label class="field">
           <span>Počet detí</span>
           <input type="number" name="kids_count" required min="1" max="50" value="10">
         </label>
+      </div>
+
+      <div class="field">
+        <span>Dostupné časy</span>
+        <input type="hidden" name="wished_time" id="wished_time" required>
+        <div class="slot-picker" id="slot-picker" role="radiogroup" aria-label="Dostupné časové sloty">
+          <p class="slot-picker__hint">Vyberte dátum a balíček.</p>
+        </div>
       </div>
 
       <label class="field">

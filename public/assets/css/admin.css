@@ -34,3 +34,73 @@ a { color: #5e72e4; }
 .badge--pending  { background: #fff3cd; color: #856404; }
 .badge--ok       { background: #d4edda; color: #155724; }
 .badge--no       { background: #f8d7da; color: #721c24; }
+
+/* Flash messages */
+.admin-flash { max-width: 1100px; margin: 0.75rem auto 0; padding: 0.6rem 1rem; border-radius: 0.375rem; font-size: 0.9rem; }
+.admin-flash--ok  { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.admin-flash--err { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* Forms */
+.admin-lead { color: #666; margin-bottom: 1.5rem; }
+.admin-form { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 1.5rem; max-width: 900px; }
+.admin-form--inline { background: #fcfcfd; }
+.admin-form h3 { margin: 0 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: #5e72e4; }
+.admin-form__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+.admin-form__actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+.admin-form__actions button { padding: 0.5rem 1.25rem; background: #5e72e4; color: white; border: 0; border-radius: 0.375rem; cursor: pointer; font: inherit; font-weight: 600; }
+.admin-form__actions button:hover { background: #4c5fd1; }
+.admin-field { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
+.admin-field span { font-size: 0.85rem; color: #555; font-weight: 600; }
+.admin-field small { color: #888; font-size: 0.8rem; }
+.admin-field input[type="text"], .admin-field input[type="number"], .admin-field input[type="date"], .admin-field input[type="time"], .admin-field select {
+  padding: 0.5rem 0.75rem; border-radius: 0.375rem; border: 1px solid #d0d7de; font: inherit; background: white;
+}
+.admin-field--check { flex-direction: row; align-items: center; gap: 0.5rem; }
+.admin-field--check span { font-weight: 400; }
+
+.admin-table--hours td { vertical-align: middle; }
+.admin-table--hours input[type="time"] { padding: 0.3rem; border-radius: 0.25rem; border: 1px solid #d0d7de; }
+
+.admin-collapsible { background: white; border-radius: 0.5rem; padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+.admin-collapsible summary { cursor: pointer; font-weight: 600; color: #5e72e4; padding: 0.25rem 0; }
+.admin-collapsible[open] summary { margin-bottom: 0.75rem; }
+.admin-btn-link { background: none; border: 0; color: #c0392b; cursor: pointer; font: inherit; text-decoration: underline; padding: 0; }
+.admin-btn-link:hover { color: #8a1e0f; }
+
+.admin-package-form { padding: 1rem 1.5rem; }
+.admin-actions-grid { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin-top: 1rem; }
+.admin-actions-grid > form { background: white; border-radius: 0.5rem; padding: 1rem; }
+@media (max-width: 768px) {
+  .admin-actions-grid { grid-template-columns: 1fr; }
+}
+
+/* Calendar */
+.admin-calendar-bar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+.admin-calendar-bar h2 { margin: 0; font-size: 1.1rem; }
+.admin-btn { padding: 0.4rem 0.9rem; background: white; border: 1px solid #d0d7de; border-radius: 0.375rem; text-decoration: none; color: #2c3e50; font-size: 0.9rem; }
+.admin-btn:hover { background: #f6f8fa; }
+
+.admin-calendar { background: white; border-radius: 0.5rem; padding: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+.admin-calendar__head { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; font-size: 0.75rem; color: #888; font-weight: 600; text-transform: uppercase; padding: 0.5rem 0; }
+.admin-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.admin-calendar__cell { background: #fafbfc; border-radius: 0.25rem; padding: 0.4rem; min-height: 96px; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.78rem; position: relative; }
+.admin-calendar__cell--off { opacity: 0.35; }
+.admin-calendar__cell--closed { background: repeating-linear-gradient(45deg, #f5f5f7, #f5f5f7 6px, #ececef 6px, #ececef 12px); }
+.admin-calendar__cell--today { border: 2px solid #5e72e4; padding: calc(0.4rem - 2px); }
+.admin-calendar__date { font-weight: 700; font-size: 0.85rem; color: #2c3e50; margin-bottom: 0.2rem; }
+.admin-calendar__tag { font-size: 0.7rem; padding: 0.1rem 0.3rem; border-radius: 0.2rem; }
+.admin-calendar__tag--closed { background: #ececef; color: #555; }
+.admin-calendar__tag--block { background: #fff3cd; color: #856404; }
+.admin-calendar__resv { display: block; padding: 0.15rem 0.35rem; border-radius: 0.2rem; text-decoration: none; font-weight: 600; font-size: 0.7rem; color: #2c3e50; line-height: 1.2; }
+.admin-calendar__resv:hover { filter: brightness(0.93); }
+.admin-calendar__resv--mini   { background: #cdebf2; }
+.admin-calendar__resv--maxi   { background: #e4d2f3; }
+.admin-calendar__resv--closed { background: #fceabf; }
+.admin-calendar__resv--cancelled { opacity: 0.4; text-decoration: line-through; }
+.admin-calendar-legend { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; font-size: 0.8rem; }
+.legend-item { padding: 0.2rem 0.5rem; border-radius: 0.2rem; }
+.legend-item--mini   { background: #cdebf2; }
+.legend-item--maxi   { background: #e4d2f3; }
+.legend-item--closed { background: #fceabf; }
+.legend-item--cancelled { background: #f5f5f7; text-decoration: line-through; }
+.legend-item--block  { background: #fff3cd; color: #856404; }
