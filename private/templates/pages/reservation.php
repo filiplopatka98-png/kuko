@@ -49,7 +49,7 @@ ob_start();
       <div class="step__inner step__inner--wide">
         <div class="step__heading">
           <button type="button" class="step__back" data-go-step="1" aria-label="Späť">‹</button>
-          <h1>Vyberte deň a čas</h1>
+          <h2 class="step__title">Vyberte deň a čas</h2>
         </div>
         <p class="step__lead">
           Vybraný balíček: <strong id="selected-package-name">—</strong>
@@ -93,7 +93,7 @@ ob_start();
       <div class="step__inner">
         <div class="step__heading">
           <button type="button" class="step__back" data-go-step="2" aria-label="Späť">‹</button>
-          <h1>Vaše údaje</h1>
+          <h2 class="step__title">Vaše údaje</h2>
         </div>
         <p class="step__lead">
           <strong id="summary-package">—</strong> · <strong id="summary-date">—</strong> · <strong id="summary-time">—</strong>
@@ -142,7 +142,7 @@ ob_start();
     <section class="step" data-step="success">
       <div class="step__inner step__inner--success">
         <p class="step__emoji" aria-hidden="true">🎉</p>
-        <h1>Ďakujeme!</h1>
+        <h2 class="step__title">Ďakujeme!</h2>
         <p>Prijali sme vašu rezerváciu. Ozveme sa do 24 hodín.</p>
         <p id="success-link"></p>
         <p><a class="btn" href="/">Späť na domov</a></p>
