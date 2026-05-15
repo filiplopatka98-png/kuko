@@ -6,19 +6,19 @@
 </div>
 <header class="nav">
   <div class="container nav__inner">
-    <a href="#domov" class="nav__brand" aria-label="KUKO detský svet — domov">
+    <a href="/" class="nav__brand" aria-label="KUKO detský svet — domov">
       <img src="/assets/img/logo.png" alt="KUKO detský svet" width="80" height="60">
     </a>
     <button class="nav__toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Otvoriť menu">
       <span></span><span></span><span></span>
     </button>
     <nav id="primary-nav" class="nav__menu" aria-label="Hlavná navigácia">
-      <a href="#domov">Domov</a>
-      <a href="#o-nas">O detskom svete</a>
-      <a href="#oslavy">Detské oslavy</a>
-      <a href="#cennik">Cenník služieb</a>
-      <a href="#galeria">Fotogaléria</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href="/#domov">Domov</a>
+      <a href="/#o-nas">O detskom svete</a>
+      <a href="/#oslavy">Detské oslavy</a>
+      <a href="/#cennik">Cenník služieb</a>
+      <a href="/#galeria">Fotogaléria</a>
+      <a href="/#kontakt">Kontakt</a>
     </nav>
   </div>
 </header>

@@ -66,13 +66,6 @@ if (root) {
     });
   });
 
-  // Auto-pick from URL query (?balicek=mini)
-  const urlPkg = new URLSearchParams(location.search).get('balicek');
-  if (urlPkg) {
-    const card = document.querySelector(`[data-pick-package="${urlPkg}"]`);
-    if (card) card.click();
-  }
-
   // ---------- Step 2: calendar ----------
   const MONTH_NAMES = ['Január','Február','Marec','Apríl','Máj','Jún','Júl','August','September','Október','November','December'];
 
@@ -372,4 +365,12 @@ if (root) {
       goStep(1);
     }
   });
+
+  // ---------- Auto-pick package from URL query (?balicek=mini) ----------
+  // Runs last so all consts/functions (MONTH_NAMES, loadMonth, …) are initialized.
+  const urlPkg = new URLSearchParams(location.search).get('balicek');
+  if (urlPkg) {
+    const card = document.querySelector(`[data-pick-package="${urlPkg}"]`);
+    if (card) card.click();
+  }
 }
