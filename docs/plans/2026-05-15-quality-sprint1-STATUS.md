@@ -30,6 +30,15 @@ Tracking dokument pre Quality Roadmap Sprint 1. Plán: `docs/plans/2026-05-15-qu
 - Test: `private/tests/unit/LoginThrottleTest.php` (3 testy)
 - **Spec review: ✅ COMPLIANT.** Poznámka: window-expiry vetva (`count()` vráti 0 pre starý bucket) nie je pokrytá testom — spec to nevyžaduje, ale je to jediná netestovaná netriviálna vetva.
 
+## ✅ SPRINT 1 KOMPLET A NASADENÝ (2026-05-15)
+
+T1–T9 hotové. Produkčný deploy cez lftp mirror overený: favicon.ico/manifest/og-cover 200, HSTS header live, robots.txt stále `Disallow: /` (indexácia OFF), public `/` 503 (maintenance stále chráni), /admin/login 200. 131 testov zelených.
+
+**Otvorené follow-ups (nie blokátory deployu, ale pred go-live):**
+1. Owner zaregistruje mesačný cron na WebSupporte: `/usr/bin/php /kuko-detskysvet.sk/private/cron/retention.php` (GDPR retention).
+2. **Go-live blokátor:** opraviť odložený `.htpasswd` prod bug (viď nižšie) — inak sa nikto neprihlási do prod adminu.
+3. Owner action items: Lighthouse baseline, axe scan, Google Business Profile, HSTS preload registrácia.
+
 ## ⏭️ KDE POKRAČOVAŤ (presný bod)
 
 **Hotové T1–T8** (každá spec+code-quality review prešla, všetky fixy zapracované). T9 lokálne časti hotové: full suite **OK (131 tests, 280 assertions)**, lint čistý, dev smoke OK (/,  /rezervacia, /faq, /ochrana-udajov, /admin/login → 200; /admin unauth → 302), roadmap-quality.md zaškrtnuté + Sprint 1 blockquote.
