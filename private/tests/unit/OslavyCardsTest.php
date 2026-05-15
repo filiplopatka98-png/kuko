@@ -8,7 +8,7 @@ final class OslavyCardsTest extends TestCase
     protected function setUp(): void { $this->t = file_get_contents(\dirname(__DIR__, 3) . '/private/templates/sections/oslavy.php'); }
     public function testPackageIconsFromAssets(): void
     {
-        foreach (['balloon.svg','little-kid.svg','uzavreta.svg'] as $svg) {
+        foreach (['badge-balloon.svg','badge-balloons.svg','badge-crown.svg'] as $svg) {
             $this->assertStringContainsString('/assets/icons/' . $svg, $this->t, "missing $svg");
         }
     }

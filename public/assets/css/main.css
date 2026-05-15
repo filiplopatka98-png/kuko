@@ -295,18 +295,19 @@ img, svg { max-width: 100%; height: auto; display: block; }
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: var(--bg-cream);
-  border: 3px solid currentColor;
+  background: var(--c-purple);
+  border: 4px solid var(--bg-cream);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   color: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1;
 }
-.package--blue   .package__badge { border-color: var(--c-blue); }
-.package--purple .package__badge { border-color: var(--c-purple); }
-.package--yellow .package__badge { border-color: var(--c-yellow); }
-.package__badge img { width: 36px; height: 36px; }
+.package--blue   .package__badge { background: var(--c-blue); }
+.package--purple .package__badge { background: var(--c-purple); }
+.package--yellow .package__badge { background: var(--c-yellow); }
+.package__badge img { width: 34px; height: 34px; }
 .package__head { display: flex; align-items: center; justify-content: center; gap: var(--s-1); text-align: center; }
 .package__head h3 { margin: 0; }
 .package__hat { font-size: 1.5rem; }

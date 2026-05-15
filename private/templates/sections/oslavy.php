@@ -3,12 +3,12 @@ $packages = $packages ?? [];
 
 /* Map package code -> circular badge icon (assets). */
 $packageIcons = [
-    'mini'   => '/assets/icons/balloon.svg',
-    'maxi'   => '/assets/icons/little-kid.svg',
-    'closed' => '/assets/icons/uzavreta.svg',
+    'mini'   => '/assets/icons/badge-balloon.svg',
+    'maxi'   => '/assets/icons/badge-balloons.svg',
+    'closed' => '/assets/icons/badge-crown.svg',
 ];
 $iconFor = static function (string $code) use ($packageIcons): string {
-    return $packageIcons[$code] ?? '/assets/icons/balloon.svg';
+    return $packageIcons[$code] ?? '/assets/icons/badge-balloon.svg';
 };
 
 /*
@@ -20,7 +20,7 @@ $iconFor = static function (string $code) use ($packageIcons): string {
 $hardcoded = [
     'mini' => <<<'HTML'
 <article class="package package--blue">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/balloon.svg" alt="" width="36" height="36"></span>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-balloon.svg" alt="" width="36" height="36"></span>
         <header class="package__head"><h3>Oslava KUKO MINI</h3></header>
         <p class="package__desc">Bázový balíček pre menšie oslavy s priateľmi. Zahŕňa prenájom časti herne na 2 hodiny.</p>
         <ul class="package__meta">
@@ -38,7 +38,7 @@ $hardcoded = [
 HTML,
     'maxi' => <<<'HTML'
 <article class="package package--purple">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/little-kid.svg" alt="" width="36" height="36"></span>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-balloons.svg" alt="" width="36" height="36"></span>
         <header class="package__head"><h3>Oslava KUKO MAXI</h3></header>
         <p class="package__desc">Pre väčšie deti a väčšie skupiny. Plne vybavená oslava s programom.</p>
         <ul class="package__meta">
@@ -57,7 +57,7 @@ HTML,
 HTML,
     'closed' => <<<'HTML'
 <article class="package package--yellow">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/uzavreta.svg" alt="" width="36" height="36"></span>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-crown.svg" alt="" width="36" height="36"></span>
         <header class="package__head"><h3>Uzavretá spoločnosť</h3></header>
         <p class="package__desc">Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.</p>
         <ul class="package__meta">
