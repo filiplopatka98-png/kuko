@@ -3,6 +3,13 @@
 /** @var string $title */
 /** @var string $user */
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/admin', PHP_URL_PATH) ?: '/admin';
+// Apache mod_dir serves the admin app at "/admin/" (trailing slash); the
+// router normalizes that for routing, so the layout must too — otherwise
+// active states / the reservations tab bar never match on the canonical URL.
+$path = rtrim($path, '/');
+if ($path === '') {
+    $path = '/admin';
+}
 $isResvGroup = (
     $path === '/admin'
     || str_starts_with($path, '/admin/reservation')

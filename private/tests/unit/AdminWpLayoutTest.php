@@ -49,6 +49,17 @@ final class AdminWpLayoutTest extends TestCase
             'active .admin-tab must have a filled background'
         );
     }
+    public function testPathNormalizedForTrailingSlash(): void
+    {
+        // Apache serves the admin app at "/admin/" (trailing slash). Without
+        // rtrim, $isResvGroup ('/admin/' === '/admin' is false) → tab bar
+        // never renders on the canonical URL. Guard that regression.
+        $this->assertMatchesRegularExpression(
+            '/\$path\s*=\s*rtrim\(\s*\$path\s*,\s*[\'"]\/[\'"]\s*\)/',
+            $this->l,
+            'layout.php must rtrim trailing slash from $path'
+        );
+    }
     public function testA11yPreserved(): void
     {
         $this->assertStringContainsString('class="skip-link"', $this->l);
