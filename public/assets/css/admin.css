@@ -36,6 +36,8 @@
 * { box-sizing: border-box; }
 body { font-family: "Nunito Sans", system-ui, sans-serif; margin: 0; background: var(--bg-cream); color: var(--c-text); line-height: 1.5; }
 a { color: var(--c-accent); }
+.skip-link{position:absolute;left:8px;top:-44px;z-index:1000;background:var(--c-accent,#D88BBE);color:#fff;padding:.6rem 1rem;border-radius:6px;text-decoration:none;transition:top .15s ease}
+.skip-link:focus{top:8px}
 .admin-header { background: var(--c-white); border-bottom: 1px solid #f0e3ec; }
 .admin-header__inner { max-width: 1100px; margin: 0 auto; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
 .admin-header h1 { font-size: 1.25rem; margin: 0; }

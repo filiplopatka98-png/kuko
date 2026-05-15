@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="<?= e(\Kuko\Asset::url('/assets/css/admin.css')) ?>">
 </head>
 <body>
+<a class="skip-link" href="#main">Preskočiť na obsah</a>
 <header class="admin-header">
   <div class="admin-header__inner">
     <h1>KUKO admin</h1>
@@ -34,6 +35,6 @@
 <?php foreach (($flashes ?? []) as $f): ?>
   <div class="admin-flash admin-flash--<?= e($f['type'] ?? 'ok') ?>"><?= e($f['msg']) ?></div>
 <?php endforeach; ?>
-<main class="admin-main"><?= $content ?></main>
+<main class="admin-main" id="main" tabindex="-1"><?= $content ?></main>
 </body>
 </html>

@@ -5,7 +5,7 @@ $canonical = '/ochrana-udajov';
 $pageIndexing = false;
 ob_start();
 ?>
-<main class="section">
+<div class="section">
   <div class="container" style="max-width: 800px;">
     <h1>Ochrana osobných údajov</h1>
     <p>Posledná aktualizácia: <?= date('j. n. Y') ?></p>
@@ -35,8 +35,7 @@ ob_start();
 
     <p style="margin-top: 3rem;"><a href="/">&larr; Späť na domov</a></p>
   </div>
-</main>
-<?php require __DIR__ . '/../footer.php'; ?>
+</div>
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/../layout.php';

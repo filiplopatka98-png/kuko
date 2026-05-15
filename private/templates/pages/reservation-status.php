@@ -12,7 +12,7 @@ $statusLabel = match ((string) $r['status']) {
 };
 ob_start();
 ?>
-<main class="section">
+<div class="section">
   <div class="container" style="max-width: 720px;">
     <h1>Status rezervácie</h1>
     <div style="background: <?= e($statusLabel[2]) ?>; color: <?= e($statusLabel[1]) ?>; padding: 0.75rem 1.25rem; border-radius: 999px; display: inline-block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2rem;">
@@ -37,8 +37,7 @@ ob_start();
 
     <p style="margin-top:2rem;"><a href="/">&larr; Späť na domov</a></p>
   </div>
-</main>
-<?php require __DIR__ . '/../footer.php'; ?>
+</div>
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/../layout.php';

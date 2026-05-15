@@ -6,7 +6,7 @@ $csrf = \Kuko\Csrf::token();
 $siteKey = \Kuko\Config::get('recaptcha.site_key', '');
 ob_start();
 ?>
-<main class="rezervacia" id="rezervacia">
+<div class="rezervacia" id="rezervacia">
   <header class="rezervacia__header">
     <a href="/" class="rezervacia__brand" aria-label="KUKO detský svet">
       <img src="/assets/img/logo.png" alt="" width="60" height="42">
@@ -149,7 +149,7 @@ ob_start();
       </div>
     </section>
   </form>
-</main>
+</div>
 
 <?php require __DIR__ . '/../cookie-banner.php'; ?>
 

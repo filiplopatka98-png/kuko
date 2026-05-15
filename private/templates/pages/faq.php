@@ -5,7 +5,6 @@ $canonical   = '/faq';
 $pageType    = 'faq';
 ob_start();
 ?>
-<main>
   <section class="section section--faq" data-reveal>
     <div class="container">
       <h1>Často kladené otázky</h1>
@@ -39,8 +38,6 @@ ob_start();
       <p style="text-align:center; margin-top:2rem;"><a class="btn" href="/">&larr; Späť na domov</a></p>
     </div>
   </section>
-</main>
-<?php require __DIR__ . '/../footer.php'; ?>
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/../layout.php';
