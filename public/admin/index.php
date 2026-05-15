@@ -219,6 +219,65 @@ $router->post('/admin/content/save', function () use ($db, $audit, $flash, $admi
     header('Location: /admin/content');
 });
 
+// ===== Gallery =====
+$galleryDir = APP_ROOT . '/public/assets/img/gallery';
+$router->get('/admin/gallery', function () use ($renderer, $db, $galleryDir, $adminUser, $flashes) {
+    $photos = (new \Kuko\MediaRepo($db, $galleryDir))->listAll();
+    echo $renderer->render('gallery', ['photos' => $photos, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+$router->post('/admin/gallery/upload', function () use ($db, $galleryDir, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    try {
+        $row = (new \Kuko\MediaRepo($db, $galleryDir))->upload($_FILES['photo'] ?? [], trim((string) ($_POST['alt'] ?? '')));
+        $audit('gallery_upload', 'gallery_photos', (int) $row['id']);
+        $flash('Fotka nahraná.');
+    } catch (\RuntimeException $e) {
+        $flash($e->getMessage(), 'err');
+    }
+    header('Location: /admin/gallery');
+});
+$router->post('/admin/gallery/{id}/delete', function (array $p) use ($db, $galleryDir, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
+    (new \Kuko\MediaRepo($db, $galleryDir))->delete($id);
+    $audit('gallery_delete', 'gallery_photos', $id);
+    $flash('Fotka zmazaná.');
+    header('Location: /admin/gallery');
+});
+$router->post('/admin/gallery/{id}/visibility', function (array $p) use ($db, $galleryDir, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
+    $visible = !empty($_POST['visible']);
+    (new \Kuko\MediaRepo($db, $galleryDir))->setVisibility($id, $visible);
+    $audit('gallery_visibility', 'gallery_photos', $id, ['visible' => $visible]);
+    $flash($visible ? 'Fotka zobrazená.' : 'Fotka skrytá.');
+    header('Location: /admin/gallery');
+});
+$router->post('/admin/gallery/{id}/alt', function (array $p) use ($db, $galleryDir, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
+    (new \Kuko\MediaRepo($db, $galleryDir))->updateAlt($id, trim((string) ($_POST['alt'] ?? '')));
+    $audit('gallery_alt', 'gallery_photos', $id);
+    $flash('ALT text uložený.');
+    header('Location: /admin/gallery');
+});
+$router->post('/admin/gallery/reorder', function () use ($db, $galleryDir) {
+    $body  = json_decode(file_get_contents('php://input') ?: '', true);
+    $token = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+    if (!\Kuko\Csrf::verify($token)) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'csrf']);
+        return;
+    }
+    $order = (is_array($body) ? ($body['order'] ?? []) : []);
+    if (is_array($order)) {
+        (new \Kuko\MediaRepo($db, $galleryDir))->reorder(array_map('intval', $order));
+    }
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true]);
+});
+
 // ===== Opening hours =====
 $router->get('/admin/opening-hours', function () use ($renderer, $hours, $adminUser, $flashes) {
     echo $renderer->render('opening-hours', ['hours' => $hours->all(), 'user' => $adminUser, 'flashes' => $flashes]);
