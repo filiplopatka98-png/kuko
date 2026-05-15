@@ -16,6 +16,12 @@
       <a href="/admin/opening-hours">Hodiny</a>
       <a href="/admin/blocked-periods">Blokácie</a>
       <a href="/admin/packages">Balíčky</a>
+      <a href="/admin/content">Obsah</a>
+      <a href="/admin/gallery">Galéria</a>
+      <a href="/admin/contact">Kontakt</a>
+      <a href="/admin/seo">SEO</a>
+      <a href="/admin/maintenance">Maintenance</a>
+      <a href="/admin/log">Log</a>
       <a href="/admin/settings">Nastavenia</a>
       <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">📅 iCal</a>
       <a href="/" target="_blank">Web ↗</a>
