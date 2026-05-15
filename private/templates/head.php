@@ -16,28 +16,13 @@ $ogImageUrl = $ogImage ?? ($baseUrl . '/assets/img/hero.jpg');
 
 // Indexing: pre-launch noindex,nofollow on everything. Per-page override possible.
 $globalIndexing = (bool) \Kuko\Config::get('app.public_indexing', false);
-$index = $pageIndexing ?? $globalIndexing;
-$robots = $index ? 'index, follow' : 'noindex, nofollow';
 
-// DB-backed SEO overrides (/admin/seo editor). DB wins; hardcoded/passed-in values
-// remain the fallback. The site must NOT break if the DB is unavailable.
-$seoRepo = null;
-try {
-    $seoRepo = new \Kuko\SettingsRepo(\Kuko\Db::fromConfig());
-} catch (\Throwable $e) {
-    error_log('[head] SEO settings DB unavailable: ' . $e->getMessage());
-}
-$seoGet = static function (string $key, string $fallback) use ($seoRepo): string {
-    if ($seoRepo === null) return $fallback;
-    $v = $seoRepo->get($key);
-    return ($v !== null && $v !== '') ? $v : $fallback;
-};
-$pt = $pageType ?? 'default';
-$titleFinal = $seoGet("seo.$pt.title", $titleFinal);
-$descriptionFinal = $seoGet("seo.$pt.description", $descriptionFinal);
-$globalIndexing = ($seoGet('seo.public_indexing', $globalIndexing ? '1' : '0') === '1');
-$index = $pageIndexing ?? $globalIndexing;
-$robots = $index ? 'index, follow' : 'noindex, nofollow';
+// DB-backed SEO overrides (/admin/seo editor). DB wins; hardcoded/passed-in
+// values remain the fallback. The site must NOT break if the DB is unavailable.
+$seo = \Kuko\Seo::resolve($pageType ?? null, $titleFinal, $descriptionFinal, $globalIndexing, $pageIndexing ?? null);
+$titleFinal = $seo['title'];
+$descriptionFinal = $seo['description'];
+$robots = $seo['robots'];
 ?>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
