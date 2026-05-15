@@ -39,7 +39,7 @@ $robots = $seo['robots'];
 <style>
 @font-face {
   font-family: "Nunito Sans";
-  src: url("/assets/fonts/NunitoSans.ttf") format("truetype-variations"), url("/assets/fonts/NunitoSans.ttf") format("truetype");
+  src: url("/assets/fonts/NunitoSans.woff2") format("woff2"), url("/assets/fonts/NunitoSans.ttf") format("truetype");
   font-weight: 100 900;
   font-display: swap;
 }
