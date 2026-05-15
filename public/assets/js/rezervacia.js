@@ -139,9 +139,11 @@ if (root) {
       cell.setAttribute('tabindex', '-1');
       if (!inMonth) {
         // Spacer: keyboard-focusable for grid traversal, but inert for activation.
+        // No aria-hidden — a focusable aria-hidden element is an ARIA violation;
+        // give it a descriptive label instead so AT announces it as off-month.
         cell.classList.add('day--off-month');
         cell.setAttribute('aria-disabled', 'true');
-        cell.setAttribute('aria-hidden', 'true');
+        cell.setAttribute('aria-label', 'Mimo aktuálneho mesiaca');
         calendarGrid.appendChild(cell);
         continue;
       }
@@ -173,6 +175,7 @@ if (root) {
         const freeCount = info.free_count ?? info.slots ?? 0;
         cell.classList.add('day--available');
         cell.dataset.date = iso;
+        cell.dataset.free = String(freeCount);
         cell.title = 'Voľné — kliknite pre výber času';
         cell.setAttribute('aria-selected', 'false');
         cell.setAttribute('aria-label', `${dayName} ${dayNum}. ${monthName}, dostupné, ${freeCount} voľných termínov`);
@@ -189,11 +192,15 @@ if (root) {
       calendarGrid.appendChild(cell);
     }
 
+    // FIX A: a month with no available days and no "today" cell would otherwise
+    // get NO tabindex=0, leaving the grid completely un-Tab-able. Fall back to
+    // the very first gridcell so the grid always has exactly one tab stop.
+    if (!firstFocusable) {
+      firstFocusable = calendarGrid.querySelector('[role="gridcell"]');
+    }
+
     // Set initial roving tabindex on the first focusable cell
     if (firstFocusable) firstFocusable.setAttribute('tabindex', '0');
-
-    // Attach keyboard handler to the grid (once per render)
-    calendarGrid.addEventListener('keydown', handleGridKeydown);
   }
 
   function reasonLabel(reason) {
@@ -227,7 +234,9 @@ if (root) {
 
     // Announce selection to screen readers
     const d = new Date(iso + 'T00:00:00');
-    const freeCount = (cell.getAttribute('aria-label') || '').match(/(\d+)\s+voľných/)?.[1] ?? '';
+    // Free-slot count is stored on the cell at render time (FIX C);
+    // falls back to '' so the announcement still works if absent.
+    const freeCount = cell.dataset.free ?? '';
     calendarAnnouncer.textContent =
       `Vybraný ${d.getDate()}. ${MONTH_NAMES[d.getMonth()]}. ${freeCount} voľných termínov nižšie.`;
 
@@ -303,6 +312,10 @@ if (root) {
   }
   document.querySelector('[data-cal-nav="prev"]').addEventListener('click', gotoPrevMonth);
   document.querySelector('[data-cal-nav="next"]').addEventListener('click', gotoNextMonth);
+  // FIX D: bind grid keydown exactly once for the page lifetime (not per
+  // renderGrid). handleGridKeydown resolves the live cells dynamically via
+  // gridCells() at event time, so re-rendered grids are handled correctly.
+  calendarGrid.addEventListener('keydown', handleGridKeydown);
 
   // ---------- Grid keyboard navigation ----------
   // ALL cells in DOM order, including off-month spacers. Index maps to grid
@@ -324,6 +337,9 @@ if (root) {
       if (current === -1) current = 0;
     }
 
+    // INTENTIONAL: ARIA APG *date-picker* pattern (not generic grid) — arrows do
+    // continuous ±1 day nav across week boundaries; Home/End = week start/end.
+    // Do not "fix" this to per-cell grid semantics; it matches the APG spec.
     let target = current;
     switch (e.key) {
       case 'ArrowLeft':  target = current - 1; break;
