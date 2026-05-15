@@ -15,6 +15,16 @@ final class Asset
             $query = substr($path, $q + 1);
         }
 
+        // Prefer a committed minified sibling (e.g. main.css -> main.min.css) when
+        // present. Only rewrite if the requested path is not already a *.min.<ext>.
+        $ext = strtolower(pathinfo($pathPart, PATHINFO_EXTENSION));
+        if ($ext !== '' && substr($pathPart, -strlen('.min.' . $ext)) !== '.min.' . $ext) {
+            $minPath = substr($pathPart, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+            if (is_file($docRoot . $minPath)) {
+                $pathPart = $minPath;
+            }
+        }
+
         $fsPath = $docRoot . $pathPart;
         if (!is_file($fsPath)) {
             return $path;
