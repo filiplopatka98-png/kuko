@@ -84,6 +84,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 @media (min-width: 768px) { .section { padding-block: var(--s-10); } }
 
 .section__lead { max-width: 720px; margin-inline: auto; text-align: center; color: var(--c-text-soft); }
+.section__lead > p:only-child { margin: 0; }
 
 .btn {
   display: inline-flex;
