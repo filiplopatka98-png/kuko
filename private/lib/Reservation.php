@@ -42,8 +42,9 @@ final class Reservation
         }
 
         $phone = (string)($d['phone'] ?? '');
-        if (!preg_match('/^\+?[0-9 ()\/-]{7,20}$/', $phone)) {
-            $errors['phone'] = 'Neplatný telefón.';
+        $phoneDigits = str_replace([' ', '(', ')', '/', '-'], '', $phone);
+        if (!preg_match('/^(\+421|0)[0-9]{9}$/', $phoneDigits)) {
+            $errors['phone'] = 'Zadajte platné slovenské telefónne číslo (napr. +421 915 319 934 alebo 0915 319 934).';
         }
 
         $email = (string)($d['email'] ?? '');

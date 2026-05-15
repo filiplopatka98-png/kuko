@@ -115,7 +115,10 @@ ob_start();
           </div>
           <div class="field">
             <label for="f-email">E-mail <span class="req" aria-hidden="true">*</span></label>
-            <input type="email" name="email" id="f-email" required aria-required="true" autocomplete="email">
+            <input type="email" name="email" id="f-email" required aria-required="true" autocomplete="email" list="email-domains">
+            <datalist id="email-domains">
+              <option value="@gmail.com"><option value="@azet.sk"><option value="@zoznam.sk"><option value="@centrum.sk"><option value="@outlook.com"><option value="@icloud.com">
+            </datalist>
           </div>
         </div>
         <div class="field">

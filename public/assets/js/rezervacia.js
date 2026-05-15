@@ -299,6 +299,17 @@ if (root) {
       list.appendChild(b);
     });
     slotGrid.appendChild(list);
+
+    // QoL: default the time to 14:00 when the user has not yet chosen a slot
+    // for this day. selectDay() resets timeInput.value before re-rendering, so
+    // this only pre-selects on a fresh day; a manual pick keeps timeInput.value
+    // set and we leave it alone. Reuse the exact click path so the selected
+    // state / hidden input / summary / button-enable all stay consistent.
+    if (!timeInput.value) {
+      const preferred = Array.from(list.querySelectorAll('.slot'))
+        .find(s => s.dataset.start === '14:00');
+      if (preferred) preferred.click();
+    }
   }
 
   // Calendar navigation
@@ -417,6 +428,56 @@ if (root) {
   const banner = document.getElementById('cookie-banner');
   if (banner && !localStorage.getItem('kuko_cookie_consent')) banner.hidden = false;
 
+  // ---------- Draft persistence (QoL) ----------
+  // Persist only the personal text fields to sessionStorage so an accidental
+  // reload doesn't lose typed contact info. Date/time/package are intentionally
+  // NOT persisted (avoids stale-availability bugs). Wrapped in try/catch —
+  // sessionStorage can throw in private mode / when storage is disabled.
+  const DRAFT_KEY = 'kuko_resv_draft';
+  const draftFields = ['kids_count', 'name', 'phone', 'email', 'note'];
+
+  function draftEl(name) {
+    return form.querySelector(`[name="${name}"]`);
+  }
+
+  function saveDraft() {
+    try {
+      const data = {};
+      draftFields.forEach(n => {
+        const el = draftEl(n);
+        if (el) data[n] = el.value;
+      });
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    } catch (e) { /* storage unavailable — ignore */ }
+  }
+
+  function restoreDraft() {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      draftFields.forEach(n => {
+        const el = draftEl(n);
+        // Only restore into empty fields so we never clobber a fresh entry.
+        if (el && !el.value && data[n] != null && data[n] !== '') {
+          el.value = data[n];
+        }
+      });
+    } catch (e) { /* corrupt / unavailable — ignore */ }
+  }
+
+  function clearDraft() {
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+  }
+
+  draftFields.forEach(n => {
+    const el = draftEl(n);
+    if (!el) return;
+    el.addEventListener('input', saveDraft);
+    el.addEventListener('change', saveDraft);
+  });
+  restoreDraft();
+
   // ---------- Step 3 submit ----------
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -466,6 +527,7 @@ if (root) {
         throw new Error('Odoslanie zlyhalo. Skúste prosím znova alebo nás kontaktujte.');
       }
 
+      clearDraft();
       goStep('success');
     } catch (err) {
       errorBox.textContent = err.message;
