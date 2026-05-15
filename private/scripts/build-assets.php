@@ -22,11 +22,15 @@ $cssInputs = [
     '/assets/css/rezervacia.css',
     '/assets/css/admin.css',
 ];
+// Only main.js & rezervacia.js are minified. gallery.js / map.js are loaded
+// solely via main.js's dynamic import('./gallery.js') / import('./map.js')
+// with literal specifiers — they never go through \Kuko\Asset::url(), so a
+// *.min sibling would never actually be served. They're tiny (~2 KB total);
+// bundling them into main.js would force eager load and change behaviour, so
+// per YAGNI they stay unminified and are intentionally excluded here.
 $jsInputs = [
     ['/assets/js/main.js', true],
     ['/assets/js/rezervacia.js', true],
-    ['/assets/js/gallery.js', false],
-    ['/assets/js/map.js', false],
 ];
 
 function minPathOf(string $in): string

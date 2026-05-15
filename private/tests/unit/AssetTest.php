@@ -53,4 +53,21 @@ final class AssetTest extends TestCase
         @unlink($this->root . '/assets/css/x.min.css');
         $this->assertSame('/assets/css/x.css?v=1700000000', Asset::stamp('/assets/css/x.css', $this->root));
     }
+    public function testCommittedMinFilesNotOlderThanSource(): void
+    {
+        $pub = \dirname(__DIR__, 3) . '/public';
+        $pairs = [
+            '/assets/css/main.css', '/assets/css/rezervacia.css', '/assets/css/admin.css',
+            '/assets/js/main.js', '/assets/js/rezervacia.js',
+        ];
+        foreach ($pairs as $src) {
+            $min = preg_replace('/\.(css|js)$/', '.min.$1', $src);
+            $this->assertFileExists($pub . $min, "missing committed minified $min — run private/scripts/build-assets.php");
+            $this->assertGreaterThanOrEqual(
+                filemtime($pub . $src),
+                filemtime($pub . $min),
+                "$min is older than its source — re-run private/scripts/build-assets.php and commit"
+            );
+        }
+    }
 }
