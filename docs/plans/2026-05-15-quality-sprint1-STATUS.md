@@ -1,0 +1,57 @@
+# Sprint 1 — Stav / Handoff (2026-05-15)
+
+Tracking dokument pre Quality Roadmap Sprint 1. Plán: `docs/plans/2026-05-15-quality-sprint1.md`. Roadmap: `docs/plans/2026-05-14-roadmap-quality.md`. Vetva: `main`. Pracujeme cez subagent-driven-development (implementer → spec review → code-quality review per task).
+
+## Kontext / prostredie
+- PHP binárka: `/opt/homebrew/bin/php` (NIE `php`)
+- Testy: `/opt/homebrew/bin/php private/lib/vendor/phpunit.phar private/tests`
+- Posledný stav testov: **OK (115 tests, 214 assertions)** — zelené
+- Deploy = manuálne lftp SFTP mirror (host `kuko-detskysvet.sk:22`, user `filip.kuko-detskysvet.sk`); maintenance gate stále ON, public_indexing stále OFF (pred-launch). Sprint 1 sa zatiaľ NEDEPLOYOVAL — deploy je až T9.
+
+## Hotové (commitnuté na main)
+
+| Commit | Čo |
+|---|---|
+| `87ea9ce` | Sprint 1 plán |
+| `98a07cc` | T1: CSRF token v admin login forme + verify v POST handleri |
+| `90bc8e4` | T1: silnejší test (CSRF overený PRED čítaním credentials) |
+| `63655b8` | T1: fix po code-review — CSRF zlyhanie = 403 + presná hláška „token vypršal" (konzistentné s kódom) |
+| `1332d07` | T2: `Kuko\LoginThrottle` brute-force (5 zlých/h per IP + per username, success vyčistí buckety) + zapojené do login POST + `locked` hláška v šablóne |
+
+### T1 — Admin login CSRF token — ✅ HOTOVÉ (spec ✅ + code-quality ✅ po fixe)
+- `private/templates/admin/login.php`: hidden `csrf` field
+- `public/admin/index.php`: `Csrf::verify` ako prvý príkaz v POST /admin/login, zlyhanie → 403 + `['expired'=>true]`
+- Šablóna error blok poradie: `locked → expired → error`
+- Test: `private/tests/integration/AdminLoginCsrfTest.php`
+
+### T2 — Brute-force throttle — ✅ implementácia + spec review ✅
+- `private/lib/LoginThrottle.php` (file-based, `permit/recordFailure/recordSuccess`, dir `APP_ROOT/private/logs/ratelimit`)
+- Zapojené do `public/admin/index.php` POST /admin/login: permit→429+`locked`, success→recordSuccess+redirect, bad creds→recordFailure+401
+- Test: `private/tests/unit/LoginThrottleTest.php` (3 testy)
+- **Spec review: ✅ COMPLIANT.** Poznámka: window-expiry vetva (`count()` vráti 0 pre starý bucket) nie je pokrytá testom — spec to nevyžaduje, ale je to jediná netestovaná netriviálna vetva.
+
+## ⏭️ KDE POKRAČOVAŤ (presný bod)
+
+**T2 čaká už len na CODE-QUALITY review** (spec review prebehol ✅). Ďalší krok:
+1. Dispatch code-quality reviewer pre T2 (commit `1332d07`). V promptne spomenúť aj window-expiry test-gap nech reviewer rozhodne, či ho doplniť (lacné — pridať `testStaleBucketResetsToZero` ktorý zapíše bucket so starým `start` a overí že `permit` znova povolí).
+2. Ak NEEDS CHANGES → implementer fix → re-review. Ak ✅ → T2 hotové, mark completed, prejsť na T3.
+
+## Zostáva v Sprinte 1 (plán má plný TDD kód pre každú)
+
+- **T2** — dokončiť code-quality review (viď vyššie)
+- **T3** — Login attempt audit logging (login_ok/login_fail/login_locked do `admin_actions` + IP/UA). Plán krok-po-kroku v sprint1 pláne, sekcia „Task 3".
+- **T4** — HSTS header v `public/.htaccess` (1 riadok, triviálne). „Task 4".
+- **T5** — GDPR: `Kuko\Privacy` (anonymizeReservation/purgeOlderThan/exportByEmail) + `private/cron/retention.php` + `/admin/gdpr` route + anonymize tlačidlo v detail.php + nav link. „Task 5". (PII stĺpce reservations: name, phone, email, note, user_agent.)
+- **T6** — Calendar a11y: `public/assets/js/rezervacia.js` ARIA grid/gridcell + keyboard nav (šípky/Home/End/PageUp/Down/Enter) + aria-live + focus-visible CSS. Implementer MUSÍ najprv prečítať rezervacia.js. „Task 6".
+- **T7** — Favicon set: `private/scripts/gen-favicons.php` (GD z `public/assets/img/logo.png`, ImageMagick NIE je) → favicon.ico/16/32/apple-touch/192/512 + `public/manifest.webmanifest` + `head.php` link set. Pozn.: `head.php` dnes odkazuje `/favicon.ico` ktorý NEEXISTUJE (404) — T7 to opraví. „Task 7".
+- **T8** — `public/assets/img/og-cover.jpg` 1200×630 (rozšíriť gen-favicons.php, font `NunitoSans.ttf`) + `head.php` default og:image → og-cover. „Task 8".
+- **T9** — Plný regression + lint sweep + dev smoke + zaškrtnúť hotové v `roadmap-quality.md` + **produkčný deploy** (lftp; bez DB migrácie — Sprint 1 nemá schema zmenu) + owner musí zaregistrovať mesačný cron `/usr/bin/php .../private/cron/retention.php`.
+
+## Owner action items (NEBUDUJEME — nahlásiť userovi na konci Sprintu 1)
+1. P1 Lighthouse baseline (owner spustí v Chrome, screenshoty do `docs/audits/`)
+2. A1 axe DevTools scan (owner spustí rozšírenie)
+3. S3 Google Business Profile (owner vytvorí/overí)
+4. B2 HSTS preload registrácia na hstspreload.org (až keď je HSTS stabilné v prod)
+
+## Po Sprinte 1
+Roadmap hovorí: po týchto 8 → prepnúť `maintenance` flag false + `public_indexing` true. Potom pokračovať ďalšími sprintami zvyšku `roadmap-quality.md` (SEO obsah, performance minifikácia/critical CSS/font subsetting, zvyšok a11y, UX detaily vrátane U1 symetrický buffer). Po #3 nasleduje user priorita #1 (go-live prerekvizity: SMTP heslo, reCAPTCHA test).
