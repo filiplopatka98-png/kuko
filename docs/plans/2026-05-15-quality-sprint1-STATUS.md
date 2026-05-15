@@ -93,3 +93,24 @@ S2-T1..T6 hotové (každá impl + spec + code-quality review + fixy), nasadené 
 Dodané: per-page noindex; single H1 reservation; WOFF2 (~60% menšie) + preload fix; CSS/JS minifikácia (Asset prefers .min + build-assets.php + stale-min guard); responsive hero (768px mobil, 146→50KB, media-scoped preload).
 
 Otvorené (mimo Sprint 2): MediaRepo prod-path bug #2 (admin upload); hero.jpg PNG-content/.jpg-ext (spawnnutý cleanup task); zvyšok roadmap-quality.md = Sprint 3 (a11y A2/A3/A5/A6, UX U1/U3/U4, security B3/B5/B6/B7, S5 analytics-owner, S3 GBP-owner).
+
+---
+
+## Sprint 3 — ROZPRACOVANÝ (2026-05-15)
+
+Plán: `docs/plans/2026-05-15-quality-sprint3.md`. **T1–T3 hotové (impl+spec+code-quality review APPROVED), commitnuté na `main`, NIE sú ešte nasadené (deploy je batchnutý v T8).** 172 PHPUnit testov green.
+
+- ✅ S3-T1 (A5) `05ff94e` — `--c-text-soft` #7A7A7A→#6A6A6A (AA 5.1:1) v main/rezervacia/admin.css; site-wide `:where(...):focus-visible`; reduced-motion fix pre `.step.is-active` fadeIn v rezervacia.css.
+- ✅ S3-T2 (A2) `a47043e` + fix `89d334b` — skip-link + `<main id="main" tabindex="-1">` vo všetkých 3 layoutoch; refactor: `<main>` zhora z 6 page templates do layoutov (page→`<div>`, footer presunutý do layout.php — DRY, bez regresie), `display:contents` odstránený (zachoval landmark v a11y strome).
+- ✅ S3-T3 (A3) `69c98bb` — `aria-required` na f-kids/f-name/f-phone/f-email; `.req`+legend „* povinné"; `#form-error` role=alert+aria-live=assertive; success region role=status+aria-live=polite; rezervacia.js overené že už správne announce-uje (bez JS zmeny).
+
+**ZOSTÁVA (presný bod pokračovania) — pokračovať v `docs/plans/2026-05-15-quality-sprint3.md`:**
+- ⏳ S3-T4 (U1) symetrický time-slot buffer v `Availability::forDate()` (~riadok 105-108: subtract `[rStart-buffer, rEnd]`, clamp 0) + test pre pre-buffer prípad (MINI 12:00–14:00 pred MAXI 14:00 musí byť odmietnuté pri buffer 30).
+- ⏳ S3-T5 (U3) SK phone validácia v `Reservation.php:45` (strip separátory → `^(\+421|0)[0-9]{9}$`) + email `<datalist>` + sessionStorage persist + default time 14:00 v rezervacia.js.
+- ⏳ S3-T6 (U4) .ics download + Google Calendar link na success kroku.
+- ⏳ S3-T7 (B6/B5) session cookie hardening v App.php (secure/httponly/samesite/use_strict_mode, guard `PHP_SAPI!=='cli'` + session_status NONE) + `private/cron/db-backup.php` + `docs/RECOVERY.md`.
+- ⏳ S3-T8 regression + roadmap bookkeeping + **deploy celého Sprintu 3** (push + lftp; rebuild build-assets.php; overiť prod invarianty). POZOR: T1–T3 sa nasadia až tu spolu s T4–T7.
+
+Owner/manuál (nebudovať): B3 (PHPMailer CVE, Leaflet/reCAPTCHA review), B7 (OWASP ZAP, manual pentest, subdomain takeover, DNS DMARC/SPF/DKIM), A6 plain-language copy (cez /admin), + go-live owner items (SMTP, reCAPTCHA browser test, GDPR cron registrácia, Lighthouse/axe, Google Business Profile, HSTS preload).
+
+Po Sprinte 3: userove „pripomienky k dizajnu" (čaká, vymenili sme poradie), potom go-live (#1: flip maintenance OFF + public_indexing ON).
