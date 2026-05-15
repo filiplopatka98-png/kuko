@@ -5,7 +5,19 @@ namespace Kuko;
 
 final class HtmlSanitizer
 {
-    private const ALLOWED_TAGS = ['b','i','strong','em','a','p','ul','ol','li','br','h3','h4'];
+    // Structural tags added for the admin-editable privacy.body / faq.items
+    // content blocks: h2 (privacy headings), div (<div class="faq">),
+    // details + summary (FAQ accordion). Only tags actually present in those
+    // blocks were added — no script/iframe/object/embed/img/span/section.
+    private const ALLOWED_TAGS = [
+        'b','i','strong','em','a','p','ul','ol','li','br','h3','h4',
+        'h2','div','details','summary',
+    ];
+
+    // Safe href prefixes. Anything not matching is dropped (incl.
+    // javascript:, data:, vbscript:, and any unlisted scheme).
+    // Case-insensitive; value is trimmed before testing.
+    private const HREF_RE = '#^(/|\#|\./|https?://|mailto:|tel:)#i';
 
     public static function clean(string $html): string
     {
@@ -57,10 +69,19 @@ final class HtmlSanitizer
             foreach (iterator_to_array($child->attributes) as $attr) {
                 $name = strtolower($attr->name);
                 if ($tag === 'a' && $name === 'href') {
+                    // Allow only the safe prefixes; reject javascript:/data:/
+                    // vbscript: and every other scheme. Trim first so leading
+                    // whitespace can't smuggle a scheme past the anchor.
                     $val = trim($attr->value);
-                    if (!preg_match('#^(https?://|mailto:|tel:)#i', $val)) {
+                    if (!preg_match(self::HREF_RE, $val)) {
                         $child->removeAttribute($attr->name);
                     }
+                } elseif ($name === 'class') {
+                    // class is presentational only and safe; needed for
+                    // <div class="faq">, <details class="faq__item">,
+                    // <h2 class="legal-h2">, <p class="section__lead">.
+                    // No id / on* / style / srcdoc — those stay stripped.
+                    continue;
                 } else {
                     $child->removeAttribute($attr->name);
                 }

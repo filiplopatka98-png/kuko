@@ -377,6 +377,13 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .faq__item[open] summary::after { content: '−'; }
 .faq__item p { padding: 0 var(--s-3) var(--s-2); margin: 0; color: var(--c-text-soft); }
 
+/* ===== Legal pages (ochrana údajov) ===== */
+/* Replaces former inline style="text-align:left;" on privacy <h2>
+   (global h2 is text-align:center, so this restores left alignment). */
+.legal-h2 { text-align: left; }
+/* Replaces former inline style="margin-top: 3rem;" on the back-home link. */
+.legal-back { margin-top: 3rem; }
+
 /* ===== Footer ===== */
 .footer { background: var(--c-white); padding-top: var(--s-6); margin-top: var(--s-8); }
 .footer__inner { display: grid; place-items: center; padding-bottom: var(--s-3); }

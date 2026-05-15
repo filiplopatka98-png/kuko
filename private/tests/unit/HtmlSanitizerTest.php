@@ -42,9 +42,11 @@ final class HtmlSanitizerTest extends TestCase
 
     public function testStripsDisallowedTagKeepsText(): void
     {
-        $out = HtmlSanitizer::clean('<div><span>keep</span></div>');
+        // span/section remain disallowed (div is now an allowed structural
+        // tag for <div class="faq">, so it is no longer unwrapped).
+        $out = HtmlSanitizer::clean('<section><span>keep</span></section>');
         $this->assertStringContainsString('keep', $out);
-        $this->assertStringNotContainsString('<div>', $out);
+        $this->assertStringNotContainsString('<section>', $out);
         $this->assertStringNotContainsString('<span>', $out);
     }
 
@@ -62,7 +64,8 @@ final class HtmlSanitizerTest extends TestCase
     public function testRecursiveUnwrapOfNestedDisallowedTags(): void
     {
         // disallowed wrapper containing disallowed child wrapping allowed content
-        $out = HtmlSanitizer::clean('<div><span><strong>keep</strong></span></div>');
+        // (span/section stay disallowed; recursive unwrap still applies to them)
+        $out = HtmlSanitizer::clean('<section><span><strong>keep</strong></span></section>');
         $this->assertSame('<strong>keep</strong>', $out);
     }
 
