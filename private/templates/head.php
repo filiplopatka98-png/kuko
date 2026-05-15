@@ -65,7 +65,7 @@ $robots = $seo['robots'];
 <!-- Performance hints -->
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-<link rel="preload" href="/assets/fonts/NunitoSans.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="/assets/fonts/NunitoSans.woff2" as="font" type="font/woff2" crossorigin>
 <?php if (($pageType ?? '') === 'home'): ?>
 <link rel="preload" as="image" href="<?= e($baseUrl) ?>/assets/img/hero.webp" type="image/webp" fetchpriority="high">
 <?php endif; ?>

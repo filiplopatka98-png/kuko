@@ -34,7 +34,7 @@ $robots = $seo['robots'];
 <?php if ($siteKey !== ''): ?>
 <meta name="recaptcha-site-key" content="<?= e($siteKey) ?>">
 <?php endif; ?>
-<link rel="preload" href="/assets/fonts/NunitoSans.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="/assets/fonts/NunitoSans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="/favicon.ico">
 <style>
 @font-face {
