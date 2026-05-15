@@ -8,6 +8,8 @@ require __DIR__ . '/../lib/autoload.php';
 $db = \Kuko\Db::fromConfig();
 $cb = new \Kuko\ContentBlocksRepo($db);
 
+// NOTE: dual source of truth — these values are duplicated as hardcoded fallbacks
+// in the section templates (Task 9) and head.php. Edit BOTH places together to avoid drift.
 $blocks = [
     // [block_key, label, content_type, value] — values copied verbatim from templates
     ['hero.title', 'Hero — nadpis', 'text', 'Detský svet KUKO'],
@@ -58,10 +60,14 @@ if ($existing === 0) {
 
 // Settings: maintenance + SEO defaults (only if key absent)
 $s = new \Kuko\SettingsRepo($db);
+// NOTE: dual source of truth — the seo.* values below are duplicated as hardcoded
+// fallbacks in head.php (and the section templates, Task 9). Edit BOTH places to avoid drift.
 $seed = [
     'maintenance.enabled'  => \Kuko\Config::get('app.maintenance', false) ? '1' : '0',
     'maintenance.password' => (string) \Kuko\Config::get('app.maintenance_password', ''),
     'seo.public_indexing'  => \Kuko\Config::get('app.public_indexing', false) ? '1' : '0',
+    'seo.default.title'       => 'KUKO detský svet — herňa a kaviareň v Piešťanoch',
+    'seo.default.description' => 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, kvalitná káva pre rodičov, oslavy na mieru. Otvorené Pon–Ne 9:00 – 20:00.',
     'seo.home.title'        => 'KUKO detský svet — herňa a kaviareň v Piešťanoch',
     'seo.home.description'  => 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, kvalitná káva pre rodičov, oslavy na mieru. Otvorené Pon–Ne 9:00 – 20:00.',
     'seo.rezervacia.title'  => 'Rezervácia oslavy — KUKO detský svet',
