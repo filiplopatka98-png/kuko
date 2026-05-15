@@ -66,4 +66,14 @@ final class ContentBlocksRepoTest extends TestCase
         $this->assertStringNotContainsString('<script', $stored);
         $this->assertStringContainsString('<p>ok</p>', $stored);
     }
+
+    public function testUpdatedAtRefreshesOnUpdate(): void
+    {
+        $this->repo->set('k', 'v1', 'text', 'a');
+        $first = $this->repo->find('k')['updated_at'];
+        sleep(1);
+        $this->repo->set('k', 'v2', 'text', 'b');
+        $second = $this->repo->find('k')['updated_at'];
+        $this->assertNotSame($first, $second, 'updated_at must refresh on UPDATE');
+    }
 }

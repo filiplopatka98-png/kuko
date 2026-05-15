@@ -49,7 +49,7 @@ final class ContentBlocksRepo
         $exists = $this->db->one('SELECT block_key FROM content_blocks WHERE block_key = ?', [$key]) !== null;
         if ($exists) {
             $this->db->execStmt(
-                'UPDATE content_blocks SET value = ?, content_type = ?, updated_by = ? WHERE block_key = ?',
+                'UPDATE content_blocks SET value = ?, content_type = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP WHERE block_key = ?',
                 [$value, $contentType, $updatedBy, $key]
             );
         } else {
