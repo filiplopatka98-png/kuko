@@ -1,4 +1,6 @@
 <?php
+$gallery  = $gallery  ?? [];
+$packages = $packages ?? [];
 $title       = 'KUKO detský svet — herňa a kaviareň v Piešťanoch';
 $description = 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, kvalitná káva pre rodičov, oslavy na mieru. Otvorené Pon–Ne 9:00 – 20:00.';
 $canonical   = '/';

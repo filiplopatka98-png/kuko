@@ -25,7 +25,16 @@ if (Maintenance::enabled() && !Maintenance::shouldBypass($path) && !$isMaintenan
 $router = new Router();
 
 $router->get('/', function () use ($renderer) {
-    echo $renderer->render('pages/home');
+    $gallery  = [];
+    $packages = [];
+    try {
+        $db = \Kuko\Db::fromConfig();
+        $gallery  = (new \Kuko\MediaRepo($db, APP_ROOT . '/public/assets/img/gallery'))->listVisible();
+        $packages = (new \Kuko\PackagesRepo($db))->listActive();
+    } catch (\Throwable $e) {
+        error_log('[home] gallery/packages load failed: ' . $e->getMessage());
+    }
+    echo $renderer->render('pages/home', ['gallery' => $gallery, 'packages' => $packages]);
 });
 
 $router->get('/robots.txt', function () {
