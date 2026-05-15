@@ -99,22 +99,23 @@ ob_start();
           <strong id="summary-package">—</strong> · <strong id="summary-date">—</strong> · <strong id="summary-time">—</strong>
         </p>
 
+        <p class="form-legend"><span class="req" aria-hidden="true">*</span> povinné pole</p>
         <div class="field">
-          <label for="f-kids">Počet detí</label>
-          <input type="number" name="kids_count" id="f-kids" required min="1" max="50" value="10">
+          <label for="f-kids">Počet detí <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" name="kids_count" id="f-kids" required aria-required="true" min="1" max="50" value="10">
         </div>
         <div class="field">
-          <label for="f-name">Meno a priezvisko</label>
-          <input type="text" name="name" id="f-name" required minlength="2" maxlength="120" autocomplete="name">
+          <label for="f-name">Meno a priezvisko <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" name="name" id="f-name" required aria-required="true" minlength="2" maxlength="120" autocomplete="name">
         </div>
         <div class="field-row">
           <div class="field">
-            <label for="f-phone">Telefón</label>
-            <input type="tel" name="phone" id="f-phone" required autocomplete="tel">
+            <label for="f-phone">Telefón <span class="req" aria-hidden="true">*</span></label>
+            <input type="tel" name="phone" id="f-phone" required aria-required="true" autocomplete="tel">
           </div>
           <div class="field">
-            <label for="f-email">E-mail</label>
-            <input type="email" name="email" id="f-email" required autocomplete="email">
+            <label for="f-email">E-mail <span class="req" aria-hidden="true">*</span></label>
+            <input type="email" name="email" id="f-email" required aria-required="true" autocomplete="email">
           </div>
         </div>
         <div class="field">
@@ -129,7 +130,7 @@ ob_start();
         </div>
         <?php endif; ?>
 
-        <p class="step__error" id="form-error" hidden></p>
+        <p class="step__error" id="form-error" role="alert" aria-live="assertive" hidden></p>
 
         <div class="step__actions">
           <button type="button" class="btn btn--ghost" data-go-step="2">‹ Späť</button>
@@ -140,7 +141,7 @@ ob_start();
 
     <!-- ===== ÚSPECH ===== -->
     <section class="step" data-step="success">
-      <div class="step__inner step__inner--success">
+      <div class="step__inner step__inner--success" role="status" aria-live="polite">
         <p class="step__emoji" aria-hidden="true">🎉</p>
         <h2 class="step__title">Ďakujeme!</h2>
         <p>Prijali sme vašu rezerváciu. Ozveme sa do 24 hodín.</p>

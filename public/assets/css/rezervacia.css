@@ -256,3 +256,7 @@ input, select, textarea { font: inherit; }
   .calendar__grid { grid-template-columns: repeat(7, minmax(36px, 1fr)); gap: 2px; }
   .step { padding: 1rem 0.75rem; }
 }
+
+/* Required-field marker + legend (a11y) */
+.req { color: #c0392b; margin-left: 0.15rem; }
+.form-legend { font-size: 0.85rem; color: var(--c-text-soft, #6A6A6A); margin: 0.25rem 0 0.75rem; }
