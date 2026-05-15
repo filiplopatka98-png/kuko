@@ -160,6 +160,36 @@ final class FaqTest extends TestCase
         $this->assertCount(6, $data['mainEntity']);
     }
 
+    public function testSchemaJsonNeutralizesScriptBreakout(): void
+    {
+        $s = Faq::schemaJson([
+            ['q' => '</script><script>alert(1)</script>', 'a' => '<a href="/x">x</a> & <b>b</b>'],
+            ['q' => 'Cena < 5 €?', 'a' => 'ok'],
+        ]);
+        // The HTML tokenizer ends a <script> on a literal `</script` and
+        // would start a new one on `<script`; neither may appear raw.
+        $this->assertFalse(strpos($s, '</script'), 'no literal </script can break the inline schema script');
+        $this->assertFalse(strpos($s, '<script'), 'no literal <script can open a new script element');
+        // Stronger: NO raw `<` or `>` char anywhere in the output.
+        $this->assertStringNotContainsString('<', $s, 'every < must be hex-escaped (JSON_HEX_TAG)');
+        $this->assertStringNotContainsString('>', $s, 'every > must be hex-escaped (JSON_HEX_TAG)');
+        // Still valid JSON and a structurally correct FAQPage.
+        $data = json_decode($s, true);
+        $this->assertIsArray($data, 'output must remain valid JSON');
+        $this->assertSame('FAQPage', $data['@type']);
+        $this->assertCount(2, $data['mainEntity']);
+        $this->assertSame('Question', $data['mainEntity'][0]['@type']);
+        $this->assertSame('Question', $data['mainEntity'][1]['@type']);
+        // json_decode reverses the \u00xx escapes, so the decoded value
+        // equals the ORIGINAL question text — safe in HTML, semantically intact.
+        $this->assertSame('</script><script>alert(1)</script>', $data['mainEntity'][0]['name']);
+        $this->assertSame('Cena < 5 €?', $data['mainEntity'][1]['name']);
+        // Answers reduced to plain text (no tags).
+        $this->assertStringNotContainsString('<', $data['mainEntity'][0]['acceptedAnswer']['text']);
+        $this->assertSame('x & b', $data['mainEntity'][0]['acceptedAnswer']['text']);
+        $this->assertSame('ok', $data['mainEntity'][1]['acceptedAnswer']['text']);
+    }
+
     // ---- wiring / string guards ----
 
     public function testFaqTemplateUsesRepeaterNotContentBlock(): void

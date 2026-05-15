@@ -121,7 +121,16 @@ final class Faq
             '@type'      => 'FAQPage',
             'mainEntity' => $mainEntity,
         ];
-        $json = json_encode($doc, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        // SECURITY: this string is emitted RAW inside an inline
+        // <script type="application/ld+json"> in head.php. The HTML tokenizer
+        // ends a <script> on a literal `</script` regardless of JSON string
+        // escaping, so we must NOT use JSON_UNESCAPED_SLASHES here (keeps
+        // `/` as `\/` → `</script>` becomes the inert `<\/script>`), and we
+        // add JSON_HEX_TAG so any `<`/`>` become `<`/`>`
+        // (defense-in-depth, fully neutralizes `<script`/`</script`).
+        // JSON_UNESCAPED_UNICODE is kept so accented Slovak chars stay
+        // human-readable. The DB storage encoding (save/seed) is unaffected.
+        $json = json_encode($doc, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
         return $json === false ? '{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[]}' : $json;
     }
 }
