@@ -38,20 +38,23 @@ foreach ($blocks as [$k, $label, $type, $val]) {
     else { echo "= skip $k\n"; }
 }
 
-// Gallery seed (only if empty) — existing static images galeria_1..5.jpg with their ALT texts.
+// Gallery seed (only if empty) — static images galeria_1..5.jpg with their ALT texts,
+// plus a 6th row reusing galeria_5.{jpg,webp} so the homepage shows a full 3×2 grid.
+// The 6th is a temporary reuse; the owner replaces it via /admin gallery later.
 $existing = (int) ($db->one('SELECT COUNT(*) AS c FROM gallery_photos')['c'] ?? 0);
 if ($existing === 0) {
-    $alts = [
-        1 => 'Detský kútik KUKO — narodeninová oslava s tortou a balónmi',
-        2 => 'Herné prvky v detskom svete KUKO — šmykľavka a hracie zóny',
-        3 => 'Interiér KUKO — rodičia pri káve, deti sa hrajú',
-        4 => 'Detská oslava v KUKO — výzdoba a deti pri stole',
-        5 => 'Vnútorný priestor detskej herne KUKO Piešťany',
+    $photos = [
+        ['galeria_1.jpg', 'galeria_1.webp', 'Detský kútik KUKO — narodeninová oslava s tortou a balónmi', 1],
+        ['galeria_2.jpg', 'galeria_2.webp', 'Herné prvky v detskom svete KUKO — šmykľavka a hracie zóny',   2],
+        ['galeria_3.jpg', 'galeria_3.webp', 'Interiér KUKO — rodičia pri káve, deti sa hrajú',              3],
+        ['galeria_4.jpg', 'galeria_4.webp', 'Detská oslava v KUKO — výzdoba a deti pri stole',              4],
+        ['galeria_5.jpg', 'galeria_5.webp', 'Vnútorný priestor detskej herne KUKO Piešťany',               5],
+        ['galeria_5.jpg', 'galeria_5.webp', 'Hracia zóna v KUKO',                                          6],
     ];
-    foreach ($alts as $i => $alt) {
+    foreach ($photos as [$jpg, $webp, $alt, $sort]) {
         $db->execStmt('INSERT INTO gallery_photos (filename, webp, alt_text, sort_order) VALUES (?,?,?,?)',
-            ["galeria_$i.jpg", "galeria_$i.webp", $alt, $i]);
-        echo "+ photo galeria_$i.jpg\n";
+            [$jpg, $webp, $alt, $sort]);
+        echo "+ photo $jpg (#$sort)\n";
     }
 } else { echo "= gallery already has $existing rows\n"; }
 

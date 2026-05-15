@@ -10,11 +10,12 @@ $galleryAlts = [
 ?>
 <section id="galeria" class="section section--galeria" data-reveal>
   <div class="container">
+    <img class="section__rainbow" src="<?= e(\Kuko\Asset::url('/assets/img/rainbow.png')) ?>" alt="" aria-hidden="true" width="260" height="120">
     <h2>Fotogaléria</h2>
     <p class="section__lead">Nazrite do nášho priestoru a atmosféry, ktorú u nás deti milujú.</p>
     <div class="gallery">
       <?php if (!empty($gallery)): ?>
-        <?php foreach ($gallery as $photo):
+        <?php foreach (array_slice($gallery, 0, 6) as $photo):
           $alt  = (string) ($photo['alt_text'] ?? 'Fotka z herne KUKO Piešťany');
           $jpg  = '/assets/img/gallery/' . $photo['filename'];
           $webp = !empty($photo['webp']) ? '/assets/img/gallery/' . $photo['webp'] : null;
@@ -39,5 +40,6 @@ $galleryAlts = [
         <?php endfor; ?>
       <?php endif; ?>
     </div>
+    <p class="gallery__cta"><a class="btn" href="/galeria">Prejsť do galérie</a></p>
   </div>
 </section>

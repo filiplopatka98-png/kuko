@@ -319,12 +319,14 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* ===== Galéria ===== */
 .section--galeria { background: var(--bg-pink-soft); }
+.section__rainbow { display: block; width: 260px; max-width: 70%; height: auto; margin: 0 auto var(--s-2); }
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); margin-top: var(--s-4); }
 @media (max-width: 768px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .gallery { grid-template-columns: 1fr; } }
-.gallery__item { padding: 0; border: 0; background: none; border-radius: var(--r-card); overflow: hidden; cursor: zoom-in; transition: transform 0.2s; display: block; }
+.gallery__item { padding: 0; border: 0; background: none; border-radius: 30px; overflow: hidden; cursor: zoom-in; transition: transform 0.2s; display: block; }
 .gallery__item:hover { transform: scale(1.03); }
-.gallery__item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.gallery__item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; border-radius: 30px; }
+.gallery__cta { text-align: center; margin-top: var(--s-4); }
 
 /* ===== Kontakt ===== */
 .section--kontakt { background: var(--bg-cream); }

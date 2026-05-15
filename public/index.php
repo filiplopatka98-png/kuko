@@ -70,6 +70,7 @@ $router->get('/sitemap.xml', function () use ($publicIndexing) {
         foreach ([
             ['/',                 '1.0', 'monthly'],
             ['/rezervacia',       '0.9', 'weekly'],
+            ['/galeria',          '0.6', 'monthly'],
             ['/faq',              '0.5', 'monthly'],
             ['/ochrana-udajov',   '0.3', 'yearly'],
         ] as [$url, $priority, $freq]) {
@@ -85,6 +86,17 @@ $router->get('/ochrana-udajov', function () use ($renderer) {
 
 $router->get('/faq', function () use ($renderer) {
     echo $renderer->render('pages/faq');
+});
+
+$router->get('/galeria', function () use ($renderer) {
+    $gallery = [];
+    try {
+        $db = \Kuko\Db::fromConfig();
+        $gallery = (new \Kuko\MediaRepo($db, \Kuko\Asset::docRoot() . '/assets/img/gallery'))->listVisible();
+    } catch (\Throwable $e) {
+        error_log('[galeria] gallery load failed: ' . $e->getMessage());
+    }
+    echo $renderer->render('pages/gallery', ['gallery' => $gallery]);
 });
 
 $router->get('/rezervacia', function () use ($renderer) {
