@@ -1,5 +1,6 @@
 <?php
 $title = 'Stránka nenájdená — KUKO detský svet';
+$pageIndexing = false;
 ob_start();
 ?>
 <main class="section" style="text-align:center;">

@@ -2,6 +2,7 @@
 /** @var array $r */
 $title = 'Status rezervácie — KUKO detský svet';
 $description = 'Prehľad vašej rezervácie v KUKO detský svet.';
+$pageIndexing = false;
 
 $statusLabel = match ((string) $r['status']) {
     'pending'   => ['Čaká na potvrdenie', '#856404', '#fff3cd'],

@@ -2,6 +2,7 @@
 /** @var bool|null $error */
 $title = 'KUKO detský svet — práve aktualizujeme';
 $description = 'Práve aktualizujeme detský svet. O chvíľu sme späť.';
+$pageIndexing = false;
 ob_start();
 ?>
 <style>
