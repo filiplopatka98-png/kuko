@@ -14,6 +14,7 @@ $blocks = [
     // [block_key, label, content_type, value] — values copied verbatim from templates
     ['hero.title', 'Hero — nadpis', 'text', 'Detský svet KUKO'],
     ['hero.subtitle', 'Hero — podtitul', 'text', 'pre radosť detí & pohodu rodičov'],
+    ['hero.tagline', 'Hero — tretí riadok (tagline)', 'text', 'Bezpečné a hravé miesto pre vaše deti v Piešťanoch'],
     ['about.lead', 'O nás — úvodný odsek', 'html', '<p>KUKO je interiérové detské ihrisko spojené s kaviarňou v Piešťanoch, vytvorené pre radosť detí a pohodlie rodičov. Mysleli sme na všetko, čo robí detský svet skutočne príjemným:</p>'],
     ['about.card1', 'O nás — karta 1', 'html', '<strong>Bezpečný, čistý a hravý priestor,</strong><br>kde sa deti môžu vyšantiť, objavovať a tráviť čas aktívne.'],
     ['about.card2', 'O nás — karta 2', 'html', 'Rodičia si zatiaľ môžu vychutnať <strong>kvalitnú kávu a chvíľku oddychu</strong> v príjemnom prostredí.'],

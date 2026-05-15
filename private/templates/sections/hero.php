@@ -4,6 +4,7 @@
   <div class="container hero__content">
     <h1 class="hero__title"><?= e(\Kuko\Content::get('hero.title', 'Detský svet KUKO')) ?></h1>
     <p class="hero__sub"><?= e(\Kuko\Content::get('hero.subtitle', 'pre radosť detí & pohodu rodičov')) ?></p>
+    <p class="hero__tagline"><?= e(\Kuko\Content::get('hero.tagline', 'Bezpečné a hravé miesto pre vaše deti v Piešťanoch')) ?></p>
     <div class="hero__cta">
       <a class="btn" href="/rezervacia">Rezervovať oslavu</a>
       <a class="btn btn--ghost" href="#cennik">Pozrieť cenník</a>
