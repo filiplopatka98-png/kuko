@@ -19,6 +19,24 @@ final class AdminWpLayoutTest extends TestCase
         foreach (['/admin/calendar','/admin/blocked-periods','/admin/opening-hours'] as $h)
             $this->assertStringContainsString('href="' . $h . '"', $this->l);
     }
+    public function testReservationSidebarSubmenu(): void
+    {
+        // REZERVÁCIE must be a sidebar group label like STRÁNKY/NASTAVENIA.
+        $this->assertMatchesRegularExpression(
+            '/admin-nav-label">REZERV\x{00C1}CIE/u',
+            $this->l,
+            'REZERVÁCIE must be a sidebar nav group label'
+        );
+        // The reservation sub-pages must appear as real sidebar nav items
+        // (.admin-nav-item), not only as in-content .admin-tab links.
+        foreach (['/admin/calendar','/admin/blocked-periods','/admin/opening-hours'] as $h) {
+            $this->assertMatchesRegularExpression(
+                '/href="' . preg_quote($h, '/') . '" class="admin-nav-item/',
+                $this->l,
+                $h . ' must be a sidebar .admin-nav-item'
+            );
+        }
+    }
     public function testA11yPreserved(): void
     {
         $this->assertStringContainsString('class="skip-link"', $this->l);
