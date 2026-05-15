@@ -57,7 +57,7 @@ ob_start();
   <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/anonymize"
         onsubmit="return confirm('Anonymizovať? PII (meno, telefón, e-mail, poznámka) sa nenávratne vymažú. Štatistika zostane.');">
     <input type="hidden" name="csrf" value="<?= e(\Kuko\Csrf::token()) ?>">
-    <button type="submit" style="background:#c0392b;color:#fff;border:none;padding:0.5rem 1rem;cursor:pointer;border-radius:3px">Anonymizovať (GDPR)</button>
+    <button type="submit" class="admin-btn-link">Anonymizovať (GDPR)</button>
   </form>
 </div>
 <?php

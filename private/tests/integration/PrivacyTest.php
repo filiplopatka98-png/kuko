@@ -59,6 +59,20 @@ final class PrivacyTest extends TestCase
         $this->assertSame(0, $p->purgeOlderThan(6));
     }
 
+    public function testPurgeAnonymizesOldRowsWithEmptyEmail(): void
+    {
+        $this->db->execStmt(
+            "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
+             VALUES ('mini','2024-12-01','10:00',5,'Walkin Guest','+421900999000','','','confirmed','UA3', ?)",
+            [(new \DateTimeImmutable('-8 months'))->format('Y-m-d H:i:s')]
+        );
+        $p = new \Kuko\Privacy($this->db);
+        $p->purgeOlderThan(6);
+        $row = $this->db->all("SELECT name, phone FROM reservations WHERE id=3")[0];
+        $this->assertSame('anonymizovaný', (string) $row['name']);
+        $this->assertSame('', (string) $row['phone']);
+    }
+
     public function testExportByEmailCaseInsensitive(): void
     {
         $p = new Privacy($this->db);

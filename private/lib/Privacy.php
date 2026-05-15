@@ -18,7 +18,7 @@ final class Privacy
     public function purgeOlderThan(int $months): int
     {
         $cutoff = (new \DateTimeImmutable("-{$months} months"))->format('Y-m-d H:i:s');
-        $rows = $this->db->all("SELECT id FROM reservations WHERE created_at < ? AND email <> ''", [$cutoff]);
+        $rows = $this->db->all("SELECT id FROM reservations WHERE created_at < ? AND name <> 'anonymizovaný'", [$cutoff]);
         foreach ($rows as $r) {
             $this->anonymizeReservation((int) $r['id']);
         }
