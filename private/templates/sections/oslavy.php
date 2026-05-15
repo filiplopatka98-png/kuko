@@ -101,7 +101,7 @@ foreach ($renderList as $entry) {
         ?>
 <article class="package package--<?= e($accent) ?>">
         <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3><?= e($p['name'] ?? '') ?></h3></header>
-        <p class="package__desc"><?= e($p['description']) ?></p>
+        <p class="package__desc"><?= $p['description'] ?></p>
         <ul class="package__meta">
           <?php if (!empty($p['kids_count_text'])): ?>
           <li><span class="ic" aria-hidden="true">👶</span> Počet detí: <?= e($p['kids_count_text']) ?></li>

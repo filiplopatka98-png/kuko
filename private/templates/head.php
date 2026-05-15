@@ -107,7 +107,7 @@ $robots = $seo['robots'];
   }],
   "sameAs": [
     <?php
-    $social = array_filter([(string) \Kuko\Config::get('social.facebook', ''), (string) \Kuko\Config::get('social.instagram', '')]);
+    $social = array_filter([\Kuko\Social::url('facebook', ''), \Kuko\Social::url('instagram', '')]);
     echo implode(",\n    ", array_map(fn($u) => '"' . e($u) . '"', $social));
     ?>
   ]

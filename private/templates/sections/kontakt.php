@@ -34,10 +34,10 @@
         <div class="contact-card contact-card--purple">
           <p class="contact-card__title">Sledujte nás na sociálnych sieťach:</p>
           <div class="contact-card__socials">
-            <a href="<?= e(\Kuko\Config::get('social.facebook', '#')) ?>" aria-label="Facebook" rel="noopener" target="_blank">
+            <a href="<?= e(\Kuko\Social::url('facebook', '#')) ?>" aria-label="Facebook" rel="noopener" target="_blank">
               <img src="/assets/icons/facebook-app-symbol.svg" alt="Facebook" width="18" height="18">
             </a>
-            <a href="<?= e(\Kuko\Config::get('social.instagram', '#')) ?>" aria-label="Instagram" rel="noopener" target="_blank">
+            <a href="<?= e(\Kuko\Social::url('instagram', '#')) ?>" aria-label="Instagram" rel="noopener" target="_blank">
               <img src="/assets/icons/instagram.svg" alt="Instagram" width="18" height="18">
             </a>
           </div>

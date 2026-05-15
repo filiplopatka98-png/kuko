@@ -219,6 +219,32 @@ $router->post('/admin/content/save', function () use ($db, $audit, $flash, $admi
     header('Location: /admin/content');
 });
 
+// ===== Contact (kontakt content blocks + social settings) =====
+$router->get('/admin/contact', function () use ($renderer, $db, $settings, $adminUser, $flashes) {
+    $cb = new \Kuko\ContentBlocksRepo($db);
+    $contact = [
+        'address' => $cb->get('kontakt.address') ?? 'Bratislavská 141, 921 01 Piešťany',
+        'phone'   => $cb->get('kontakt.phone')   ?? '+421 915 319 934',
+        'email'   => $cb->get('kontakt.email')   ?? 'info@kuko-detskysvet.sk',
+        'hours'   => $cb->get('kontakt.hours')   ?? 'Pondelok – Nedeľa: 9:00 – 20:00',
+        'facebook'  => $settings->get('social.facebook')  ?? (string) \Kuko\Config::get('social.facebook', ''),
+        'instagram' => $settings->get('social.instagram') ?? (string) \Kuko\Config::get('social.instagram', ''),
+    ];
+    echo $renderer->render('contact', ['contact' => $contact, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+$router->post('/admin/contact', function () use ($db, $settings, $audit, $flash, $adminUser) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $cb = new \Kuko\ContentBlocksRepo($db);
+    foreach (['address', 'phone', 'email', 'hours'] as $f) {
+        $cb->set('kontakt.' . $f, trim((string) ($_POST[$f] ?? '')), 'text', $adminUser);
+    }
+    $settings->set('social.facebook',  trim((string) ($_POST['facebook']  ?? '')));
+    $settings->set('social.instagram', trim((string) ($_POST['instagram'] ?? '')));
+    $audit('contact_save', 'content_blocks', 0);
+    $flash('Kontaktné údaje uložené.');
+    header('Location: /admin/contact');
+});
+
 // ===== Gallery =====
 $galleryDir = APP_ROOT . '/public/assets/img/gallery';
 $router->get('/admin/gallery', function () use ($renderer, $db, $galleryDir, $adminUser, $flashes) {
@@ -332,12 +358,22 @@ $router->get('/admin/packages', function () use ($renderer, $packages, $adminUse
 $router->post('/admin/packages/{code}', function (array $p) use ($packages, $audit, $flash) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
     $code = (string) $p['code'];
+    $accent = (string) ($_POST['accent_color'] ?? 'blue');
+    if (!in_array($accent, ['blue', 'purple', 'yellow'], true)) $accent = 'blue';
+    $items = array_values(array_filter(array_map('trim', explode("\n", (string) ($_POST['included'] ?? '')))));
+    $includedJson = json_encode($items, JSON_UNESCAPED_UNICODE);
     $packages->update($code, [
         'name'            => (string) $_POST['name'],
         'duration_min'    => (int) $_POST['duration_min'],
         'blocks_full_day' => !empty($_POST['blocks_full_day']),
         'is_active'       => !empty($_POST['is_active']),
         'sort_order'      => (int) ($_POST['sort_order'] ?? 0),
+        'description'     => \Kuko\HtmlSanitizer::clean((string) ($_POST['description'] ?? '')),
+        'price_text'      => (string) ($_POST['price_text'] ?? ''),
+        'kids_count_text' => (string) ($_POST['kids_count_text'] ?? ''),
+        'duration_text'   => (string) ($_POST['duration_text'] ?? ''),
+        'included_json'   => $includedJson,
+        'accent_color'    => $accent,
     ]);
     $audit('update_package', 'packages', 0, ['code' => $code]);
     $flash("Balíček $code uložený.");

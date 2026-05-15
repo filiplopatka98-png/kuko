@@ -17,7 +17,7 @@ final class RepositoriesTest extends TestCase
     {
         $this->db = Db::fromDsn('sqlite::memory:');
         $this->db->exec("CREATE TABLE settings (setting_key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT (datetime('now')))");
-        $this->db->exec("CREATE TABLE packages (code TEXT PRIMARY KEY, name TEXT NOT NULL, duration_min INTEGER NOT NULL, blocks_full_day INTEGER NOT NULL DEFAULT 0, is_active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0)");
+        $this->db->exec("CREATE TABLE packages (code TEXT PRIMARY KEY, name TEXT NOT NULL, duration_min INTEGER NOT NULL, blocks_full_day INTEGER NOT NULL DEFAULT 0, is_active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, description TEXT, price_text TEXT, kids_count_text TEXT, duration_text TEXT, included_json TEXT, accent_color TEXT)");
         $this->db->exec("CREATE TABLE opening_hours (weekday INTEGER PRIMARY KEY, is_open INTEGER NOT NULL DEFAULT 1, open_from TEXT NOT NULL, open_to TEXT NOT NULL)");
         $this->db->exec("CREATE TABLE blocked_periods (id INTEGER PRIMARY KEY AUTOINCREMENT, date_from TEXT NOT NULL, date_to TEXT NOT NULL, time_from TEXT, time_to TEXT, reason TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')))");
     }
@@ -45,6 +45,33 @@ final class RepositoriesTest extends TestCase
         $p->update('mini', ['name' => 'MINI v2', 'duration_min' => 150, 'blocks_full_day' => 0, 'is_active' => 1, 'sort_order' => 5]);
         $this->assertSame('MINI v2', $p->find('mini')['name']);
         $this->assertSame(150, (int) $p->find('mini')['duration_min']);
+    }
+
+    public function testUpdatePersistsExtendedFields(): void
+    {
+        $this->db->execStmt("INSERT INTO packages (code, name, duration_min, sort_order) VALUES ('mini','MINI',120,1)");
+        $p = new PackagesRepo($this->db);
+        $p->update('mini', [
+            'name'            => 'MINI',
+            'duration_min'    => 120,
+            'blocks_full_day' => 0,
+            'is_active'       => 1,
+            'sort_order'      => 1,
+            'description'     => '<p>Popis <strong>mini</strong></p>',
+            'price_text'      => '120 €',
+            'kids_count_text' => 'do 10',
+            'duration_text'   => '2 h',
+            'included_json'   => '["Polozka A","Polozka B"]',
+            'accent_color'    => 'blue',
+        ]);
+        $row = $p->find('mini');
+        $this->assertSame('<p>Popis <strong>mini</strong></p>', $row['description']);
+        $this->assertSame('120 €', $row['price_text']);
+        $this->assertSame('do 10', $row['kids_count_text']);
+        $this->assertSame('2 h', $row['duration_text']);
+        $this->assertSame('["Polozka A","Polozka B"]', $row['included_json']);
+        $this->assertSame('blue', $row['accent_color']);
+        $this->assertSame(['Polozka A', 'Polozka B'], json_decode((string) $row['included_json'], true));
     }
 
     public function testOpeningHoursUpdate(): void

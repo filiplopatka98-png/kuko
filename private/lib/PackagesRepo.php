@@ -30,13 +30,21 @@ final class PackagesRepo
     public function update(string $code, array $d): void
     {
         $this->db->execStmt(
-            'UPDATE packages SET name = ?, duration_min = ?, blocks_full_day = ?, is_active = ?, sort_order = ? WHERE code = ?',
+            'UPDATE packages SET name = ?, duration_min = ?, blocks_full_day = ?, is_active = ?, sort_order = ?, '
+            . 'description = ?, price_text = ?, kids_count_text = ?, duration_text = ?, included_json = ?, accent_color = ? '
+            . 'WHERE code = ?',
             [
                 (string) $d['name'],
                 (int) $d['duration_min'],
                 (int) ($d['blocks_full_day'] ?? 0),
                 (int) ($d['is_active'] ?? 1),
                 (int) ($d['sort_order'] ?? 0),
+                isset($d['description'])     ? (string) $d['description']     : null,
+                isset($d['price_text'])      ? (string) $d['price_text']      : null,
+                isset($d['kids_count_text']) ? (string) $d['kids_count_text'] : null,
+                isset($d['duration_text'])   ? (string) $d['duration_text']   : null,
+                isset($d['included_json'])   ? (string) $d['included_json']   : null,
+                isset($d['accent_color'])    ? (string) $d['accent_color']    : null,
                 $code,
             ]
         );
