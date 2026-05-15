@@ -10,6 +10,7 @@ ob_start();
     <h1>Ochrana osobných údajov</h1>
     <p>Posledná aktualizácia: <?= date('j. n. Y') ?></p>
 
+<?= \Kuko\Content::get('privacy.body', <<<'HTML'
     <h2 style="text-align:left;">1. Prevádzkovateľ</h2>
     <p>Prevádzkovateľom webu kuko-detskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
 
@@ -34,7 +35,8 @@ ob_start();
     <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
 
     <p style="margin-top: 3rem;"><a href="/">&larr; Späť na domov</a></p>
-  </div>
+
+HTML) ?>  </div>
 </div>
 <?php
 $content = ob_get_clean();

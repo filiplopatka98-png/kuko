@@ -34,6 +34,65 @@ $blocks = [
     ['kontakt.email', 'Kontakt — e-mail', 'text', 'info@kuko-detskysvet.sk'],
     ['kontakt.hours', 'Kontakt — otváracie hodiny', 'text', 'Pondelok – Nedeľa: 9:00 – 20:00'],
     ['footer.copyright', 'Footer — copyright', 'text', 'Copyright © {{year}} KUKO-detskysvet.sk | Všetky práva vyhradené.'],
+    // Editable pages (admin "Stránky") — values copied verbatim from the
+    // hardcoded fallbacks in pages/privacy.php and pages/faq.php.
+    ['privacy.body', 'Ochrana údajov — text', 'html', <<<'HTML'
+    <h2 style="text-align:left;">1. Prevádzkovateľ</h2>
+    <p>Prevádzkovateľom webu kuko-detskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+
+    <h2 style="text-align:left;">2. Rozsah a účel spracovania</h2>
+    <p>Pri rezervácii oslavy spracúvame údaje, ktoré ste nám poskytli prostredníctvom formulára: meno, telefón, e-mail, požadovaný dátum a čas oslavy, počet detí a poznámku. Tieto údaje spracúvame výlučne na účel vybavenia vašej rezervácie a kontaktu vo veci oslavy.</p>
+
+    <h2 style="text-align:left;">3. Právny základ</h2>
+    <p>Spracovanie prebieha na základe vašej žiadosti o rezerváciu (predzmluvné konanie podľa čl. 6 ods. 1 písm. b GDPR) a nášho oprávneného záujmu zabezpečiť funkčnosť rezervačného systému (čl. 6 ods. 1 písm. f GDPR).</p>
+
+    <h2 style="text-align:left;">4. Doba uchovávania</h2>
+    <p>Údaje uchovávame po dobu potrebnú na vybavenie rezervácie a 6 mesiacov po jej skončení, následne sú anonymizované alebo vymazané.</p>
+
+    <h2 style="text-align:left;">5. Cookies a Google reCAPTCHA</h2>
+    <p>Web používa nasledujúce cookies:</p>
+    <ul>
+      <li><strong>Technické cookies</strong> (PHPSESSID, cookie_consent) — nevyhnutné pre fungovanie a uloženie vášho rozhodnutia o cookies. Tieto cookies nevyžadujú váš súhlas.</li>
+      <li><strong>Google reCAPTCHA</strong> (_GRECAPTCHA) — slúži na ochranu rezervačného formulára pred spamom. Spoločnosť Google týmto môže získať údaje o vašom správaní na stránke. Cookie sa nahrá iba po vašom súhlase. Viac informácií: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</li>
+    </ul>
+    <p>Súhlas s cookies môžete kedykoľvek odvolať kliknutím na „Cookie nastavenia" v pätičke.</p>
+
+    <h2 style="text-align:left;">6. Vaše práva</h2>
+    <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+
+    <p style="margin-top: 3rem;"><a href="/">&larr; Späť na domov</a></p>
+HTML],
+    ['faq.intro', 'FAQ — úvod', 'html', <<<'HTML'
+<p class="section__lead">Najčastejšie veci, ktoré sa nás rodičia pýtajú pred prvou návštevou.</p>
+HTML],
+    ['faq.items', 'FAQ — otázky a odpovede', 'html', <<<'HTML'
+<div class="faq">
+        <details class="faq__item">
+          <summary>Aké sú ceny vstupu do KUKO?</summary>
+          <p>Dieťa do 1 roku má vstup <strong>zadarmo</strong>. Dieťa od 1 roku platí <strong>5 € za hodinu</strong>, alebo <strong>15 € na celý deň neobmedzene</strong>.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Akú oslavu si môžem zarezervovať?</summary>
+          <p>Ponúkame 3 balíčky osláv: <strong>KUKO MINI</strong> (do 10 detí, 2 hodiny, 120–150 €), <strong>KUKO MAXI</strong> (do 20 detí, 3 hodiny, 220–260 €) a <strong>Uzavretá spoločnosť</strong> (celé KUKO len pre vás, 4 hodiny, 350 €). <a href="/rezervacia">Rezervovať</a>.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Aké sú otváracie hodiny?</summary>
+          <p>KUKO je otvorený <strong>každý deň</strong>, Pondelok – Nedeľa od 9:00 do 20:00.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Pre aký vek detí je KUKO vhodný?</summary>
+          <p>KUKO je vhodný pre deti od narodenia. Pre najmenších máme bezpečné kojenecké zóny, pre väčšie deti aktívne hracie prvky. Rodičia sú za bezpečnosť svojich detí v priestore zodpovední.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Kde sa KUKO nachádza?</summary>
+          <p>Nájdete nás na <strong>Bratislavskej 141, 921 01 Piešťany</strong>. Pozrite si mapu v sekcii <a href="/#kontakt">Kontakt</a>.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Ako môžem zrušiť alebo zmeniť rezerváciu?</summary>
+          <p>Zmenu alebo zrušenie termínu vybavíme telefonicky na <a href="tel:+421915319934">+421 915 319 934</a> alebo e-mailom na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Cez web rezerváciu meniť nedá.</p>
+        </details>
+      </div>
+HTML],
 ];
 foreach ($blocks as [$k, $label, $type, $val]) {
     if ($cb->get($k) === null) { $cb->set($k, $val, $type, 'seed', $label); echo "+ block $k\n"; }

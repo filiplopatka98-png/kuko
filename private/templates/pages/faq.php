@@ -8,8 +8,11 @@ ob_start();
   <section class="section section--faq" data-reveal>
     <div class="container">
       <h1>Často kladené otázky</h1>
-      <p class="section__lead">Najčastejšie veci, ktoré sa nás rodičia pýtajú pred prvou návštevou.</p>
-      <div class="faq">
+      <?= \Kuko\Content::get('faq.intro', <<<'HTML'
+<p class="section__lead">Najčastejšie veci, ktoré sa nás rodičia pýtajú pred prvou návštevou.</p>
+
+HTML) ?>      <?= \Kuko\Content::get('faq.items', <<<'HTML'
+<div class="faq">
         <details class="faq__item">
           <summary>Aké sú ceny vstupu do KUKO?</summary>
           <p>Dieťa do 1 roku má vstup <strong>zadarmo</strong>. Dieťa od 1 roku platí <strong>5 € za hodinu</strong>, alebo <strong>15 € na celý deň neobmedzene</strong>.</p>
@@ -35,7 +38,8 @@ ob_start();
           <p>Zmenu alebo zrušenie termínu vybavíme telefonicky na <a href="tel:+421915319934">+421 915 319 934</a> alebo e-mailom na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Cez web rezerváciu meniť nedá.</p>
         </details>
       </div>
-      <p style="text-align:center; margin-top:2rem;"><a class="btn" href="/">&larr; Späť na domov</a></p>
+
+HTML) ?>      <p style="text-align:center; margin-top:2rem;"><a class="btn" href="/">&larr; Späť na domov</a></p>
     </div>
   </section>
 <?php

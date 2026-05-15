@@ -120,6 +120,7 @@ $robots = $seo['robots'];
 </script>
 
 <?php if (($pageType ?? '') === 'faq'): ?>
+<!-- NOTE: keep questions in sync with the faq.items content block (/admin Stránky → FAQ). Schema kept static to guarantee valid JSON-LD. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
