@@ -149,6 +149,10 @@ ob_start();
         <h2 class="step__title">Ďakujeme!</h2>
         <p>Prijali sme vašu rezerváciu. Ozveme sa do 24 hodín.</p>
         <p id="success-link"></p>
+        <div class="success-cal" id="success-cal" hidden>
+          <a class="btn btn--ghost" id="cal-ics" download="kuko-oslava.ics" href="#">Stiahnuť .ics</a>
+          <a class="btn btn--ghost" id="cal-gcal" target="_blank" rel="noopener" href="#">Pridať do Google kalendára</a>
+        </div>
         <p><a class="btn" href="/">Späť na domov</a></p>
       </div>
     </section>

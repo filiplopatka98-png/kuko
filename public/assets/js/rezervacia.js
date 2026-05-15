@@ -35,6 +35,64 @@ if (root) {
     return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
   }
 
+  // ---------- Add-to-calendar (success step affordance) ----------
+  // Built purely client-side from data the success step already has. The
+  // booking has ALREADY succeeded by the time this runs — wrap everything in
+  // try/catch so a calendar failure can never break the success display.
+  function buildCalendarLinks() {
+    try {
+      const cal = document.getElementById('success-cal');
+      if (!cal) return;
+      const isoDate = dateInput.value;            // YYYY-MM-DD
+      const hm      = timeInput.value;            // HH:MM
+      if (!isoDate || !hm) return;
+      const durMin  = selectedDuration > 0 ? selectedDuration : 120;
+
+      // Local Europe/Bratislava wall time → Date. toISOString() then yields the
+      // correct UTC instant for the calendar import.
+      const start = new Date(`${isoDate}T${hm}:00`);
+      const end   = new Date(start.getTime() + durMin * 60000);
+      const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+      const startU = stamp(start);
+      const endU   = stamp(end);
+      const nowU   = stamp(new Date());
+      const uid    = (Date.now().toString(36) + Math.random().toString(36).slice(2)) + '@kuko-detskysvet.sk';
+
+      const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//KUKO//rezervacia//SK',
+        'BEGIN:VEVENT',
+        'UID:' + uid,
+        'DTSTAMP:' + nowU,
+        'DTSTART:' + startU,
+        'DTEND:' + endU,
+        'SUMMARY:Oslava v KUKO',
+        'LOCATION:KUKO detský svet\\, Bratislavská 141\\, 921 01 Piešťany',
+        'END:VEVENT',
+        'END:VCALENDAR',
+      ].join('\r\n');
+
+      const icsLink = document.getElementById('cal-ics');
+      if (icsLink) {
+        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        icsLink.href = URL.createObjectURL(blob);
+      }
+
+      const gcalLink = document.getElementById('cal-gcal');
+      if (gcalLink) {
+        const loc = encodeURIComponent('KUKO detský svet, Bratislavská 141, 921 01 Piešťany');
+        gcalLink.href =
+          'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+          '&text=' + encodeURIComponent('Oslava v KUKO') +
+          '&dates=' + startU + '/' + endU +
+          '&location=' + loc;
+      }
+
+      cal.hidden = false;
+    } catch (e) { /* nice-to-have only — never break the success screen */ }
+  }
+
   // ---------- Step navigation ----------
   function goStep(step) {
     steps.forEach(s => s.classList.toggle('is-active', s.dataset.step === String(step)));
@@ -528,6 +586,7 @@ if (root) {
       }
 
       clearDraft();
+      buildCalendarLinks();
       goStep('success');
     } catch (err) {
       errorBox.textContent = err.message;

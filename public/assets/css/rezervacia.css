@@ -235,6 +235,7 @@ input, select, textarea { font: inherit; }
 
 /* ===== Footer disclaimer in success ===== */
 #success-link { color: var(--c-text-soft); font-size: 0.9rem; margin: 1.5rem 0; }
+.success-cal { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
 
 /* ===== Cookie banner (compact, since we import the standard one) ===== */
 .cookie-banner {
