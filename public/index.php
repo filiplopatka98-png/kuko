@@ -49,6 +49,7 @@ $router->get('/sitemap.xml', function () {
         foreach ([
             ['/',                 '1.0', 'monthly'],
             ['/rezervacia',       '0.9', 'weekly'],
+            ['/faq',              '0.5', 'monthly'],
             ['/ochrana-udajov',   '0.3', 'yearly'],
         ] as [$url, $priority, $freq]) {
             echo "  <url>\n    <loc>{$base}{$url}</loc>\n    <lastmod>{$today}</lastmod>\n    <changefreq>{$freq}</changefreq>\n    <priority>{$priority}</priority>\n  </url>\n";
@@ -59,6 +60,10 @@ $router->get('/sitemap.xml', function () {
 
 $router->get('/ochrana-udajov', function () use ($renderer) {
     echo $renderer->render('pages/privacy');
+});
+
+$router->get('/faq', function () use ($renderer) {
+    echo $renderer->render('pages/faq');
 });
 
 $router->get('/rezervacia', function () use ($renderer) {

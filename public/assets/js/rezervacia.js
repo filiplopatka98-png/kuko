@@ -26,6 +26,14 @@ if (root) {
   let recaptchaPromise = null;
   let currentMonth = new Date();
   currentMonth.setDate(1);
+  let selectedDuration = 0; // minutes — duration of the picked package
+
+  // "09:00" + 120 min → "11:00"
+  function addMinutes(hm, minutes) {
+    const [h, m] = hm.split(':').map(Number);
+    const total = h * 60 + m + minutes;
+    return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+  }
 
   // ---------- Step navigation ----------
   function goStep(step) {
@@ -49,6 +57,7 @@ if (root) {
       const code = card.dataset.pickPackage;
       const dur  = card.dataset.duration;
       pkgInput.value = code;
+      selectedDuration = parseInt(dur, 10) || 0;
       selPkgName.textContent = card.querySelector('h2').textContent;
       selPkgDur.textContent  = dur;
       sumPkg.textContent     = card.querySelector('h2').textContent;
@@ -147,11 +156,8 @@ if (root) {
         cell.title = reasonLabel(reason);
       } else {
         cell.classList.add('day--available');
-        const count = document.createElement('span');
-        count.className = 'day__count';
-        count.textContent = `${info.slots_count}×`;
-        cell.appendChild(count);
         cell.dataset.date = iso;
+        cell.title = 'Voľné — kliknite pre výber času';
         cell.addEventListener('click', () => selectDay(cell, iso));
       }
 
@@ -199,26 +205,42 @@ if (root) {
       slotGrid.innerHTML = '<p style="color:#c0392b">V tento deň už nie sú voľné časy.</p>';
       return;
     }
+
+    // Help text — explains that you pick a START time and the package spans N hours
+    const durH = Math.floor(selectedDuration / 60);
+    const durM = selectedDuration % 60;
+    const durLabel = durM === 0 ? `${durH} h` : `${durH} h ${durM} min`;
+    const hint = document.createElement('p');
+    hint.className = 'slot-help';
+    hint.innerHTML = `Vyberte <strong>začiatok</strong> oslavy. Každý termín pokrýva celý balíček (<strong>${durLabel}</strong>).`;
+    slotGrid.appendChild(hint);
+
+    const list = document.createElement('div');
+    list.className = 'slot-list';
     slots.forEach(t => {
+      const end = addMinutes(t, selectedDuration);
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'slot';
       b.setAttribute('role', 'radio');
       b.setAttribute('aria-checked', 'false');
-      b.textContent = t;
+      b.dataset.start = t;
+      b.innerHTML = `<span class="slot__range">${t} – ${end}</span><span class="slot__dur">${durLabel}</span>`;
+      b.setAttribute('aria-label', `Oslava ${t} až ${end}, ${durLabel}`);
       b.addEventListener('click', () => {
-        slotGrid.querySelectorAll('.slot').forEach(s => {
+        list.querySelectorAll('.slot').forEach(s => {
           s.classList.remove('is-selected');
           s.setAttribute('aria-checked', 'false');
         });
         b.classList.add('is-selected');
         b.setAttribute('aria-checked', 'true');
         timeInput.value = t;
-        sumTime.textContent = t;
+        sumTime.textContent = `${t} – ${end}`;
         to3Btn.disabled = false;
       });
-      slotGrid.appendChild(b);
+      list.appendChild(b);
     });
+    slotGrid.appendChild(list);
   }
 
   // Calendar navigation

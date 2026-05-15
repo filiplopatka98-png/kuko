@@ -11,7 +11,6 @@ ob_start();
   <?php require __DIR__ . '/../sections/cennik.php'; ?>
   <?php require __DIR__ . '/../sections/oslavy.php'; ?>
   <?php require __DIR__ . '/../sections/galeria.php'; ?>
-  <?php require __DIR__ . '/../sections/faq.php'; ?>
   <?php require __DIR__ . '/../sections/kontakt.php'; ?>
 </main>
 <?php require __DIR__ . '/../footer.php'; ?>

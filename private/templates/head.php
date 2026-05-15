@@ -109,7 +109,7 @@ $robots = $index ? 'index, follow' : 'noindex, nofollow';
 }
 </script>
 
-<?php if (($pageType ?? '') === 'home'): ?>
+<?php if (($pageType ?? '') === 'faq'): ?>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
