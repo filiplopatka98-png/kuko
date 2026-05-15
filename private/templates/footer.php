@@ -1,7 +1,7 @@
 <footer class="footer">
   <div class="container footer__inner">
     <div class="footer__logo">
-      <img src="/assets/img/logo.png" alt="KUKO detský svet" width="180" height="120">
+      <img src="<?= e(\Kuko\Asset::url('/assets/img/logo.png')) ?>" alt="KUKO detský svet" width="244" height="180">
     </div>
   </div>
   <div class="footer__nav-bg">
