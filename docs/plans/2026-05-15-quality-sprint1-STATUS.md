@@ -147,3 +147,12 @@ Plán: `docs/plans/2026-05-15-design-fixes.md` (user feedback vs `screenshots/`)
 - ⏳ DT-8 regression + bookkeeping + **deploy celých design-fixes** (DT-1..DT-7 sa nasadia naraz; push+lftp; overiť prod invarianty + nové assety cache-busted).
 
 Owner doplní neskôr: presný hero tagline text (cez /admin/content) + reálna 6. galéria fotka (cez /admin galéria). Po design-fixes: go-live (#1) owner items + flip maintenance OFF.
+
+---
+
+## ✅ Design corrections DT-1..DT-8 — NASADENÉ (2026-05-15)
+
+DT-1..DT-7 hotové (každá impl + review; konsolidovaný review APPROVED), DT-8 deploy. 219 PHPUnit testov green. Commity `2f1ddcf`…`12ff356`.
+- DT-1 logo+rainbow z Logo.jpeg · DT-2 header rebuild (topbar/center logo/pink nav) + footer logo · DT-3 hero tagline (editovateľný blok) · DT-4 O nás (hrubé bordery+ikony+straddle CTA) · DT-5 Oslavy (bordery+top icon badge+straddle CTA) · DT-6 galéria (rainbow+6 grid 30px radius+/galeria stránka, seed 6. fotka idempotentne) · DT-7 Kontakt (bordery+asset ikony+social v jednom riadku).
+- Prod seed cez `_setup.php?action=seed&token=` (pridané, idempotentné): doplní `hero.tagline` content blok + 6. galéria fotku; ostatné = skip.
+- Owner doplní cez /admin: presný hero tagline text + reálnu 6. galéria fotku (teraz dočasne = galeria_5).
