@@ -209,15 +209,17 @@ img, svg { max-width: 100%; height: auto; display: block; }
   grid-template-columns: repeat(4, 1fr);
   gap: var(--s-3);
   margin-top: var(--s-4);
+  /* room for the straddling CTA that protrudes below the last card */
+  padding-bottom: var(--s-4);
 }
 @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px)  { .cards-grid { grid-template-columns: 1fr; } }
 
 .card {
   background: var(--c-white);
-  border-radius: var(--r-card);
+  border-radius: 20px;
   padding: var(--s-3);
-  border: 3px solid;
+  border: 5px solid;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -227,11 +229,24 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .card--blue   { border-color: var(--c-blue); }
 .card--peach  { border-color: var(--c-peach); }
 .card--yellow { border-color: var(--c-yellow); }
-.card--purple { border-color: var(--c-purple); }
+.card--purple { border-color: var(--c-purple); position: relative; }
 
-.card__icon { width: 48px; height: 48px; margin-top: var(--s-1); }
+.card__icon { width: 64px; height: 64px; margin-top: var(--s-1); }
 .card__body { color: var(--c-text); font-size: 0.95rem; margin: 0; }
 .card__cta { margin-top: auto; }
+
+/* CTA that straddles the bottom border of the last (purple) card */
+.btn--straddle {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  margin: 0;
+  background: var(--bg-pink-soft);
+  color: var(--c-text);
+  white-space: nowrap;
+  z-index: 1;
+}
 
 /* ===== Cenník ===== */
 .section--cennik { background: var(--bg-pink-soft); }
