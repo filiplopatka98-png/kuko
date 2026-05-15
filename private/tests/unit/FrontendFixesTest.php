@@ -41,4 +41,9 @@ final class FrontendFixesTest extends TestCase
         $this->assertMatchesRegularExpression('/\.kontakt__map-wrap\s*\{[^}]*isolation:\s*isolate/s', $css);
         $this->assertMatchesRegularExpression('/\.nav\s*\{[^}]*z-index:\s*200/s', $css);
     }
+    public function testStraddleHoverKeepsOffset(): void
+    {
+        $css = file_get_contents($this->root . "/public/assets/css/main.css");
+        $this->assertMatchesRegularExpression("/\.btn--straddle:hover\s*\{[^}]*translate\(-50%/s", $css, "straddle hover must keep the centering translate");
+    }
 }

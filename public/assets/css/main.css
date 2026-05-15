@@ -247,6 +247,9 @@ img, svg { max-width: 100%; height: auto; display: block; }
   white-space: nowrap;
   z-index: 1;
 }
+/* Keep the straddle offset on hover (plain .btn:hover would override the
+   centering translate and make the button jump away). */
+.btn--straddle:hover { transform: translate(-50%, calc(50% - 3px)); }
 
 /* ===== Cenník ===== */
 .section--cennik { background: var(--bg-pink-soft); }
