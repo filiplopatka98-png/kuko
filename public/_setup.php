@@ -1,6 +1,6 @@
 <?php
 // One-shot deployment helper — REMOVE AFTER USE.
-// Use ?action=path|migrate|delete & token=<token-from-config>
+// Use ?action=path|migrate|seed|smoke|delete & token=<token-from-config>
 declare(strict_types=1);
 
 require dirname(__DIR__) . '/private/lib/App.php';
@@ -58,6 +58,16 @@ switch ($action) {
         echo "all migrations applied\n";
         break;
 
+    case 'seed':
+        try {
+            require dirname(__DIR__) . '/private/scripts/seed-cms.php';
+            echo "seed-cms done\n";
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo "seed failed: " . $e->getMessage() . "\n";
+        }
+        break;
+
     case 'delete':
         if (@unlink(__FILE__)) {
             echo "deleted\n";
@@ -81,5 +91,5 @@ switch ($action) {
         break;
 
     default:
-        echo "actions: path | migrate | smoke | delete\n";
+        echo "actions: path | migrate | seed | smoke | delete\n";
 }

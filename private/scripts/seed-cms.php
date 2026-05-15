@@ -3,8 +3,10 @@
 // + maintenance/SEO settings from hardcoded/config. Safe to run repeatedly.
 declare(strict_types=1);
 
-require __DIR__ . '/../lib/autoload.php';
-\Kuko\Config::load(__DIR__ . '/../../config/config.php');
+require_once __DIR__ . '/../lib/autoload.php';
+if (!\Kuko\Config::isLoaded()) {
+    \Kuko\Config::load(__DIR__ . '/../../config/config.php');
+}
 $db = \Kuko\Db::fromConfig();
 $cb = new \Kuko\ContentBlocksRepo($db);
 
