@@ -32,11 +32,13 @@ Tracking dokument pre Quality Roadmap Sprint 1. Plán: `docs/plans/2026-05-15-qu
 
 ## ⏭️ KDE POKRAČOVAŤ (presný bod)
 
-**Hotové T1–T6** (každá spec+code-quality review prešla). Stav testov: **OK (126 tests, 254 assertions)**.
+**Hotové T1–T8** (každá spec+code-quality review prešla, všetky fixy zapracované). T9 lokálne časti hotové: full suite **OK (131 tests, 280 assertions)**, lint čistý, dev smoke OK (/,  /rezervacia, /faq, /ochrana-udajov, /admin/login → 200; /admin unauth → 302), roadmap-quality.md zaškrtnuté + Sprint 1 blockquote.
 
-Ďalší krok: **T7 — Multi-device favicon set + manifest** (in_progress, ešte nezačaté). Plný TDD návod je v `docs/plans/2026-05-15-quality-sprint1.md` sekcia „Task 7". Generátor `private/scripts/gen-favicons.php` (GD z `public/assets/img/logo.png`, ImageMagick NIE je), pozn.: `head.php` dnes odkazuje neexistujúci `/favicon.ico` (404) — T7 to opraví. Potom T8 (OG cover) a T9 (regression + roadmap bookkeeping + prod deploy).
+**Zostáva už LEN produkčný deploy (T9 záver)** — čaká na explicitné OK od usera (zápis na shared infra). Deploy = lftp SFTP mirror `public/`→`web/`, `private/`→`private/` (bez DB migrácie — Sprint 1 nemá schema zmenu). Maintenance gate zostáva ON, public_indexing OFF. Po deploy: owner zaregistruje mesačný cron `/usr/bin/php .../private/cron/retention.php`.
 
-Commity T1–T6: `98a07cc 90bc8e4 63655b8 1332d07 270133a 60fae27 c20adcf 0683d04 33482ff e254838 d39e873`. Working tree čistý.
+**POZOR pred go-live:** odložený `.htpasswd` prod bug (nižšie) treba opraviť skôr než sa vypne maintenance — inak sa nikto neprihlási do prod adminu. Sprint 1 deploy je ale bezpečný aj bez toho (maintenance chráni public, do adminu sa aj tak zatiaľ nikto neprihlasuje).
+
+Commity Sprint 1: `98a07cc 90bc8e4 63655b8 1332d07 270133a 60fae27 c20adcf 0683d04 33482ff e254838 d39e873 ef247ee 8cf5381` + docs `db502ab`. Working tree čistý.
 
 ## Stav úloh
 
