@@ -234,12 +234,33 @@ Momentálne sú meta title + description per stránka hardcoded v PHP templates 
 
 ---
 
-## Out of scope (zatiaľ)
+## Odložené (Phase 2 — po hlavnom CMS)
 
-- Markdown editor pre privacy page (zatiaľ ostáva PHP súbor)
-- Versioning obsahu (kto kedy čo zmenil — máme `admin_actions` audit log, stačí)
+Tieto boli explicitne mimo scope hlavnej CMS iterácie (spec
+`docs/specs/2026-05-15-admin-cms-design.md`), ale **patria do plánu na neskôr**
+— nezabudnúť, len nie teraz:
+
+- **Privacy page text editor** — `/admin` editovanie `/ochrana-udajov`. Legal
+  text, ostáva PHP súbor. Pridať keď bude treba meniť GDPR znenie cez UI.
+  Riziko: needá sa „pokaziť" právny text WYSIWYG-om → radšej štruktúrovaný editor
+  alebo verzionovaný markdown. ~½ dňa.
+- **Mail šablóny editor** — `/admin/mail-templates` pre úpravu
+  reservation_admin/customer/confirmed/cancelled HTML+text. Tokeny ako
+  `{{name}}`, `{{date}}` placeholder system. ~1 deň.
+- **`/rezervacia` UI texty** — step labels, help texty, success správa cez
+  content_blocks (`rezervacia.step1.title`, …). Drobné, ~½ dňa.
+- **`/admin/users`** — správa viacerých admin používateľov (pridať/zmazať/
+  reset hesla), nahradí ručný `.htpasswd`. ~½ dňa.
+- **Plné verziovanie + rollback obsahu** — každá zmena bloku ukladá verziu,
+  možnosť vrátiť. Audit log + `/admin/log` (v hlavnom scope) stačí na prehľad;
+  rollback je nadstavba. ~1,5 dňa.
+- **Live preview** — real-time náhľad zmeny pred uložením (iframe split-view).
+  V hlavnom scope len „otvoriť web v novej karte" link. ~1 deň.
+
+## Out of scope úplne (mimo plánu)
+
 - Multi-jazyčnosť (len SK)
-- Page builder / drag-drop layout
+- Page builder / drag-drop layout sekcií
 - Newsletter manažment
 - Public reviews / hodnotenia
 - Online platby
