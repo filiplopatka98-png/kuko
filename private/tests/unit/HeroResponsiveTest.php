@@ -18,6 +18,26 @@ final class HeroResponsiveTest extends TestCase
             'mobile webp must be smaller than full hero.webp'
         );
     }
+    public function testHeroAssetsHaveCorrectImageType(): void
+    {
+        $d = \dirname(__DIR__, 3) . '/public/assets/img/';
+        $expect = [
+            'hero.jpg'       => IMAGETYPE_JPEG,
+            'hero-768.jpg'   => IMAGETYPE_JPEG,
+            'hero.webp'      => IMAGETYPE_WEBP,
+            'hero-768.webp'  => IMAGETYPE_WEBP,
+        ];
+        foreach ($expect as $file => $type) {
+            $info = getimagesize($d . $file);
+            $this->assertNotFalse($info, "$file is not a readable image");
+            $this->assertSame(
+                $type,
+                $info[2],
+                "$file content must match its extension (no PNG-as-.jpg footgun)"
+            );
+        }
+    }
+
     public function testCssHasMobileHeroOverride(): void
     {
         $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/main.css');
