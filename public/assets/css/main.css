@@ -163,6 +163,12 @@ img, svg { max-width: 100%; height: auto; display: block; }
   background-image: image-set(url("/assets/img/hero.webp") type("image/webp"), url("/assets/img/hero.jpg") type("image/jpeg"));
   background-size: cover; background-position: center;
 }
+@media (max-width: 768px) {
+  .hero__bg {
+    background-image: url("/assets/img/hero-768.jpg");
+    background-image: image-set(url("/assets/img/hero-768.webp") type("image/webp"), url("/assets/img/hero-768.jpg") type("image/jpeg"));
+  }
+}
 .hero__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.45)); z-index: -1; }
 .hero__title { color: var(--c-white); text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
 .hero__sub { font-size: 1.15rem; opacity: 0.95; margin-bottom: var(--s-3); }
