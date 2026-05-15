@@ -83,3 +83,13 @@ Commity Sprint 1: `98a07cc 90bc8e4 63655b8 1332d07 270133a 60fae27 c20adcf 0683d
 
 ## Po Sprinte 1
 Roadmap hovorí: po týchto 8 → prepnúť `maintenance` flag false + `public_indexing` true. Potom pokračovať ďalšími sprintami zvyšku `roadmap-quality.md` (SEO obsah, performance minifikácia/critical CSS/font subsetting, zvyšok a11y, UX detaily vrátane U1 symetrický buffer). Po #3 nasleduje user priorita #1 (go-live prerekvizity: SMTP heslo, reCAPTCHA test).
+
+---
+
+## Sprint 2 KOMPLET A NASADENÝ (2026-05-15)
+
+S2-T1..T6 hotové (každá impl + spec + code-quality review + fixy), nasadené na prod, overené (woff2/min css+js/hero-768 = 200; public / 503 + robots Disallow nezmenené). 157 PHPUnit testov green. Commity `95c663a`…`af2752e`, pushnuté na GitHub.
+
+Dodané: per-page noindex; single H1 reservation; WOFF2 (~60% menšie) + preload fix; CSS/JS minifikácia (Asset prefers .min + build-assets.php + stale-min guard); responsive hero (768px mobil, 146→50KB, media-scoped preload).
+
+Otvorené (mimo Sprint 2): MediaRepo prod-path bug #2 (admin upload); hero.jpg PNG-content/.jpg-ext (spawnnutý cleanup task); zvyšok roadmap-quality.md = Sprint 3 (a11y A2/A3/A5/A6, UX U1/U3/U4, security B3/B5/B6/B7, S5 analytics-owner, S3 GBP-owner).
