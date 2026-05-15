@@ -21,5 +21,31 @@ final class App
             error_reporting(E_ALL & ~E_DEPRECATED);
             ini_set('display_errors', '0');
         }
+
+        // Session cookie hardening — runs ONCE at bootstrap, before any
+        // session_start() elsewhere (Auth/Csrf start sessions lazily). The
+        // CLI/TESTING guard makes this a complete no-op under PHPUnit, and
+        // session_status()/headers_sent() guards ensure we never fight an
+        // already-started session or trigger "headers already sent".
+        //
+        // Prod sits behind the WebSupport reverse proxy which terminates TLS
+        // and forwards X-Forwarded-Proto: https (same header the .htaccess
+        // force-HTTPS rule keys on). So cookie_secure is only set when https
+        // is detected — local plain-http dev keeps working.
+        if (PHP_SAPI !== 'cli' && !defined('TESTING') && session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            $https = (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+                  || (($_SERVER['HTTPS'] ?? '') === 'on');
+            @ini_set('session.use_strict_mode', '1');
+            @ini_set('session.cookie_httponly', '1');
+            @ini_set('session.cookie_samesite', 'Lax');
+            if ($https) { @ini_set('session.cookie_secure', '1'); }
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+                'secure'   => $https,
+            ]);
+        }
     }
 }
