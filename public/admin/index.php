@@ -33,8 +33,10 @@ $router->get('/admin/login', function () use ($renderer) {
 
 $router->post('/admin/login', function () use ($renderer) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) {
-        http_response_code(400);
-        echo $renderer->render('login', ['error' => true, 'next' => (string) ($_POST['next'] ?? '/admin')]);
+        $next = (string) ($_POST['next'] ?? '/admin');
+        if (!preg_match('#^/admin#', $next)) $next = '/admin';
+        http_response_code(403);
+        echo $renderer->render('login', ['expired' => true, 'next' => $next]);
         return;
     }
     $user     = trim((string) ($_POST['username'] ?? ''));
