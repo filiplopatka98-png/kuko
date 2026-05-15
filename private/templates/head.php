@@ -12,7 +12,7 @@ $descriptionFinal = $description ?? 'Detská herňa a kaviareň v Piešťanoch. 
 $siteKey = \Kuko\Config::get('recaptcha.site_key', '');
 $baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
 $canonicalUrl = $baseUrl . ($canonical ?? '/');
-$ogImageUrl = $ogImage ?? ($baseUrl . '/assets/img/hero.jpg');
+$ogImageUrl = $ogImage ?? ($baseUrl . '/assets/img/og-cover.jpg');
 
 // Indexing: pre-launch noindex,nofollow on everything. Per-page override possible.
 $globalIndexing = (bool) \Kuko\Config::get('app.public_indexing', false);

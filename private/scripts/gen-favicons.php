@@ -40,3 +40,23 @@ $ico .= pack('VV', strlen($png), 22);
 $ico .= $png;
 file_put_contents($pub . '/favicon.ico', $ico);
 fwrite(STDOUT, "wrote favicon.ico\n");
+
+// --- OG cover 1200x630 ---
+$ogW = 1200; $ogH = 630;
+$og = imagecreatetruecolor($ogW, $ogH);
+$bg = imagecolorallocate($og, 0xFB, 0xEE, 0xF5);
+imagefilledrectangle($og, 0, 0, $ogW, $ogH, $bg);
+$boxH = (int) ($ogH * 0.52);
+$scale = min(($ogW * 0.5) / $lw, $boxH / $lh);
+$dw = (int) ($lw * $scale); $dh = (int) ($lh * $scale);
+imagecopyresampled($og, $logo, (int)(($ogW-$dw)/2), (int)($ogH*0.16), 0, 0, $dw, $dh, $lw, $lh);
+$font = dirname(__DIR__, 2) . '/public/assets/fonts/NunitoSans.ttf';
+if (is_file($font)) {
+    $ink = imagecolorallocate($og, 0x3D, 0x3D, 0x3D);
+    $txt = 'kuko-detskysvet.sk';
+    $bb = imagettfbbox(34, 0, $font, $txt);
+    $tw = $bb[2] - $bb[0];
+    imagettftext($og, 34, 0, (int)(($ogW-$tw)/2), (int)($ogH*0.88), $ink, $font, $txt);
+}
+imagejpeg($og, $pub . '/assets/img/og-cover.jpg', 88);
+fwrite(STDOUT, "wrote og-cover.jpg (1200x630)\n");
