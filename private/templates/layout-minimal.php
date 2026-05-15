@@ -43,7 +43,6 @@ $robots = $seo['robots'];
   font-weight: 100 900;
   font-display: swap;
 }
-main#main { display: contents; }
 .skip-link{position:absolute;left:8px;top:-44px;z-index:1000;background:var(--c-accent,#D88BBE);color:#fff;padding:.6rem 1rem;border-radius:6px;text-decoration:none;transition:top .15s ease}
 .skip-link:focus{top:8px}
 </style>
