@@ -69,6 +69,11 @@ Commity Sprint 1: `98a07cc 90bc8e4 63655b8 1332d07 270133a 60fae27 c20adcf 0683d
 - Deploy: Auth.php + upload `config/.htpasswd` → `kuko-detskysvet.sk/config/.htpasswd`.
 
 **Blokátor pre go-live:** áno — bez opravy sa nikto nevie prihlásiť do prod adminu.
+**STAV (2026-05-15):** `.htpasswd` cesta OPRAVENÁ (Auth číta `config/.htpasswd`, commit `e28b3c4`, nasadené, login funguje). Tento blokátor je VYRIEŠENÝ.
+
+## 🐞 ZNÁMY PROD BUG #2 — MediaRepo gallery path (rovnaká rodina, odložené)
+
+`public/index.php:44` konštruuje `new MediaRepo($db, APP_ROOT.'/public/assets/img/gallery')`. Na prod `APP_ROOT=kuko-detskysvet.sk/`, ale verejný adresár je `web/` → cesta `…/public/assets/img/gallery` neexistuje. Homepage **display** galérie funguje (šablóna používa URL `/assets/img/gallery/...`, nie filesystem), ale **admin upload/delete fotky** na prod zapisuje/maže v neexistujúcej ceste → upload novej fotky cez admin na prod zlyhá. **Fix:** MediaRepo by mal cestu k webrootu rozlíšiť robustne ako `Kuko\Asset::docRoot()` (DOCUMENT_ROOT → APP_ROOT/public → APP_ROOT/web). Odložené — spraviť spolu s ostatnými prod-path opravami pred go-live. Nie je blokátor pre verejný launch (admin upload nie je launch-critical), ale opraviť skoro.
 
 ## Owner action items (NEBUDUJEME — nahlásiť userovi na konci Sprintu 1)
 1. P1 Lighthouse baseline (owner spustí v Chrome, screenshoty do `docs/audits/`)
