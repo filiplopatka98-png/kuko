@@ -95,6 +95,30 @@ foreach (
     $stmt->execute($kv);
 }
 
+$pdo->exec("CREATE TABLE content_blocks (
+    block_key TEXT PRIMARY KEY,
+    label TEXT NOT NULL,
+    content_type TEXT NOT NULL DEFAULT 'text',
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_by TEXT
+)");
+$pdo->exec("CREATE TABLE gallery_photos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    webp TEXT,
+    alt_text TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_visible INTEGER NOT NULL DEFAULT 1,
+    uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
+)");
+$pdo->exec("ALTER TABLE packages ADD COLUMN description TEXT");
+$pdo->exec("ALTER TABLE packages ADD COLUMN price_text TEXT");
+$pdo->exec("ALTER TABLE packages ADD COLUMN kids_count_text TEXT");
+$pdo->exec("ALTER TABLE packages ADD COLUMN duration_text TEXT");
+$pdo->exec("ALTER TABLE packages ADD COLUMN included_json TEXT");
+$pdo->exec("ALTER TABLE packages ADD COLUMN accent_color TEXT");
+
 echo "Dev SQLite DB initialized at $dbPath\n";
 echo "Update config/config.php:\n";
 echo "  'db' => ['host' => 'sqlite:' . __DIR__ . '/../private/logs/kuko-dev.sqlite', 'name' => '', 'user' => '', 'pass' => '', 'charset' => 'utf8mb4']\n";
