@@ -32,20 +32,18 @@ Tracking dokument pre Quality Roadmap Sprint 1. Plán: `docs/plans/2026-05-15-qu
 
 ## ⏭️ KDE POKRAČOVAŤ (presný bod)
 
-**T2 čaká už len na CODE-QUALITY review** (spec review prebehol ✅). Ďalší krok:
-1. Dispatch code-quality reviewer pre T2 (commit `1332d07`). V promptne spomenúť aj window-expiry test-gap nech reviewer rozhodne, či ho doplniť (lacné — pridať `testStaleBucketResetsToZero` ktorý zapíše bucket so starým `start` a overí že `permit` znova povolí).
-2. Ak NEEDS CHANGES → implementer fix → re-review. Ak ✅ → T2 hotové, mark completed, prejsť na T3.
+**Hotové T1–T6** (každá spec+code-quality review prešla). Stav testov: **OK (126 tests, 254 assertions)**.
 
-## Zostáva v Sprinte 1 (plán má plný TDD kód pre každú)
+Ďalší krok: **T7 — Multi-device favicon set + manifest** (in_progress, ešte nezačaté). Plný TDD návod je v `docs/plans/2026-05-15-quality-sprint1.md` sekcia „Task 7". Generátor `private/scripts/gen-favicons.php` (GD z `public/assets/img/logo.png`, ImageMagick NIE je), pozn.: `head.php` dnes odkazuje neexistujúci `/favicon.ico` (404) — T7 to opraví. Potom T8 (OG cover) a T9 (regression + roadmap bookkeeping + prod deploy).
 
-- **T2** — dokončiť code-quality review (viď vyššie)
-- **T3** — Login attempt audit logging (login_ok/login_fail/login_locked do `admin_actions` + IP/UA). Plán krok-po-kroku v sprint1 pláne, sekcia „Task 3".
-- **T4** — HSTS header v `public/.htaccess` (1 riadok, triviálne). „Task 4".
-- **T5** — GDPR: `Kuko\Privacy` (anonymizeReservation/purgeOlderThan/exportByEmail) + `private/cron/retention.php` + `/admin/gdpr` route + anonymize tlačidlo v detail.php + nav link. „Task 5". (PII stĺpce reservations: name, phone, email, note, user_agent.)
-- **T6** — Calendar a11y: `public/assets/js/rezervacia.js` ARIA grid/gridcell + keyboard nav (šípky/Home/End/PageUp/Down/Enter) + aria-live + focus-visible CSS. Implementer MUSÍ najprv prečítať rezervacia.js. „Task 6".
-- **T7** — Favicon set: `private/scripts/gen-favicons.php` (GD z `public/assets/img/logo.png`, ImageMagick NIE je) → favicon.ico/16/32/apple-touch/192/512 + `public/manifest.webmanifest` + `head.php` link set. Pozn.: `head.php` dnes odkazuje `/favicon.ico` ktorý NEEXISTUJE (404) — T7 to opraví. „Task 7".
-- **T8** — `public/assets/img/og-cover.jpg` 1200×630 (rozšíriť gen-favicons.php, font `NunitoSans.ttf`) + `head.php` default og:image → og-cover. „Task 8".
-- **T9** — Plný regression + lint sweep + dev smoke + zaškrtnúť hotové v `roadmap-quality.md` + **produkčný deploy** (lftp; bez DB migrácie — Sprint 1 nemá schema zmenu) + owner musí zaregistrovať mesačný cron `/usr/bin/php .../private/cron/retention.php`.
+Commity T1–T6: `98a07cc 90bc8e4 63655b8 1332d07 270133a 60fae27 c20adcf 0683d04 33482ff e254838 d39e873`. Working tree čistý.
+
+## Stav úloh
+
+- **T1–T6** — ✅ HOTOVÉ (impl + spec review + code-quality review, všetky fixy zapracované)
+- **T7** — ⏳ Favicon set: `private/scripts/gen-favicons.php` (GD z `public/assets/img/logo.png`, ImageMagick NIE je) → favicon.ico/16/32/apple-touch/192/512 + `public/manifest.webmanifest` + `head.php` link set. Pozn.: `head.php` dnes odkazuje `/favicon.ico` ktorý NEEXISTUJE (404) — T7 to opraví. Plán „Task 7".
+- **T8** — ⏳ `public/assets/img/og-cover.jpg` 1200×630 (rozšíriť gen-favicons.php, font `NunitoSans.ttf`) + `head.php` default og:image → og-cover. Plán „Task 8".
+- **T9** — ⏳ Plný regression + lint sweep + dev smoke + zaškrtnúť hotové v `roadmap-quality.md` + **produkčný deploy** (lftp; bez DB migrácie — Sprint 1 nemá schema zmenu) + owner musí zaregistrovať mesačný cron `/usr/bin/php .../private/cron/retention.php`. **POZOR:** pred go-live (maintenance off) treba ešte opraviť odložený `.htpasswd` prod bug (viď nižšie) — inak sa nikto neprihlási do prod adminu.
 
 ## 🐞 ZNÁMY PROD BUG — admin login (odložené, opraviť PRED go-live)
 
