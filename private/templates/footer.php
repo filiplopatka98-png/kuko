@@ -16,7 +16,7 @@
     </nav>
   </div>
   <div class="container footer__copy">
-    <p>Copyright &copy; <?= date('Y') ?> KUKO-detskysvet.sk | Všetky práva vyhradené.</p>
+    <p><?= e(\Kuko\Content::get('footer.copyright', 'Copyright © {{year}} KUKO-detskysvet.sk | Všetky práva vyhradené.')) ?></p>
     <p><a href="/ochrana-udajov">Ochrana osobných údajov</a> &middot; <button type="button" class="link-btn" id="cookie-reopen">Cookie nastavenia</button></p>
   </div>
 </footer>

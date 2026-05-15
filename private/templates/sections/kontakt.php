@@ -11,7 +11,7 @@
           <span class="contact-card__icon" aria-hidden="true">🏠</span>
           <div>
             <p class="contact-card__title">Navštívte náš Detský svet KUKO:</p>
-            <p class="contact-card__value"><strong>Bratislavská 141, 921 01 Piešťany</strong></p>
+            <p class="contact-card__value"><strong><?= e(\Kuko\Content::get('kontakt.address', 'Bratislavská 141, 921 01 Piešťany')) ?></strong></p>
           </div>
         </div>
         <div class="contact-card contact-card--peach">
@@ -19,8 +19,8 @@
           <div>
             <p class="contact-card__title">Máte otázky? Kontaktujte nás:</p>
             <p class="contact-card__value">
-              <a href="tel:+421915319934">+421 915 319 934</a> |
-              <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>
+              <a href="tel:+421915319934"><?= e(\Kuko\Content::get('kontakt.phone', '+421 915 319 934')) ?></a> |
+              <a href="mailto:info@kuko-detskysvet.sk"><?= e(\Kuko\Content::get('kontakt.email', 'info@kuko-detskysvet.sk')) ?></a>
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@
           <span class="contact-card__icon" aria-hidden="true">⏰</span>
           <div>
             <p class="contact-card__title">Otváracie hodiny — sme tu pre vás každý deň:</p>
-            <p class="contact-card__value"><strong>Pondelok – Nedeľa: 9:00 – 20:00</strong></p>
+            <p class="contact-card__value"><strong><?= e(\Kuko\Content::get('kontakt.hours', 'Pondelok – Nedeľa: 9:00 – 20:00')) ?></strong></p>
           </div>
         </div>
         <div class="contact-card contact-card--purple">
