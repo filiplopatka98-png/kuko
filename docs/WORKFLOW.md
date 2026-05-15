@@ -240,17 +240,27 @@ Token je verifikovaný cez `hash_equals` — bez správneho tokenu vráti 403. S
 
 ### Admin používatelia (htpasswd)
 
-`.htpasswd` obsahuje bcrypt hashe. Pridanie nového admina:
+`config/.htpasswd` obsahuje bcrypt hashe (jeden používateľ na riadok). Auth ho
+číta z `config/.htpasswd` — **mimo** webroot-u (`web/`), takže súbor nie je
+verejne prístupný. Pridanie / reset admina (aj recovery ak si zabudol heslo):
+
+1. Lokálne nastav / resetni heslo (interaktívne, súbor je gitignored):
 
 ```bash
-# Lokálne vygeneruj:
-/usr/sbin/htpasswd -nbB jana 'SilneHeslo' >> /tmp/new-htpasswd
-
-# Stiahni existujúci .htpasswd, pridaj nového, nahraj späť:
-lftp ... get kuko-detskysvet.sk/web/admin/.htpasswd -o /tmp/htpasswd
-cat /tmp/new-htpasswd >> /tmp/htpasswd
-lftp ... put /tmp/htpasswd -o kuko-detskysvet.sk/web/admin/.htpasswd
+/opt/homebrew/bin/php private/scripts/admin-passwd.php
 ```
+
+2. Nahraj výsledný súbor na produkciu (jedným lftp put):
+
+```bash
+lftp -e "
+  open -p 22 -u 'filip.kuko-detskysvet.sk,<heslo>' sftp://kuko-detskysvet.sk;
+  put config/.htpasswd -o kuko-detskysvet.sk/config/.htpasswd;
+  bye
+"
+```
+
+3. Hotovo — Auth číta `config/.htpasswd` (mimo webroot-u), zmena platí ihneď.
 
 ### Verifikácia po deploy
 

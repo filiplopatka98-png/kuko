@@ -5,7 +5,7 @@ namespace Kuko;
 /**
  * Session-based admin auth.
  *
- * Credentials come from public/admin/.htpasswd so the file format from
+ * Credentials come from config/.htpasswd so the file format from
  * the previous Basic Auth deploy is reused — one user per line, bcrypt hashed:
  *
  *   username:$2y$05$.....
@@ -98,7 +98,7 @@ final class Auth
     /** @return array<string,string> username => bcrypt hash */
     private static function loadHtpasswd(): array
     {
-        $file = APP_ROOT . '/public/admin/.htpasswd';
+        $file = APP_ROOT . '/config/.htpasswd';
         if (!is_file($file)) return [];
         $entries = [];
         foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
