@@ -2,6 +2,8 @@
 
 **Status:** Backlog. Implementuje sa po Admin CMS iterácii (docs/plans/2026-05-14-roadmap-admin-cms.md).
 
+> **Admin CMS shipped** (2026-05-15): content_blocks / gallery / packages-extended / contact / seo / maintenance / log admin stránky live; Quill WYSIWYG + HtmlSanitizer; per-page SEO + maintenance toggle teraz DB-driven cez SettingsRepo. Follow-ups deferred (už v docs/plans/2026-05-14-roadmap-admin-cms.md Phase 2): privacy editor, mail templates editor, /admin/users, content versioning/rollback, live preview.
+
 Tento dokument zhŕňa kvalitatívne oblasti, ktoré chceme dotiahnuť pred plným launch-om mimo maintenance mode-u. Šesť častí:
 
 1. **SEO** — technické, obsahové, local
@@ -69,6 +71,7 @@ Tento dokument zhŕňa kvalitatívne oblasti, ktoré chceme dotiahnuť pred pln�
 - [ ] **2FA pre admin** (TOTP cez Google Authenticator) — niekedy v Q3 keď to dáva zmysel z hľadiska traffic-u
 - [ ] **CAPTCHA aj na admin login** — invisible reCAPTCHA v3, threshold 0.7 (vyššie ako pre rezerváciu)
 - [ ] **Audit log enrichment** — admin_actions už loguje, ale chýba IP/UA, neúspešné login pokusy
+- [ ] **Login POST nemá CSRF token** — `/admin/login` POST (`public/admin/index.php`) neoveruje CSRF token; login formulár (`private/templates/admin/login.php`) nemá csrf field. Nízke riziko (login je z podstaty neautentizovaný, cieľom sú credentials nie state-change) ale logged-in-CSRF / login-CSRF hardening je good practice. Pridať CSRF token do login formulára + overiť v POST handleri. ~15 min
 
 ### B2. Transport + headers (priority: high, hotové)
 - [x] HTTPS forced (hotové)
