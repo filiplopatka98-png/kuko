@@ -16,6 +16,28 @@ $isResvGroup = (
     || str_starts_with($path, '/admin/calendar')
     || str_starts_with($path, '/admin/blocked-periods')
     || str_starts_with($path, '/admin/opening-hours')
+    || str_starts_with($path, '/admin/packages')
+    || str_starts_with($path, '/admin/settings')
+);
+$isPagesGroup = (
+    $path === '/admin/pages'
+    || str_starts_with($path, '/admin/pages/')
+    // legacy destinations that redirect into the pages app — keep the
+    // sidebar highlighting "Stránky" if they are somehow hit pre-redirect.
+    || $path === '/admin/content'
+    || str_starts_with($path, '/admin/content/')
+    || $path === '/admin/seo'
+    || str_starts_with($path, '/admin/seo/')
+);
+$isSettingsGroup = (
+    $path === '/admin/contact'
+    || str_starts_with($path, '/admin/contact/')
+    || $path === '/admin/maintenance'
+    || str_starts_with($path, '/admin/maintenance/')
+    || $path === '/admin/log'
+    || str_starts_with($path, '/admin/log/')
+    || $path === '/admin/gdpr'
+    || str_starts_with($path, '/admin/gdpr/')
 );
 /**
  * Active-state helper.
@@ -53,23 +75,9 @@ $aria = static function (bool $on): string {
   </div>
   <nav class="admin-sidebar__nav" aria-label="Admin">
     <a href="/admin" class="admin-nav-item admin-nav-item--top<?= $aria($isResvGroup) ?>">Rezervácie</a>
-
-    <div class="admin-nav-group">
-      <span class="admin-nav-label">STRÁNKY</span>
-      <a href="/admin/content" class="admin-nav-item<?= $aria($active('/admin/content')) ?>">Obsah</a>
-      <a href="/admin/packages" class="admin-nav-item<?= $aria($active('/admin/packages')) ?>">Balíčky</a>
-      <a href="/admin/gallery" class="admin-nav-item<?= $aria($active('/admin/gallery')) ?>">Galéria</a>
-      <a href="/admin/contact" class="admin-nav-item<?= $aria($active('/admin/contact')) ?>">Kontakt</a>
-    </div>
-
-    <div class="admin-nav-group">
-      <span class="admin-nav-label">NASTAVENIA</span>
-      <a href="/admin/seo" class="admin-nav-item<?= $aria($active('/admin/seo')) ?>">SEO</a>
-      <a href="/admin/maintenance" class="admin-nav-item<?= $aria($active('/admin/maintenance')) ?>">Maintenance</a>
-      <a href="/admin/log" class="admin-nav-item<?= $aria($active('/admin/log')) ?>">Logy</a>
-      <a href="/admin/gdpr" class="admin-nav-item<?= $aria($active('/admin/gdpr')) ?>">GDPR</a>
-      <a href="/admin/settings" class="admin-nav-item<?= $aria($active('/admin/settings')) ?>">Všeobecné</a>
-    </div>
+    <a href="/admin/pages" class="admin-nav-item admin-nav-item--top<?= $aria($isPagesGroup) ?>">Stránky</a>
+    <a href="/admin/gallery" class="admin-nav-item admin-nav-item--top<?= $aria($active('/admin/gallery')) ?>">Galéria</a>
+    <a href="/admin/contact" class="admin-nav-item admin-nav-item--top<?= $aria($isSettingsGroup) ?>">Nastavenia</a>
   </nav>
   <div class="admin-sidebar__footer">
     <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">iCal export</a>
@@ -88,6 +96,15 @@ $aria = static function (bool $on): string {
     <a href="/admin/calendar" class="admin-tab<?= $aria($active('/admin/calendar')) ?>">Kalendár</a>
     <a href="/admin/blocked-periods" class="admin-tab<?= $aria($active('/admin/blocked-periods')) ?>">Blokácie</a>
     <a href="/admin/opening-hours" class="admin-tab<?= $aria($active('/admin/opening-hours')) ?>">Otváracie hodiny</a>
+    <a href="/admin/packages" class="admin-tab<?= $aria($active('/admin/packages')) ?>">Balíčky</a>
+    <a href="/admin/settings" class="admin-tab<?= $aria($active('/admin/settings')) ?>">Nastavenia</a>
+  </nav>
+<?php elseif ($isSettingsGroup): ?>
+  <nav class="admin-tabs" aria-label="Nastavenia">
+    <a href="/admin/contact" class="admin-tab<?= $aria($active('/admin/contact')) ?>">Kontakt</a>
+    <a href="/admin/maintenance" class="admin-tab<?= $aria($active('/admin/maintenance')) ?>">Maintenance</a>
+    <a href="/admin/log" class="admin-tab<?= $aria($active('/admin/log')) ?>">Logy</a>
+    <a href="/admin/gdpr" class="admin-tab<?= $aria($active('/admin/gdpr')) ?>">GDPR</a>
   </nav>
 <?php endif; ?>
 <main class="admin-main" id="main" tabindex="-1"><?= $content ?></main>
