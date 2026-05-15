@@ -9,7 +9,7 @@
   --c-purple: #C9A8E1;
   --c-pink: #F5C3DE;
   --c-text: #3D3D3D;
-  --c-text-soft: #7A7A7A;
+  --c-text-soft: #6A6A6A;
   --c-accent: #D88BBE;
   --c-white: #FFFFFF;
 
@@ -117,6 +117,12 @@ img, svg { max-width: 100%; height: auto; display: block; }
   outline: 3px solid var(--c-accent, #D88BBE);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--c-accent, #D88BBE);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 [data-reveal] {

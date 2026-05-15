@@ -9,7 +9,7 @@
   --c-purple: #C9A8E1;
   --c-pink: #F5C3DE;
   --c-text: #3D3D3D;
-  --c-text-soft: #7A7A7A;
+  --c-text-soft: #6A6A6A;
   --c-accent: #D88BBE;
   --c-white: #FFFFFF;
   --c-success: #2ecc71;
@@ -89,6 +89,9 @@ input, select, textarea { font: inherit; }
 .step { display: none; flex: 1; padding: 2rem 1.5rem; }
 .step.is-active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .step.is-active { animation: none !important; transition: none !important; }
+}
 .step__inner { max-width: 720px; margin: 0 auto; }
 .step__inner--wide { max-width: 980px; }
 .step__inner--success { text-align: center; padding-top: 4rem; }
