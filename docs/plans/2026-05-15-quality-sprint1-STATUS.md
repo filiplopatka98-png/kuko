@@ -162,3 +162,11 @@ DT-1..DT-7 hotové (každá impl + review; konsolidovaný review APPROVED), DT-8
 ## ⏭️ ZOSTÁVA: DT-9 — Admin WP-style layout (NOVÁ POŽIADAVKA, ďalšia session)
 
 User chce admin prerobiť ako WordPress admin: **ľavý sidebar menu**, sekcia **Stránky**, sekcia **Nastavenia** (kam pôjde aj maintenance aj logy), **Rezervácie** ako samostatná položka s **tabmi** (blokácie atď.). Veľká architektonická zmena admin layoutu (`private/templates/admin/layout.php` + všetky admin templaty + nav štruktúra v `public/admin/index.php`). Treba vlastný plán (mapovať súčasné /admin routes → nové sekcie/sidebar/taby) + subagent-driven exekúcia + review + deploy. Súčasné admin sekcie: rezervácie(list/detail/calendar), packages, content, gallery, contact, seo, maintenance, log, gdpr, opening-hours, blocked-periods.
+
+---
+
+## ✅ DT-9 Admin WP-style layout — HOTOVÉ + NASADENÉ (2026-05-15)
+
+`fabae78` + fix `33e89dd` (review APPROVED po fixe). 223 testov green. Iba `private/templates/admin/layout.php` + `public/assets/css/admin.css`(+min) + test — ŽIADNE route/section-template zmeny.
+- Ľavý sidebar: **Rezervácie** (top-level, tab bar Zoznam/Kalendár/Blokácie/Otváracie hodiny na resv-group routes) · skupina **STRÁNKY** (Obsah/Balíčky/Galéria/Kontakt) · skupina **NASTAVENIA** (SEO/Maintenance/Logy/GDPR/Všeobecné) · footer iCal/Web/@user/Odhlásiť.
+- Active-state exact-or-boundary (`/admin/log`≠`/admin/logout`, `/admin/seo`≠`/admin/settings`); `/admin` dashboard exact; reservations-group logika zachovaná. Pure-CSS responsive hamburger (≤900px), `.sr-only` doplnené do admin.css. a11y zachované (skip-link first, single `<main id=main>`). Login (layout-minimal) neovplyvnený, auth gate nezmenený.
