@@ -459,6 +459,62 @@ $router->get('/admin/calendar.ics', function () use ($db, $packages) {
     echo implode("\r\n", $lines) . "\r\n";
 });
 
+// ===== SEO (per-page meta + global indexing) =====
+$seoPages = ['default', 'home', 'rezervacia', 'faq', 'privacy'];
+$router->get('/admin/seo', function () use ($renderer, $settings, $adminUser, $flashes, $seoPages) {
+    $seo = [];
+    foreach ($seoPages as $pg) {
+        $seo["seo.$pg.title"]       = (string) $settings->get("seo.$pg.title", '');
+        $seo["seo.$pg.description"] = (string) $settings->get("seo.$pg.description", '');
+    }
+    echo $renderer->render('seo', [
+        'seo'      => $seo,
+        'indexing' => $settings->get('seo.public_indexing') === '1',
+        'user'     => $adminUser,
+        'flashes'  => $flashes,
+    ]);
+});
+$router->post('/admin/seo', function () use ($settings, $audit, $flash, $seoPages) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    foreach ($seoPages as $pg) {
+        $settings->set("seo.$pg.title", trim((string) ($_POST["{$pg}_title"] ?? '')));
+        $settings->set("seo.$pg.description", trim((string) ($_POST["{$pg}_description"] ?? '')));
+    }
+    $settings->set('seo.public_indexing', !empty($_POST['public_indexing']) ? '1' : '0');
+    $audit('seo_save', 'settings', 0);
+    $flash('SEO nastavenia uložené.');
+    header('Location: /admin/seo');
+});
+
+// ===== Maintenance (toggle + staff password) =====
+$router->get('/admin/maintenance', function () use ($renderer, $settings, $adminUser, $flashes) {
+    echo $renderer->render('maintenance', [
+        'enabled'     => $settings->get('maintenance.enabled') === '1',
+        'hasPassword' => ((string) $settings->get('maintenance.password', '')) !== '',
+        'user'        => $adminUser,
+        'flashes'     => $flashes,
+    ]);
+});
+$router->post('/admin/maintenance', function () use ($settings, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $on = !empty($_POST['enabled']);
+    $settings->set('maintenance.enabled', $on ? '1' : '0');
+    if (!empty($_POST['password'])) {
+        $settings->set('maintenance.password', (string) $_POST['password']);
+    }
+    $audit('maintenance_toggle', 'settings', 0, ['enabled' => $on]);
+    $flash('Maintenance ' . ($on
+        ? 'ZAPNUTÝ — verejnosť vidí údržbovú stránku.'
+        : 'vypnutý — web je verejne dostupný.'));
+    header('Location: /admin/maintenance');
+});
+
+// ===== Audit log (read-only) =====
+$router->get('/admin/log', function () use ($renderer, $db, $adminUser, $flashes) {
+    $rows = $db->all('SELECT * FROM admin_actions ORDER BY created_at DESC, id DESC LIMIT 200');
+    echo $renderer->render('log', ['rows' => $rows, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+
 $match = $router->match($method, $path);
 if ($match === null) {
     http_response_code(404);

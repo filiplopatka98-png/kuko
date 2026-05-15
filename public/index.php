@@ -24,6 +24,18 @@ if (Maintenance::enabled() && !Maintenance::shouldBypass($path) && !$isMaintenan
 
 $router = new Router();
 
+// Public indexing: DB setting (/admin/seo toggle) wins; config is the fallback
+// so robots.txt / sitemap.xml flip live with the SEO editor and the <meta robots> tag.
+$publicIndexing = static function (): bool {
+    try {
+        $v = (new \Kuko\SettingsRepo(\Kuko\Db::fromConfig()))->get('seo.public_indexing');
+        if ($v !== null) return $v === '1';
+    } catch (\Throwable $e) {
+        error_log('[robots] seo.public_indexing read failed: ' . $e->getMessage());
+    }
+    return (bool) \Kuko\Config::get('app.public_indexing', false);
+};
+
 $router->get('/', function () use ($renderer) {
     $gallery  = [];
     $packages = [];
@@ -37,9 +49,9 @@ $router->get('/', function () use ($renderer) {
     echo $renderer->render('pages/home', ['gallery' => $gallery, 'packages' => $packages]);
 });
 
-$router->get('/robots.txt', function () {
+$router->get('/robots.txt', function () use ($publicIndexing) {
     header('Content-Type: text/plain; charset=utf-8');
-    $indexing = (bool) \Kuko\Config::get('app.public_indexing', false);
+    $indexing = $publicIndexing();
     if ($indexing) {
         echo "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /rezervacia/\n\nSitemap: " . rtrim((string) \Kuko\Config::get('app.url'), '/') . "/sitemap.xml\n";
     } else {
@@ -47,9 +59,9 @@ $router->get('/robots.txt', function () {
     }
 });
 
-$router->get('/sitemap.xml', function () {
+$router->get('/sitemap.xml', function () use ($publicIndexing) {
     header('Content-Type: application/xml; charset=utf-8');
-    $indexing = (bool) \Kuko\Config::get('app.public_indexing', false);
+    $indexing = $publicIndexing();
     $base = rtrim((string) \Kuko\Config::get('app.url'), '/');
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
