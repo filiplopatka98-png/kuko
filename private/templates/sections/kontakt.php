@@ -1,21 +1,33 @@
+<?php
+$fbUrl = \Kuko\Social::url('facebook', '');
+$igUrl = \Kuko\Social::url('instagram', '');
+?>
 <section id="kontakt" class="section section--kontakt" data-reveal>
   <div class="container">
     <h2>Kde nás nájdete?</h2>
     <p class="section__lead">Tešíme sa na vašu návštevu!</p>
     <div class="kontakt__grid">
-      <div id="map" class="kontakt__map" aria-label="Mapa s polohou KUKO detský svet">
-        <noscript><p style="padding:1rem">Mapa vyžaduje JavaScript. Adresa: Bratislavská 141, 921 01 Piešťany.</p></noscript>
+      <div class="kontakt__map-wrap">
+        <div id="map" class="kontakt__map" aria-label="Mapa s polohou KUKO detský svet">
+          <noscript><p style="padding:1rem">Mapa vyžaduje JavaScript. Adresa: Bratislavská 141, 921 01 Piešťany.</p></noscript>
+        </div>
       </div>
       <div class="kontakt__cards">
         <div class="contact-card contact-card--blue">
-          <span class="contact-card__icon" aria-hidden="true">🏠</span>
+          <span class="contact-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>
+            </svg>
+          </span>
           <div>
             <p class="contact-card__title">Navštívte náš Detský svet KUKO:</p>
             <p class="contact-card__value"><strong><?= e(\Kuko\Content::get('kontakt.address', 'Bratislavská 141, 921 01 Piešťany')) ?></strong></p>
           </div>
         </div>
         <div class="contact-card contact-card--peach">
-          <span class="contact-card__icon" aria-hidden="true">📞</span>
+          <span class="contact-card__icon" aria-hidden="true">
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/contact-us-1.svg')) ?>" alt="" aria-hidden="true" width="32" height="30">
+          </span>
           <div>
             <p class="contact-card__title">Máte otázky? Kontaktujte nás:</p>
             <p class="contact-card__value">
@@ -25,21 +37,27 @@
           </div>
         </div>
         <div class="contact-card contact-card--yellow">
-          <span class="contact-card__icon" aria-hidden="true">⏰</span>
+          <span class="contact-card__icon" aria-hidden="true">
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/clock.svg')) ?>" alt="" aria-hidden="true" width="32" height="32">
+          </span>
           <div>
             <p class="contact-card__title">Otváracie hodiny — sme tu pre vás každý deň:</p>
             <p class="contact-card__value"><strong><?= e(\Kuko\Content::get('kontakt.hours', 'Pondelok – Nedeľa: 9:00 – 20:00')) ?></strong></p>
           </div>
         </div>
-        <div class="contact-card contact-card--purple">
+        <div class="contact-card contact-card--social">
           <p class="contact-card__title">Sledujte nás na sociálnych sieťach:</p>
           <div class="contact-card__socials">
-            <a href="<?= e(\Kuko\Social::url('facebook', '#')) ?>" aria-label="Facebook" rel="noopener" target="_blank">
-              <img src="/assets/icons/facebook-app-symbol.svg" alt="Facebook" width="18" height="18">
+            <?php if ($fbUrl !== ''): ?>
+            <a href="<?= e($fbUrl) ?>" aria-label="Facebook" rel="noopener" target="_blank">
+              <img src="<?= e(\Kuko\Asset::url('/assets/icons/facebook-app-symbol.svg')) ?>" alt="Facebook" width="22" height="22">
             </a>
-            <a href="<?= e(\Kuko\Social::url('instagram', '#')) ?>" aria-label="Instagram" rel="noopener" target="_blank">
-              <img src="/assets/icons/instagram.svg" alt="Instagram" width="18" height="18">
+            <?php endif; ?>
+            <?php if ($igUrl !== ''): ?>
+            <a href="<?= e($igUrl) ?>" aria-label="Instagram" rel="noopener" target="_blank">
+              <img src="<?= e(\Kuko\Asset::url('/assets/icons/instagram.svg')) ?>" alt="Instagram" width="22" height="22">
             </a>
+            <?php endif; ?>
           </div>
         </div>
       </div>

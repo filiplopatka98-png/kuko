@@ -332,22 +332,29 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .section--kontakt { background: var(--bg-cream); }
 .kontakt__grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--s-4); margin-top: var(--s-4); }
 @media (max-width: 1024px) { .kontakt__grid { grid-template-columns: 1fr; } }
-.kontakt__map { aspect-ratio: 4/3; border-radius: var(--r-card); background: #e9eef5; border: 3px solid var(--c-purple); overflow: hidden; }
+.kontakt__map-wrap { border-radius: var(--r-card); border: 5px solid var(--c-purple); overflow: hidden; }
+.kontakt__map { aspect-ratio: 4/3; background: #e9eef5; }
+@media (max-width: 768px) { .kontakt__map { aspect-ratio: 3/2; } }
 .kontakt__cards { display: flex; flex-direction: column; gap: var(--s-2); }
 .contact-card {
   background: var(--c-white); border-radius: var(--r-card); padding: var(--s-2) var(--s-3);
-  border: 2px solid; display: flex; align-items: center; gap: var(--s-2);
+  border: 5px solid; display: flex; align-items: center; gap: var(--s-2);
 }
 .contact-card--blue   { border-color: var(--c-blue); }
 .contact-card--peach  { border-color: var(--c-peach); }
 .contact-card--yellow { border-color: var(--c-yellow); }
-.contact-card--purple { border-color: var(--c-purple); flex-direction: column; align-items: flex-start; }
-.contact-card__icon { font-size: 1.5rem; flex-shrink: 0; }
+.contact-card--social {
+  border: 2px solid var(--c-purple); background: var(--bg-pink-soft);
+  flex-direction: row; align-items: center; flex-wrap: wrap; gap: var(--s-2);
+}
+.contact-card--social .contact-card__title { font-size: 0.95rem; }
+.contact-card__icon { flex-shrink: 0; display: grid; place-items: center; color: var(--c-blue); }
+.contact-card__icon svg, .contact-card__icon img { display: block; }
 .contact-card__title { font-size: 0.85rem; color: var(--c-text-soft); margin: 0; }
 .contact-card__value { margin: 0.15rem 0 0; font-size: 0.95rem; }
-.contact-card__socials { display: flex; gap: var(--s-1); margin-top: 0.5rem; }
-.contact-card__socials a { width: 36px; height: 36px; background: var(--bg-pink-soft); border-radius: 50%; display: grid; place-items: center; }
-.contact-card__socials img { width: 18px; height: 18px; }
+.contact-card__socials { display: flex; gap: var(--s-1); align-items: center; margin: 0; }
+.contact-card__socials a { width: 40px; height: 40px; background: var(--c-purple); border-radius: 50%; display: grid; place-items: center; }
+.contact-card__socials img { width: 22px; height: 22px; }
 
 /* ===== FAQ ===== */
 .section--faq { background: var(--c-white); }
