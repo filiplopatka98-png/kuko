@@ -58,4 +58,18 @@ final class HtmlSanitizerTest extends TestCase
     {
         $this->assertSame('', HtmlSanitizer::clean(''));
     }
+
+    public function testRecursiveUnwrapOfNestedDisallowedTags(): void
+    {
+        // disallowed wrapper containing disallowed child wrapping allowed content
+        $out = HtmlSanitizer::clean('<div><span><strong>keep</strong></span></div>');
+        $this->assertSame('<strong>keep</strong>', $out);
+    }
+
+    public function testMalformedHtmlDoesNotLeak(): void
+    {
+        $out = HtmlSanitizer::clean('<p>unclosed <strong>bold <script>alert(1)</script>');
+        $this->assertStringNotContainsString('<script', $out);
+        $this->assertStringContainsString('bold', $out);
+    }
 }

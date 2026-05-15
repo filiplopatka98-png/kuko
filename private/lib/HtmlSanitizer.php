@@ -14,6 +14,8 @@ final class HtmlSanitizer
         $dom = new \DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
         $dom->loadHTML(
+            // XML prolog forces libxml to parse input as UTF-8 (not Latin-1)
+            // wrapper gives a stable retrieval anchor and stops loadHTML auto-wrapping in <html><body>
             '<?xml encoding="UTF-8"><div id="__root">' . $html . '</div>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
         );
