@@ -45,7 +45,7 @@ $robots = $seo['robots'];
 }
 </style>
 <?php foreach (($stylesheets ?? []) as $href): ?>
-<link rel="stylesheet" href="<?= e($href) ?>">
+<link rel="stylesheet" href="<?= e(\Kuko\Asset::url($href)) ?>">
 <?php endforeach; ?>
 </head>
 <body>

@@ -8,6 +8,6 @@
 <?php require __DIR__ . '/nav.php'; ?>
 <?= $content ?>
 <?php require __DIR__ . '/cookie-banner.php'; ?>
-<script type="module" src="/assets/js/main.js"></script>
+<script type="module" src="<?= e(\Kuko\Asset::url('/assets/js/main.js')) ?>"></script>
 </body>
 </html>

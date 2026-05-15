@@ -71,7 +71,7 @@ $robots = $seo['robots'];
 <?php endif; ?>
 
 <!-- Stylesheets -->
-<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="<?= e(\Kuko\Asset::url('/assets/css/main.css')) ?>">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
 <!-- Schema.org -->

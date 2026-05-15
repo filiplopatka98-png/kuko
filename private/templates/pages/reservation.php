@@ -153,7 +153,7 @@ ob_start();
 
 <?php require __DIR__ . '/../cookie-banner.php'; ?>
 
-<script type="module" src="/assets/js/rezervacia.js"></script>
+<script type="module" src="<?= e(\Kuko\Asset::url('/assets/js/rezervacia.js')) ?>"></script>
 <?php
 $content = ob_get_clean();
 $stylesheets = ['/assets/css/rezervacia.css'];

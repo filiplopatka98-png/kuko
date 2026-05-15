@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($title ?? 'KUKO admin') ?></title>
-<link rel="stylesheet" href="/assets/css/admin.css">
+<link rel="stylesheet" href="<?= e(\Kuko\Asset::url('/assets/css/admin.css')) ?>">
 </head>
 <body>
 <header class="admin-header">
