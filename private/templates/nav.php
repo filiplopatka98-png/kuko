@@ -13,7 +13,9 @@ $ig = \Kuko\Social::url('instagram', '');
         <span>info@kuko-detskysvet.sk</span>
       </a>
       <a href="tel:+421915319934" class="topbar__link">
-        <img class="topbar__icon" src="<?= e(\Kuko\Asset::url('/assets/icons/contact-us.svg')) ?>" width="16" height="16" alt="" aria-hidden="true">
+        <svg class="topbar__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M5.1 2.2c.3-.3.8-.3 1 .1l1.2 2c.2.3.1.7-.1 1l-.9.9c-.1.1-.1.3-.1.4.3.9 1.4 2 2.3 2.3.2 0 .3 0 .4-.1l.9-.9c.2-.3.6-.3 1-.1l2 1.2c.4.2.4.7.1 1l-.9.9c-.5.5-1.2.7-1.9.5C7.4 10.6 5.4 8.6 3.7 4.9c-.2-.7 0-1.4.5-1.9z" fill="currentColor"/>
+        </svg>
         <span>+421 915 319 934</span>
       </a>
     </div>

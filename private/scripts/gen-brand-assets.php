@@ -56,16 +56,30 @@ function writePair($img, string $outDir, string $base, int $w, int $h): void
 [$logo, $lw, $lh] = scaleToWidth($src, $W, $H, 600);
 writePair($logo, $outDir, 'logo', $lw, $lh);
 
-// --- Rainbow crop: top portion (rainbow arc + kid faces), no KUKO/script ---
-// Crop fraction tuned via visual self-verification (see DT-1 notes).
-$cropFrac = 0.44;
-$cropW = $W;
-$cropH = (int) round($H * $cropFrac);
-$crop = imagecreatetruecolor($cropW, $cropH);
-$white = imagecolorallocate($crop, 255, 255, 255);
-imagefilledrectangle($crop, 0, 0, $cropW, $cropH, $white);
-imagecopy($crop, $src, 0, 0, 0, 0, $cropW, $cropH);
-[$rainbow, $rw, $rh] = scaleToWidth($crop, $cropW, $cropH, 320);
-writePair($rainbow, $outDir, 'rainbow', $rw, $rh);
+// --- Rainbow: scaled directly from the TRANSPARENT source (rainbow + 2 kid
+// faces, no KUKO text) so the gallery heading graphic has no white box. ---
+$rbSrcPath = $root . '/assets/Image_logo.png';
+$rbSrc = imagecreatefrompng($rbSrcPath);
+if ($rbSrc === false) {
+    fwrite(STDERR, "Failed to load $rbSrcPath\n");
+    exit(1);
+}
+$rbW = imagesx($rbSrc);
+$rbH = imagesy($rbSrc);
+fwrite(STDOUT, "Rainbow source: $rbSrcPath ({$rbW}x{$rbH})\n");
+$rw = min(320, $rbW);
+$rh = (int) round($rbH * ($rw / $rbW));
+$rainbow = imagecreatetruecolor($rw, $rh);
+imagealphablending($rainbow, false);
+imagesavealpha($rainbow, true);
+$transparent = imagecolorallocatealpha($rainbow, 0, 0, 0, 127);
+imagefilledrectangle($rainbow, 0, 0, $rw, $rh, $transparent);
+imagecopyresampled($rainbow, $rbSrc, 0, 0, 0, 0, $rw, $rh, $rbW, $rbH);
+$rbPng = "$outDir/rainbow.png";
+$rbWebp = "$outDir/rainbow.webp";
+imagepng($rainbow, $rbPng, 9);
+imagewebp($rainbow, $rbWebp, 86);
+fwrite(STDOUT, "Wrote $rbPng ({$rw}x{$rh}) [transparent]\n");
+fwrite(STDOUT, "Wrote $rbWebp ({$rw}x{$rh}) [transparent]\n");
 
 fwrite(STDOUT, "Done.\n");
