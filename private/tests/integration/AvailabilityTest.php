@@ -118,23 +118,46 @@ final class AvailabilityTest extends TestCase
 
     public function testExistingReservationBlocksWithBuffer(): void
     {
-        // MAXI 13:00-16:00 + buffer 30 = blocks until 16:30
+        // MAXI 13:00-16:00 + symmetric buffer 30 = blocks [12:30, 16:30)
         $this->db->execStmt(
             "INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, ip_hash, status)
              VALUES ('maxi', '2026-05-21', '13:00:00', 10, 'X', '+421900', 'x@x', '" . str_repeat('a', 64) . "', 'confirmed')"
         );
         $r = $this->make()->forDate('2026-05-21', 'mini');
-        // MINI is 120min. Allowed: 09:00..11:00, after 16:30 → 17:00, 18:00.
-        // Between 11:00 and 13:00 also OK (start at 11:00 ends 13:00 = conflicting? No — overlap check excludes boundary? Let me re-check.)
-        // Actually subtract removes [13:00, 16:30). Start 11:00 finishes 13:00 — touches but does not overlap. OK.
+        // MINI is 120min. subtract removes [12:30, 16:30).
+        // Before-buffer: last allowed MINI start is 10:30 (10:30+2h = 12:30 touches lower bound, OK).
         $this->assertContains('09:00', $r->slots);
-        $this->assertContains('11:00', $r->slots);  // ends 13:00 boundary
+        $this->assertContains('10:30', $r->slots);     // ends 12:30 boundary (before-buffer)
+        $this->assertNotContains('11:00', $r->slots);  // ends 13:00 — now inside before-buffer
         $this->assertNotContains('11:30', $r->slots);  // would overlap (11:30+2h=13:30 inside block)
         $this->assertNotContains('12:00', $r->slots);
         $this->assertNotContains('15:00', $r->slots);
         $this->assertNotContains('16:00', $r->slots);
         $this->assertContains('17:00', $r->slots);
-        $this->assertContains('16:30', $r->slots);  // first slot after buffer ends (16:30 + 2h = 18:30 ≤ 20:00)
+        $this->assertContains('16:30', $r->slots);  // first slot after buffer ends (16:30 + 2h = 18:30 ≤ 20:00) — after-buffer still validated
+    }
+
+    public function testExistingReservationBlocksBeforeWithBuffer(): void
+    {
+        // MAXI slot 14:00 for 180 min (14:00-17:00), buffer 30.
+        // Symmetric buffer blocks [13:30, 17:30). A NEW MINI ending exactly at 14:00
+        // (12:00-14:00) used to be ALLOWED by the old after-only buffer, but the
+        // before-buffer now pushes the blocked region back to 13:30, so a MINI
+        // starting at 12:00 (ends 14:00) overlaps 13:30-14:00 and must be rejected.
+        $this->settings->set('buffer_min', '30');
+        $this->db->execStmt(
+            "INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, ip_hash, status)
+             VALUES ('maxi', '2026-05-21', '14:00:00', 10, 'X', '+421900', 'x@x', '" . str_repeat('a', 64) . "', 'confirmed')"
+        );
+        $r = $this->make()->forDate('2026-05-21', 'mini');
+        // 12:00 MINI ends 14:00 — under OLD logic this was offered; with the
+        // before-buffer it overlaps [13:30, 14:00) and must NOT be offered.
+        $this->assertNotContains('12:00', $r->slots);
+        // 11:30 MINI ends 13:30 — touches the before-buffer lower bound, still OK.
+        $this->assertContains('11:30', $r->slots);
+        // After-buffer end: 17:00 + 30 = 17:30, first MINI after is 17:30.
+        $this->assertContains('17:30', $r->slots);
+        $this->assertNotContains('16:00', $r->slots);
     }
 
     public function testCancelledReservationDoesNotBlock(): void

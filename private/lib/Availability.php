@@ -105,7 +105,7 @@ final class Availability
             if ((int) $e['blocks_full_day'] === 1) continue; // unreachable, defensive
             $rStart = $this->minutes((string) $e['wished_time']);
             $rEnd   = $rStart + (int) $e['duration_min'] + $buffer;
-            $intervals = $this->subtract($intervals, $rStart, $rEnd);
+            $intervals = $this->subtract($intervals, max(0, $rStart - $buffer), $rEnd);
         }
 
         // If date == today: shift start past now+lead
