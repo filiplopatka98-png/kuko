@@ -41,8 +41,10 @@ final class MediaRepo
 
         $webpName = null;
         if (function_exists('imagewebp')) {
-            $webpName = $base . '.webp';
-            @imagewebp($img, $this->dir . '/' . $webpName, 82);
+            $candidate = $base . '.webp';
+            if (@imagewebp($img, $this->dir . '/' . $candidate, 82)) {
+                $webpName = $candidate;
+            }
         }
         // GD images are freed by GC; imagedestroy() is a deprecated no-op on PHP 8.5.
 

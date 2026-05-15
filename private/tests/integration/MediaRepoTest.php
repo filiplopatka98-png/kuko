@@ -88,4 +88,11 @@ final class MediaRepoTest extends TestCase
         $this->repo->updateAlt($a['id'], 'New alt');
         $this->assertSame('New alt', $this->repo->listAll()[0]['alt_text']);
     }
+
+    public function testUploadGeneratesWebpVariant(): void
+    {
+        $row = $this->repo->upload($this->fakeUpload(), 'A');
+        $this->assertNotNull($row['webp']);
+        $this->assertFileExists($this->dir . '/' . $row['webp']);
+    }
 }
