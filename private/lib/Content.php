@@ -37,7 +37,8 @@ final class Content
             $repo = self::repo();
             if ($repo === null) return null;
             return $repo->get($key);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            error_log('[Content] lookup failed for "' . $key . '": ' . $e->getMessage());
             return null;
         }
     }
@@ -50,7 +51,8 @@ final class Content
             self::$triedConfig = true;
             try {
                 self::$db = Db::fromConfig();
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                error_log('[Content] DB unavailable, serving fallbacks: ' . $e->getMessage());
                 return null;
             }
         }
