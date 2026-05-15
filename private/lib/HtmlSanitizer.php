@@ -17,7 +17,7 @@ final class HtmlSanitizer
     // Safe href prefixes. Anything not matching is dropped (incl.
     // javascript:, data:, vbscript:, and any unlisted scheme).
     // Case-insensitive; value is trimmed before testing.
-    private const HREF_RE = '#^(/|\#|\./|https?://|mailto:|tel:)#i';
+    private const HREF_RE = '#^(/(?![/\\\\])|\#|\./|https?://|mailto:|tel:)#i';
 
     public static function clean(string $html): string
     {

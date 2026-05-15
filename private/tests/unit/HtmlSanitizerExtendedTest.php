@@ -76,9 +76,11 @@ final class HtmlSanitizerExtendedTest extends TestCase
     public static function badHrefProvider(): array
     {
         return [
-            'javascript' => ['javascript:alert(1)', 'javascript:'],
-            'data'       => ['data:text/html,<b>', 'data:text/html'],
-            'vbscript'   => ['vbscript:msgbox(1)', 'vbscript:'],
+            'javascript'        => ['javascript:alert(1)', 'javascript:'],
+            'data'              => ['data:text/html,<b>', 'data:text/html'],
+            'vbscript'          => ['vbscript:msgbox(1)', 'vbscript:'],
+            'protocol-relative' => ['//evil.com', 'evil.com'],
+            'backslash-host'    => ['/\\\\evil.com', 'evil.com'],
         ];
     }
 
