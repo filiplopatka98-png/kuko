@@ -68,6 +68,15 @@ if (root) {
 
   // ---------- Step 2: calendar ----------
   const MONTH_NAMES = ['Január','Február','Marec','Apríl','Máj','Jún','Júl','August','September','Október','November','December'];
+  const DAY_NAMES = ['Nedeľa','Pondelok','Utorok','Streda','Štvrtok','Piatok','Sobota'];
+
+  // Visually-hidden live region for screen-reader announcements
+  const calendarAnnouncer = document.createElement('div');
+  calendarAnnouncer.setAttribute('aria-live', 'polite');
+  calendarAnnouncer.setAttribute('aria-atomic', 'true');
+  calendarAnnouncer.className = 'sr-only';
+  calendarAnnouncer.id = 'calendar-announcer';
+  document.body.appendChild(calendarAnnouncer);
 
   function monthKey(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
@@ -98,6 +107,9 @@ if (root) {
 
   function renderGrid(days) {
     calendarGrid.innerHTML = '';
+    calendarGrid.setAttribute('role', 'grid');
+    calendarGrid.setAttribute('aria-label', 'Kalendár dostupných termínov');
+
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
     const first = new Date(year, month, 1);
@@ -110,6 +122,10 @@ if (root) {
     const cells = rows * 7;
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
+    const todayIso = today.toISOString().slice(0, 10);
+
+    // Track the first available (or today's) cell for roving tabindex seed
+    let firstFocusable = null;
 
     for (let i = 0; i < cells; i++) {
       const dayNum = i - startOffset + 1;
@@ -120,22 +136,27 @@ if (root) {
       cell.type = 'button';
       cell.className = 'day';
       cell.setAttribute('role', 'gridcell');
+      cell.setAttribute('tabindex', '-1');
       if (!inMonth) {
+        // Spacer: keyboard-focusable for grid traversal, but inert for activation.
         cell.classList.add('day--off-month');
-        cell.disabled = true;
-        cell.textContent = '';
+        cell.setAttribute('aria-disabled', 'true');
+        cell.setAttribute('aria-hidden', 'true');
         calendarGrid.appendChild(cell);
         continue;
       }
 
       const info = days?.[iso];
+      const dayName = DAY_NAMES[cellDate.getDay()];
+      const monthName = MONTH_NAMES[month];
       const dayLabel = document.createElement('span');
       dayLabel.textContent = dayNum;
       cell.appendChild(dayLabel);
 
       if (cellDate < today) {
         cell.classList.add('day--past');
-        cell.disabled = true;
+        cell.setAttribute('aria-disabled', 'true');
+        cell.setAttribute('aria-label', `${dayName} ${dayNum}. ${monthName}, v minulosti`);
       } else if (!info || info.status === 'unavailable') {
         const reason = info?.reason;
         if (reason === 'closed_day' || reason === 'blocked_full_day') {
@@ -145,21 +166,34 @@ if (root) {
         } else {
           cell.classList.add('day--full');
         }
-        cell.disabled = true;
         cell.title = reasonLabel(reason);
+        cell.setAttribute('aria-disabled', 'true');
+        cell.setAttribute('aria-label', `${dayName} ${dayNum}. ${monthName}, plne obsadené`);
       } else {
+        const freeCount = info.free_count ?? info.slots ?? 0;
         cell.classList.add('day--available');
         cell.dataset.date = iso;
         cell.title = 'Voľné — kliknite pre výber času';
+        cell.setAttribute('aria-selected', 'false');
+        cell.setAttribute('aria-label', `${dayName} ${dayNum}. ${monthName}, dostupné, ${freeCount} voľných termínov`);
+        cell.setAttribute('aria-disabled', 'false');
         cell.addEventListener('click', () => selectDay(cell, iso));
+        if (firstFocusable === null) firstFocusable = cell;
       }
 
-      if (iso === today.toISOString().slice(0, 10)) {
+      if (iso === todayIso) {
         cell.classList.add('is-today');
+        if (firstFocusable === null) firstFocusable = cell;
       }
 
       calendarGrid.appendChild(cell);
     }
+
+    // Set initial roving tabindex on the first focusable cell
+    if (firstFocusable) firstFocusable.setAttribute('tabindex', '0');
+
+    // Attach keyboard handler to the grid (once per render)
+    calendarGrid.addEventListener('keydown', handleGridKeydown);
   }
 
   function reasonLabel(reason) {
@@ -172,9 +206,31 @@ if (root) {
     })[reason] ?? 'Nedostupné';
   }
 
+  // Move roving tabindex + DOM focus to a cell (used by keyboard nav)
+  function focusCell(cell) {
+    if (!cell) return;
+    calendarGrid.querySelectorAll('[role="gridcell"]').forEach(c => c.setAttribute('tabindex', '-1'));
+    cell.setAttribute('tabindex', '0');
+    cell.focus();
+  }
+
   async function selectDay(cell, iso) {
-    calendarGrid.querySelectorAll('.day').forEach(c => c.classList.remove('is-selected'));
+    calendarGrid.querySelectorAll('.day').forEach(c => {
+      c.classList.remove('is-selected');
+      if (c.hasAttribute('aria-selected')) c.setAttribute('aria-selected', 'false');
+    });
     cell.classList.add('is-selected');
+    cell.setAttribute('aria-selected', 'true');
+    // Selected cell becomes the roving tabindex anchor
+    calendarGrid.querySelectorAll('[role="gridcell"]').forEach(c => c.setAttribute('tabindex', '-1'));
+    cell.setAttribute('tabindex', '0');
+
+    // Announce selection to screen readers
+    const d = new Date(iso + 'T00:00:00');
+    const freeCount = (cell.getAttribute('aria-label') || '').match(/(\d+)\s+voľných/)?.[1] ?? '';
+    calendarAnnouncer.textContent =
+      `Vybraný ${d.getDate()}. ${MONTH_NAMES[d.getMonth()]}. ${freeCount} voľných termínov nižšie.`;
+
     dateInput.value = iso;
     sumDate.textContent = iso;
     timeInput.value = '';
@@ -237,14 +293,65 @@ if (root) {
   }
 
   // Calendar navigation
-  document.querySelector('[data-cal-nav="prev"]').addEventListener('click', () => {
+  function gotoPrevMonth() {
     currentMonth.setMonth(currentMonth.getMonth() - 1);
     loadMonth();
-  });
-  document.querySelector('[data-cal-nav="next"]').addEventListener('click', () => {
+  }
+  function gotoNextMonth() {
     currentMonth.setMonth(currentMonth.getMonth() + 1);
     loadMonth();
-  });
+  }
+  document.querySelector('[data-cal-nav="prev"]').addEventListener('click', gotoPrevMonth);
+  document.querySelector('[data-cal-nav="next"]').addEventListener('click', gotoNextMonth);
+
+  // ---------- Grid keyboard navigation ----------
+  // ALL cells in DOM order, including off-month spacers. Index maps to grid
+  // geometry: column = index % 7, row = floor(index / 7). Off-month spacer
+  // cells are valid navigation targets so the focus ring can traverse the
+  // whole 7-wide grid; only their selection (Enter/Space) is a no-op.
+  function gridCells() {
+    return Array.from(calendarGrid.querySelectorAll('[role="gridcell"]'));
+  }
+
+  function handleGridKeydown(e) {
+    const cells = gridCells();
+    if (!cells.length) return;
+
+    // Anchor on the currently focused cell, or the roving-tabindex cell.
+    let current = cells.indexOf(document.activeElement);
+    if (current === -1) {
+      current = cells.findIndex(c => c.getAttribute('tabindex') === '0');
+      if (current === -1) current = 0;
+    }
+
+    let target = current;
+    switch (e.key) {
+      case 'ArrowLeft':  target = current - 1; break;
+      case 'ArrowRight': target = current + 1; break;
+      case 'ArrowUp':    target = current - 7; break;
+      case 'ArrowDown':  target = current + 7; break;
+      case 'Home':       target = current - (current % 7); break;
+      case 'End':        target = current - (current % 7) + 6; break;
+      case 'PageUp':     e.preventDefault(); gotoPrevMonth(); return;
+      case 'PageDown':   e.preventDefault(); gotoNextMonth(); return;
+      case 'Enter':
+      case ' ':
+      case 'Spacebar': {
+        const c = cells[current];
+        if (c && c.classList.contains('day--available') && c.dataset.date) {
+          e.preventDefault();
+          selectDay(c, c.dataset.date);
+        }
+        return;
+      }
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    if (target < 0 || target >= cells.length) return; // edge of grid — stay put
+    focusCell(cells[target]);
+  }
 
   // ---------- Cookie consent + reCAPTCHA ----------
   function consentAccepted() {
