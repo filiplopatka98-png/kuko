@@ -14,7 +14,7 @@ final class LoginThrottle
         private int $windowSec = 3600,
     ) {
         if (!is_dir($this->dir)) {
-            @mkdir($this->dir, 0700, true);
+            mkdir($this->dir, 0700, true);
         }
     }
 

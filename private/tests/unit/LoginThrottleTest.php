@@ -47,4 +47,14 @@ final class LoginThrottleTest extends TestCase
         for ($i = 0; $i < 5; $i++) { $t->permit('10.0.0.' . $i, 'victim'); $t->recordFailure('10.0.0.' . $i, 'victim'); }
         $this->assertFalse($t->permit('10.0.0.99', 'victim'), 'username bucket blocks even from a fresh IP');
     }
+
+    public function testStaleBucketResetsAfterWindow(): void
+    {
+        $t = new LoginThrottle($this->dir, 5, 3600);
+        // Write a maxed-out bucket whose window already elapsed.
+        $stale = ['start' => time() - 3601, 'count' => 5];
+        file_put_contents($this->dir . '/login_ip_' . sha1('5.5.5.5') . '.json', json_encode($stale));
+        file_put_contents($this->dir . '/login_user_' . sha1('joe') . '.json', json_encode($stale));
+        $this->assertTrue($t->permit('5.5.5.5', 'joe'), 'stale (expired-window) buckets must reset to 0');
+    }
 }
