@@ -200,6 +200,25 @@ $router->post('/admin/settings', function () use ($settings, $audit, $flash) {
     header('Location: /admin/settings');
 });
 
+// ===== Content blocks =====
+$router->get('/admin/content', function () use ($renderer, $db, $adminUser, $flashes) {
+    $cb = new \Kuko\ContentBlocksRepo($db);
+    echo $renderer->render('content', ['groups' => $cb->listGrouped(), 'user' => $adminUser, 'flashes' => $flashes]);
+});
+$router->post('/admin/content/save', function () use ($db, $audit, $flash, $adminUser) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $key  = (string) ($_POST['block_key'] ?? '');
+    $type = (string) ($_POST['content_type'] ?? 'text');
+    $val  = (string) ($_POST['value'] ?? '');
+    if ($key === '') { $flash('Chýba kľúč bloku.', 'err'); header('Location: /admin/content'); return; }
+    if (!in_array($type, ['text', 'html'], true)) $type = 'text';
+    $cb = new \Kuko\ContentBlocksRepo($db);
+    $cb->set($key, $val, $type, $adminUser);
+    $audit('content_save', 'content_blocks', 0, ['key' => $key]);
+    $flash('Blok „' . $key . '" uložený.');
+    header('Location: /admin/content');
+});
+
 // ===== Opening hours =====
 $router->get('/admin/opening-hours', function () use ($renderer, $hours, $adminUser, $flashes) {
     echo $renderer->render('opening-hours', ['hours' => $hours->all(), 'user' => $adminUser, 'flashes' => $flashes]);
