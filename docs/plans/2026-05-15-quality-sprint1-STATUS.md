@@ -47,6 +47,20 @@ Tracking dokument pre Quality Roadmap Sprint 1. Plán: `docs/plans/2026-05-15-qu
 - **T8** — `public/assets/img/og-cover.jpg` 1200×630 (rozšíriť gen-favicons.php, font `NunitoSans.ttf`) + `head.php` default og:image → og-cover. „Task 8".
 - **T9** — Plný regression + lint sweep + dev smoke + zaškrtnúť hotové v `roadmap-quality.md` + **produkčný deploy** (lftp; bez DB migrácie — Sprint 1 nemá schema zmenu) + owner musí zaregistrovať mesačný cron `/usr/bin/php .../private/cron/retention.php`.
 
+## 🐞 ZNÁMY PROD BUG — admin login (odložené, opraviť PRED go-live)
+
+**Symptóm:** na produkcii sa NEDÁ prihlásiť do adminu ani so správnym menom/heslom (lokálne OK).
+
+**Príčina:** `Auth::loadHtpasswd()` (`private/lib/Auth.php:101`) hľadá `APP_ROOT . '/public/admin/.htpasswd'`. Na prod `APP_ROOT = kuko-detskysvet.sk/` (z `web/index.php` → `../private/lib/App.php` → `dirname(__DIR__,2)`), ale verejný adresár je `web/`, nie `public/`. Súbor sa nikdy nenájde → prázdne entries → každý login zlyhá. Admin login sa na prod nikdy reálne neoveril (deploy/seed šli cez token-gated `_setup.php`).
+
+**Dohodnutá oprava (NEROBIŤ teraz — user rozhodol odložiť, spraviť s ostatnými zmenami):**
+- Zmeniť `Auth.php` aby `.htpasswd` čítal z `APP_ROOT . '/config/.htpasswd'` (cesta funguje lokálne aj na prod, je mimo DocumentRootu = bezpečnejšie než `web/admin/`).
+- TDD test na path resolution.
+- Vygenerovať `config/.htpasswd` (bcrypt, gitignore — pridať `/config/.htpasswd` do `.gitignore`).
+- Deploy: Auth.php + upload `config/.htpasswd` → `kuko-detskysvet.sk/config/.htpasswd`.
+
+**Blokátor pre go-live:** áno — bez opravy sa nikto nevie prihlásiť do prod adminu.
+
 ## Owner action items (NEBUDUJEME — nahlásiť userovi na konci Sprintu 1)
 1. P1 Lighthouse baseline (owner spustí v Chrome, screenshoty do `docs/audits/`)
 2. A1 axe DevTools scan (owner spustí rozšírenie)
