@@ -170,3 +170,23 @@ User chce admin prerobiť ako WordPress admin: **ľavý sidebar menu**, sekcia *
 `fabae78` + fix `33e89dd` (review APPROVED po fixe). 223 testov green. Iba `private/templates/admin/layout.php` + `public/assets/css/admin.css`(+min) + test — ŽIADNE route/section-template zmeny.
 - Ľavý sidebar: **Rezervácie** (top-level, tab bar Zoznam/Kalendár/Blokácie/Otváracie hodiny na resv-group routes) · skupina **STRÁNKY** (Obsah/Balíčky/Galéria/Kontakt) · skupina **NASTAVENIA** (SEO/Maintenance/Logy/GDPR/Všeobecné) · footer iCal/Web/@user/Odhlásiť.
 - Active-state exact-or-boundary (`/admin/log`≠`/admin/logout`, `/admin/seo`≠`/admin/settings`); `/admin` dashboard exact; reservations-group logika zachovaná. Pure-CSS responsive hamburger (≤900px), `.sr-only` doplnené do admin.css. a11y zachované (skip-link first, single `<main id=main>`). Login (layout-minimal) neovplyvnený, auth gate nezmenený.
+
+---
+
+## Admin IA v2 — ROZPRACOVANÉ (2026-05-15). Plán: docs/plans/2026-05-15-admin-ia-v2.md
+
+**HOTOVÉ + commitnuté na `main`, NIE nasadené (deploy batchnutý v AD-5):** 278 PHPUnit testov green.
+- ✅ AD-1 `cb34bee` — globálne štýlovanie všetkých admin inputov/selectov/textarea (.admin-main baseline + accent focus ring), de-dup .admin-field/.admin-filter.
+- ✅ AD-2 `82919fa` — galéria homepage výber: migrácia **006_gallery_homepage.sql** (on_homepage stĺpec), MediaRepo setHomepage(cap 6)/homepageSet(picked≤6 + PHP-shuffle random fill), admin checkbox route /admin/gallery/{id}/homepage, homepage `/` používa homepageSet(), /galeria stále listVisible() (všetky). seed-cms idempotentne označí prvých 6.
+- ✅ AD-3 `08647d7` — faq.intro/faq.items/privacy.body ako Content bloky (fallback byte-identický; výstup nezmenený). FAQ JSON-LD ostáva static + NOTE komentár.
+- ✅ AD-3b `c44c7c8` + sec-fix `065f9d2` — HtmlSanitizer rozšírený (h2/div/details/summary + class + relative/#/./ href), FAQ/privacy round-trip cez set() lossless; privacy inline style→.legal-h2/.legal-back triedy. **Security: opravený //host protocol-relative bypass.** XSS guards (script/style/iframe/on*/js:/data:) zachované.
+
+### ⚠️ DEPLOY PORADIE (kritické — pre AD-5 / ďalšiu session)
+1. lftp nasadiť VŠETOK kód AD-1..AD-3b+AD-4 (vrátane `private/lib/HtmlSanitizer.php`, `006_gallery_homepage.sql`, MediaRepo, admin templaty, public/index.php, seed-cms.php, main.css/min, admin.css/min).
+2. Prod: `_setup.php?action=migrate&token=` → aplikuje **006** (on_homepage stĺpec). MUSÍ byť pred seedom (seed-cms dopytuje on_homepage).
+3. AŽ POTOM `_setup.php?action=seed&token=` — seed-cms je idempotentný; seeduje faq/privacy bloky + označí 6 on_homepage. **Smie sa spustiť LEN keď je už nasadený opravený HtmlSanitizer (AD-3b+065f9d2)** — inak by `$cb->set` uložil zmangľovaný FAQ/privacy markup. Poradie: kód → migrate(006) → seed.
+4. Overiť: public / 503 + robots Disallow nezmenené, /admin/login 200, /galeria všetky fotky, homepage 6 (curated+random), FAQ/privacy vyzerajú rovnako (z DB == fallback, lossless).
+
+### ⏭️ ZOSTÁVA — AD-4 (najväčší task) + AD-5
+**AD-4 Admin IA restructure** (plán docs/plans/2026-05-15-admin-ia-v2.md sekcia AD-4): prepísať `private/templates/admin/layout.php` sidebar na cieľové IA (Rezervácie / Stránky / Galéria / Nastavenia, single items + footer); pridať tab bary: Rezervácie (Zoznam/Kalendár/Blokácie/Otváracie hodiny/**Balíčky**/**Nastavenia**) keď `$isResvGroup` (rozšíriť o /admin/packages,/admin/settings), Nastavenia (Kontakt/Maintenance/Logy/GDPR) nový `$isSettingsGroup` {/admin/contact,/admin/maintenance,/admin/log,/admin/gdpr}. Nové routy `/admin/pages` (zoznam 5 stránok: Domov/Rezervácia/Fotogaléria/FAQ/Ochrana údajov) + `/admin/pages/{page}` + `/admin/pages/{page}/save` → `pages.php`+`page-edit.php` s pod-tabmi Obsah|SEO (Domov: hero/about/cennik/kontakt/footer bloky; FAQ: faq.*; Privacy: privacy.body; ostatné: SEO-only) — REUSE existujúcu logiku z content.php save + seo.php save (ContentBlocksRepo + SettingsRepo, CSRF, audit, flash). `/admin/content` a `/admin/seo` → redirect na `/admin/pages`. `/admin/settings`(Rezervácie tab), `/admin/contact`(Nastavenia tab), `/admin/packages`(Rezervácie tab) handlery nezmenené, mení sa len nav grouping. Zachovať skip-link + single `<main id=main>` + normalizovaný `$path` (rtrim) + $active/$aria + pill taby. Aktualizovať AdminWpLayoutTest + nové testy. a11y zachované.
+**AD-5**: full regression + lint + dev smoke (všetky admin routy, /admin/pages list+editor, tab bary, galéria checkboxy ≤6, FAQ/privacy z DB==fallback) + bookkeeping + push + lftp + prod migrate(006)→seed (poradie vyššie) + overenie invariantov.
