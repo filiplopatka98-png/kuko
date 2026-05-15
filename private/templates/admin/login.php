@@ -32,6 +32,7 @@ ob_start();
   .login__error { color: #c0392b; background: #fdecea; padding: 0.5rem 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.9rem; }
 </style>
 <form method="post" action="/admin/login" class="login" autocomplete="off">
+  <input type="hidden" name="csrf" value="<?= e(\Kuko\Csrf::token()) ?>">
   <h1>KUKO admin</h1>
   <p class="login__sub">Prihláste sa pre prístup k rezerváciám.</p>
 

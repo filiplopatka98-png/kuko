@@ -32,6 +32,11 @@ $router->get('/admin/login', function () use ($renderer) {
 });
 
 $router->post('/admin/login', function () use ($renderer) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) {
+        http_response_code(400);
+        echo $renderer->render('login', ['error' => true, 'next' => (string) ($_POST['next'] ?? '/admin')]);
+        return;
+    }
     $user     = trim((string) ($_POST['username'] ?? ''));
     $pass     = (string) ($_POST['password'] ?? '');
     $remember = !empty($_POST['remember']);
