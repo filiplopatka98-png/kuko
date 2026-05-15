@@ -7,9 +7,58 @@ final class Maintenance
     private const COOKIE_NAME = 'kuko_staff';
     private const COOKIE_TTL  = 30 * 86400; // 30 days
 
-    /** True if maintenance mode is enabled in config. */
+    private static ?SettingsRepo $settings = null;
+
+    public static function setSettings(?SettingsRepo $s): void
+    {
+        self::$settings = $s;
+    }
+
+    private static function settings(): ?SettingsRepo
+    {
+        if (self::$settings !== null) return self::$settings;
+        try {
+            self::$settings = new SettingsRepo(Db::fromConfig());
+        } catch (\Throwable) {
+            return null;
+        }
+        return self::$settings;
+    }
+
+    /**
+     * Maintenance password from settings (DB) with config fallback.
+     * Returns '' when neither source defines one.
+     */
+    /**
+     * Read a settings key, swallowing any DB error (table missing, query fails).
+     * The maintenance gate must never crash on a settings-layer fault — it
+     * degrades to the config fallback instead of fataling.
+     */
+    private static function settingValue(string $key): ?string
+    {
+        try {
+            return self::settings()?->get($key);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private static function password(): string
+    {
+        $fromSettings = self::settingValue('maintenance.password');
+        if ($fromSettings !== null && $fromSettings !== '') {
+            return $fromSettings;
+        }
+        return (string) Config::get('app.maintenance_password', '');
+    }
+
+    /** True if maintenance mode is enabled (settings DB, config fallback). */
     public static function enabled(): bool
     {
+        $fromSettings = self::settingValue('maintenance.enabled');
+        if ($fromSettings !== null) {
+            return $fromSettings === '1';
+        }
         return (bool) Config::get('app.maintenance', false);
     }
 
@@ -45,7 +94,7 @@ final class Maintenance
 
     public static function passwordMatches(string $given): bool
     {
-        $expected = (string) Config::get('app.maintenance_password', '');
+        $expected = self::password();
         if ($expected === '') return false;
         return hash_equals($expected, $given);
     }
@@ -67,7 +116,7 @@ final class Maintenance
 
     private static function expectedCookieValue(): string
     {
-        $password = (string) Config::get('app.maintenance_password', '');
+        $password = self::password();
         $secret   = (string) Config::get('auth.secret', '');
         // Cookie value depends on both password and auth secret — rotating either invalidates all sessions.
         return hash('sha256', 'maintenance|' . $password . '|' . $secret);
