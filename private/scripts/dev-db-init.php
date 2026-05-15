@@ -112,6 +112,7 @@ $pdo->exec("CREATE TABLE gallery_photos (
     is_visible INTEGER NOT NULL DEFAULT 1,
     uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
 )");
+$pdo->exec("ALTER TABLE gallery_photos ADD COLUMN on_homepage INTEGER NOT NULL DEFAULT 0"); // 006_gallery_homepage
 $pdo->exec("ALTER TABLE packages ADD COLUMN description TEXT");
 $pdo->exec("ALTER TABLE packages ADD COLUMN price_text TEXT");
 $pdo->exec("ALTER TABLE packages ADD COLUMN kids_count_text TEXT");

@@ -32,7 +32,10 @@ ob_start();
 <?php if (!$photos): ?>
   <p class="admin-empty">Žiadne fotky.</p>
 <?php else: ?>
+<?php $homepageCount = 0; foreach ($photos as $__ph) { if (!empty($__ph['on_homepage'])) $homepageCount++; } ?>
 <p class="admin-lead gal-hint">Presúvaj fotky myšou pre zmenu poradia.</p>
+<p class="admin-lead gal-hp-counter">Na homepage: <strong id="galHpCount"><?= $homepageCount ?></strong>/6
+  <span class="gal-hp-note">(ak je menej ako 6, zvyšok homepage doplní náhodné viditeľné fotky)</span></p>
 <div class="gal-grid" id="galGrid">
   <?php foreach ($photos as $ph): ?>
     <?php
@@ -42,6 +45,7 @@ ob_start();
       $alt     = (string) $ph['alt_text'];
       $sort    = (int) $ph['sort_order'];
       $visible = !empty($ph['is_visible']);
+      $onHome  = !empty($ph['on_homepage']);
     ?>
     <div class="gal-card<?= $visible ? '' : ' gal-card--hidden' ?>" draggable="true" data-id="<?= $pid ?>">
       <div class="gal-card__handle" title="Presunúť">⠿ #<?= $sort ?></div>
@@ -53,6 +57,15 @@ ob_start();
         <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
         <input type="text" name="alt" value="<?= e($alt) ?>" maxlength="255" placeholder="ALT text">
         <button type="submit" class="admin-btn-link">Uložiť ALT</button>
+      </form>
+      <form method="post" action="/admin/gallery/<?= $pid ?>/homepage" class="gal-hp">
+        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+        <input type="hidden" name="on" value="<?= $onHome ? '0' : '1' ?>">
+        <label class="gal-hp__label">
+          <input type="checkbox" class="gal-hp__box" <?= $onHome ? 'checked' : '' ?>
+                 onchange="this.form.submit()">
+          <span>Na homepage</span>
+        </label>
       </form>
       <div class="gal-card__actions">
         <form method="post" action="/admin/gallery/<?= $pid ?>/visibility" style="display:inline">
@@ -86,6 +99,11 @@ ob_start();
 .gal-alt { display: flex; gap: .3rem; align-items: center; margin: .5rem 0; }
 .gal-alt input { flex: 1; min-width: 0; }
 .gal-card__actions { display: flex; gap: .8rem; }
+.gal-hp { margin: .4rem 0; }
+.gal-hp__label { display: flex; align-items: center; gap: .35rem; font-size: .9rem; cursor: pointer; }
+.gal-hp__box:disabled + span { color: #aaa; }
+.gal-hp-counter { margin-top: .4rem; }
+.gal-hp-note { font-size: .8rem; color: #888; font-style: italic; }
 </style>
 <script>
 (function () {
@@ -130,6 +148,19 @@ ob_start();
       }
     }).catch(function () {});
   });
+})();
+(function () {
+  // Client nicety only — server-side enforcement (setHomepage) is the source of truth.
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.gal-hp__box'));
+  var counter = document.getElementById('galHpCount');
+  if (!boxes.length) return;
+  function sync() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    if (counter) counter.textContent = n;
+    boxes.forEach(function (b) { b.disabled = (n >= 6 && !b.checked); });
+  }
+  boxes.forEach(function (b) { b.addEventListener('change', sync); });
+  sync();
 })();
 </script>
 <?php

@@ -73,6 +73,69 @@ final class MediaRepo
         $this->db->execStmt('UPDATE gallery_photos SET is_visible = ? WHERE id = ?', [$visible ? 1 : 0, $id]);
     }
 
+    private const HOMEPAGE_MAX = 6;
+
+    /**
+     * Toggle a photo's "show on homepage" flag.
+     * Turning OFF is always allowed. Turning ON is rejected (returns false) when
+     * the cap is already reached AND this id is not already on. Returns true on
+     * a successful change (or a no-op re-enable of an already-on id).
+     */
+    public function setHomepage(int $id, bool $on): bool
+    {
+        if (!$on) {
+            $this->db->execStmt('UPDATE gallery_photos SET on_homepage = 0 WHERE id = ?', [$id]);
+            return true;
+        }
+        $alreadyOn = (int) ($this->db->one(
+            'SELECT on_homepage FROM gallery_photos WHERE id = ?', [$id]
+        )['on_homepage'] ?? 0) === 1;
+        if (!$alreadyOn) {
+            $count = (int) ($this->db->one(
+                'SELECT COUNT(*) AS c FROM gallery_photos WHERE on_homepage = 1'
+            )['c'] ?? 0);
+            if ($count >= self::HOMEPAGE_MAX) {
+                return false;
+            }
+        }
+        $this->db->execStmt('UPDATE gallery_photos SET on_homepage = 1 WHERE id = ?', [$id]);
+        return true;
+    }
+
+    /**
+     * Photos for the homepage gallery: up to 6 owner-picked (is_visible AND
+     * on_homepage, ordered by sort_order,id, capped at 6); if fewer than 6,
+     * fill the remaining slots with RANDOM other visible photos. Random fill is
+     * done in PHP (shuffle) so it is DB-portable (no RAND()/RANDOM() SQL).
+     * Result length = min(6, total visible). Rows match listVisible() shape.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function homepageSet(): array
+    {
+        $picked = $this->db->all(
+            'SELECT * FROM gallery_photos WHERE is_visible = 1 AND on_homepage = 1 ORDER BY sort_order, id'
+        );
+        $picked = array_slice($picked, 0, self::HOMEPAGE_MAX);
+        if (count($picked) >= self::HOMEPAGE_MAX) {
+            return $picked;
+        }
+        $chosenIds = [];
+        foreach ($picked as $row) {
+            $chosenIds[(int) $row['id']] = true;
+        }
+        $candidates = $this->db->all(
+            'SELECT * FROM gallery_photos WHERE is_visible = 1 ORDER BY sort_order, id'
+        );
+        $candidates = array_values(array_filter(
+            $candidates,
+            fn($row) => !isset($chosenIds[(int) $row['id']])
+        ));
+        shuffle($candidates);
+        $need = self::HOMEPAGE_MAX - count($picked);
+        return array_merge($picked, array_slice($candidates, 0, $need));
+    }
+
     public function updateAlt(int $id, string $alt): void
     {
         $this->db->execStmt('UPDATE gallery_photos SET alt_text = ? WHERE id = ?', [$alt, $id]);

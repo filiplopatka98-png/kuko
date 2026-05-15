@@ -71,6 +71,21 @@ if ($hasSixth === 0) {
     echo "+ photo galeria_5.jpg (#6) — 6th starter inserted\n";
 } else { echo "= 6th starter photo (sort_order=6) already present\n"; }
 
+// Homepage gallery default: if nothing is curated yet (zero on_homepage=1),
+// mark the first 6 visible photos (by sort_order,id) so a fresh/existing prod
+// DB shows a sensible full grid. Guarded so re-running does not churn or
+// override an owner's later selection.
+$onHome = (int) ($db->one('SELECT COUNT(*) AS c FROM gallery_photos WHERE on_homepage = 1')['c'] ?? 0);
+if ($onHome === 0) {
+    $first6 = $db->all('SELECT id FROM gallery_photos WHERE is_visible = 1 ORDER BY sort_order, id LIMIT 6');
+    foreach ($first6 as $r) {
+        $db->execStmt('UPDATE gallery_photos SET on_homepage = 1 WHERE id = ?', [(int) $r['id']]);
+    }
+    echo '+ homepage gallery default — marked ' . count($first6) . " visible photo(s) on_homepage\n";
+} else {
+    echo "= homepage gallery already curated ($onHome on_homepage)\n";
+}
+
 // Settings: maintenance + SEO defaults (only if key absent)
 $s = new \Kuko\SettingsRepo($db);
 // NOTE: dual source of truth — the seo.* values below are duplicated as hardcoded

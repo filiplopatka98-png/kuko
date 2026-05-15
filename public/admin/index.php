@@ -319,6 +319,19 @@ $router->post('/admin/gallery/{id}/visibility', function (array $p) use ($db, $g
     $flash($visible ? 'Fotka zobrazená.' : 'Fotka skrytá.');
     header('Location: /admin/gallery');
 });
+$router->post('/admin/gallery/{id}/homepage', function (array $p) use ($db, $galleryDir, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
+    $on = !empty($_POST['on']);
+    $ok = (new \Kuko\MediaRepo($db, $galleryDir))->setHomepage($id, $on);
+    if (!$ok) {
+        $flash('Na homepage môže byť najviac 6 fotiek.', 'err');
+    } else {
+        $audit('gallery_homepage', 'gallery_photos', $id, ['on' => $on]);
+        $flash($on ? 'Fotka pridaná na homepage.' : 'Fotka odobraná z homepage.');
+    }
+    header('Location: /admin/gallery');
+});
 $router->post('/admin/gallery/{id}/alt', function (array $p) use ($db, $galleryDir, $audit, $flash) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
     $id = (int) $p['id'];
