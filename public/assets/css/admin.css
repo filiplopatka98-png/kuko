@@ -38,14 +38,56 @@ body { font-family: "Nunito Sans", system-ui, sans-serif; margin: 0; background:
 a { color: var(--c-accent); }
 .skip-link{position:absolute;left:8px;top:-44px;z-index:1000;background:var(--c-accent,#D88BBE);color:#fff;padding:.6rem 1rem;border-radius:6px;text-decoration:none;transition:top .15s ease}
 .skip-link:focus{top:8px}
-.admin-header { background: var(--c-white); border-bottom: 1px solid #f0e3ec; }
-.admin-header__inner { max-width: 1100px; margin: 0 auto; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
-.admin-header h1 { font-size: 1.25rem; margin: 0; }
-.admin-header nav { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; flex-wrap: wrap; }
-.admin-user { color: var(--c-text-soft); font-size: 0.85rem; }
-.admin-logout { color: #c0392b !important; font-size: 0.85rem; padding-left: 0.5rem; border-left: 1px solid #f0e3ec; }
+/* WordPress-style left-sidebar admin layout */
+.admin-body { display: flex; min-height: 100vh; }
+.admin-sidebar {
+  width: 240px; flex: 0 0 240px; background: var(--c-white); border-right: 1px solid #f0e3ec;
+  display: flex; flex-direction: column; position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
+}
+.admin-sidebar__brand { display: flex; align-items: center; gap: 0.6rem; padding: 1.1rem 1.25rem; font-size: 1.15rem; font-weight: 800; border-bottom: 1px solid #f0e3ec; }
+.admin-sidebar__logo { border-radius: 8px; object-fit: contain; }
+.admin-sidebar__nav { flex: 1; padding: 0.75rem 0; display: flex; flex-direction: column; }
+.admin-nav-group { margin-top: 1rem; }
+.admin-nav-label { display: block; padding: 0.4rem 1.25rem 0.3rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-text-soft); }
+.admin-nav-item {
+  display: block; padding: 0.55rem 1.25rem; font-size: 0.92rem; color: var(--c-text); text-decoration: none;
+  border-left: 3px solid transparent; transition: background 0.12s ease, color 0.12s ease;
+}
+.admin-nav-item:hover { background: var(--bg-pink-soft); }
+.admin-nav-item.is-active { background: var(--bg-pink-soft); color: var(--c-accent-dark); border-left-color: var(--c-accent); font-weight: 700; }
+.admin-sidebar__footer { padding: 1rem 1.25rem; border-top: 1px solid #f0e3ec; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; }
+.admin-sidebar__footer a { color: var(--c-accent); text-decoration: none; }
+.admin-sidebar__footer a:hover { text-decoration: underline; }
+.admin-user { color: var(--c-text-soft); font-size: 0.8rem; }
+.admin-logout { color: #c0392b !important; font-weight: 700; }
 .admin-logout:hover { color: #8a1e0f !important; }
-.admin-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+.admin-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.admin-main { max-width: 1100px; width: 100%; margin: 0 auto; padding: 1.5rem 1.5rem; }
+/* Reservations tab bar */
+.admin-tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; padding: 1rem 1.5rem 0; max-width: 1100px; width: 100%; margin: 0 auto; border-bottom: 1px solid #f0e3ec; }
+.admin-tab {
+  padding: 0.6rem 1rem; font-size: 0.9rem; color: var(--c-text-soft); text-decoration: none; font-weight: 600;
+  border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.admin-tab:hover { color: var(--c-text); }
+.admin-tab.is-active { color: var(--c-accent-dark); border-bottom-color: var(--c-accent); }
+/* Responsive: off-canvas sidebar via pure-CSS checkbox toggle */
+.admin-hamburger { display: none; }
+@media (max-width: 900px) {
+  .admin-body { display: block; }
+  .admin-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; z-index: 900;
+    transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 0 0 24px rgba(0,0,0,0.12);
+  }
+  .admin-nav-toggle:checked ~ .admin-sidebar { transform: translateX(0); }
+  .admin-hamburger {
+    display: flex; flex-direction: column; justify-content: center; gap: 4px; position: fixed; top: 0.75rem; left: 0.75rem;
+    z-index: 901; width: 42px; height: 42px; padding: 9px; background: var(--c-white); border: 1px solid #f0e3ec;
+    border-radius: 8px; cursor: pointer; box-shadow: var(--shadow-card);
+  }
+  .admin-hamburger span { display: block; height: 2px; background: var(--c-text); border-radius: 2px; }
+  .admin-content { padding-top: 3.75rem; }
+}
 .admin-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
 .admin-filter select, .admin-filter input, .admin-filter button {
   padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e3d6df; background: var(--c-white); font: inherit;
