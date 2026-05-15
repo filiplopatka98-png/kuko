@@ -45,7 +45,7 @@ final class Asset
         return self::stamp($path, self::docRoot());
     }
 
-    private static function docRoot(): string
+    public static function docRoot(): string
     {
         $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
         if ($docRoot !== '' && is_dir($docRoot)) {

@@ -53,6 +53,27 @@ final class AssetTest extends TestCase
         @unlink($this->root . '/assets/css/x.min.css');
         $this->assertSame('/assets/css/x.css?v=1700000000', Asset::stamp('/assets/css/x.css', $this->root));
     }
+    public function testDocRootPrefersServerDocumentRootWhenValidDir(): void
+    {
+        $orig = $_SERVER['DOCUMENT_ROOT'] ?? null;
+        $_SERVER['DOCUMENT_ROOT'] = $this->root;          // a real temp dir from setUp
+        try {
+            $this->assertSame($this->root, \Kuko\Asset::docRoot());
+        } finally {
+            if ($orig === null) unset($_SERVER['DOCUMENT_ROOT']); else $_SERVER['DOCUMENT_ROOT'] = $orig;
+        }
+    }
+    public function testDocRootFallsBackToAppRootPublicWhenNoServerDocRoot(): void
+    {
+        $orig = $_SERVER['DOCUMENT_ROOT'] ?? null;
+        unset($_SERVER['DOCUMENT_ROOT']);
+        try {
+            // APP_ROOT is defined by the test bootstrap to the repo root which HAS /public
+            $this->assertSame(APP_ROOT . '/public', \Kuko\Asset::docRoot());
+        } finally {
+            if ($orig !== null) $_SERVER['DOCUMENT_ROOT'] = $orig;
+        }
+    }
     public function testCommittedMinFilesNotOlderThanSource(): void
     {
         $pub = \dirname(__DIR__, 3) . '/public';

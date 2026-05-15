@@ -286,7 +286,7 @@ $router->post('/admin/contact', function () use ($db, $settings, $audit, $flash,
 });
 
 // ===== Gallery =====
-$galleryDir = APP_ROOT . '/public/assets/img/gallery';
+$galleryDir = \Kuko\Asset::docRoot() . '/assets/img/gallery';
 $router->get('/admin/gallery', function () use ($renderer, $db, $galleryDir, $adminUser, $flashes) {
     $photos = (new \Kuko\MediaRepo($db, $galleryDir))->listAll();
     echo $renderer->render('gallery', ['photos' => $photos, 'user' => $adminUser, 'flashes' => $flashes]);

@@ -41,7 +41,7 @@ $router->get('/', function () use ($renderer) {
     $packages = [];
     try {
         $db = \Kuko\Db::fromConfig();
-        $gallery  = (new \Kuko\MediaRepo($db, APP_ROOT . '/public/assets/img/gallery'))->listVisible();
+        $gallery  = (new \Kuko\MediaRepo($db, \Kuko\Asset::docRoot() . '/assets/img/gallery'))->listVisible();
         $packages = (new \Kuko\PackagesRepo($db))->listActive();
     } catch (\Throwable $e) {
         error_log('[home] gallery/packages load failed: ' . $e->getMessage());
