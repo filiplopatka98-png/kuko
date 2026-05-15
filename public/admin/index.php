@@ -555,6 +555,23 @@ $router->get('/admin/log', function () use ($renderer, $db, $adminUser, $flashes
     echo $renderer->render('log', ['rows' => $rows, 'user' => $adminUser, 'flashes' => $flashes]);
 });
 
+// ===== GDPR — anonymize reservation =====
+$router->post('/admin/reservation/{id}/anonymize', function (array $p) use ($db, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $id = (int) $p['id'];
+    (new \Kuko\Privacy($db))->anonymizeReservation($id);
+    $audit('anonymize', 'reservations', $id);
+    $flash('Rezervácia #' . $id . ' anonymizovaná (PII vymazané, štatistika zachovaná).');
+    header('Location: /admin/reservation/' . $id);
+});
+
+// ===== GDPR — email export =====
+$router->get('/admin/gdpr', function () use ($renderer, $db, $adminUser, $flashes) {
+    $email = trim((string) ($_GET['email'] ?? ''));
+    $rows  = $email !== '' ? (new \Kuko\Privacy($db))->exportByEmail($email) : [];
+    echo $renderer->render('gdpr', ['email' => $email, 'rows' => $rows, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+
 $match = $router->match($method, $path);
 if ($match === null) {
     http_response_code(404);

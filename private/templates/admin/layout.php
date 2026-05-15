@@ -22,6 +22,7 @@
       <a href="/admin/seo">SEO</a>
       <a href="/admin/maintenance">Maintenance</a>
       <a href="/admin/log">Log</a>
+      <a href="/admin/gdpr">GDPR</a>
       <a href="/admin/settings">Nastavenia</a>
       <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">📅 iCal</a>
       <a href="/" target="_blank">Web ↗</a>

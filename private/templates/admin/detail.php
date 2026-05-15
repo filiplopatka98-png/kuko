@@ -52,6 +52,14 @@ ob_start();
     <p style="margin:0;color:#888;font-size:0.85rem">Backend overí dostupnosť rovnako ako pri novej rezervácii.</p>
   </form>
 </div>
+
+<div style="margin-top:2rem">
+  <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/anonymize"
+        onsubmit="return confirm('Anonymizovať? PII (meno, telefón, e-mail, poznámka) sa nenávratne vymažú. Štatistika zostane.');">
+    <input type="hidden" name="csrf" value="<?= e(\Kuko\Csrf::token()) ?>">
+    <button type="submit" style="background:#c0392b;color:#fff;border:none;padding:0.5rem 1rem;cursor:pointer;border-radius:3px">Anonymizovať (GDPR)</button>
+  </form>
+</div>
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/layout.php';
