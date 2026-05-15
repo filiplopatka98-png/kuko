@@ -114,3 +114,17 @@ Plán: `docs/plans/2026-05-15-quality-sprint3.md`. **T1–T3 hotové (impl+spec+
 Owner/manuál (nebudovať): B3 (PHPMailer CVE, Leaflet/reCAPTCHA review), B7 (OWASP ZAP, manual pentest, subdomain takeover, DNS DMARC/SPF/DKIM), A6 plain-language copy (cez /admin), + go-live owner items (SMTP, reCAPTCHA browser test, GDPR cron registrácia, Lighthouse/axe, Google Business Profile, HSTS preload).
 
 Po Sprinte 3: userove „pripomienky k dizajnu" (čaká, vymenili sme poradie), potom go-live (#1: flip maintenance OFF + public_indexing ON).
+
+---
+
+## ✅ Sprint 3 KOMPLET A NASADENÝ (2026-05-15)
+
+S3-T1..T8 hotové (každá impl + spec + code-quality review APPROVED), nasadené na prod, overené (cache-busted: main.min.css má #6A6A6A+skip-link; rezervacia.min.js má VCALENDAR+kuko_resv_draft; server sizes == local; public / 503 + robots Disallow nezmenené; /admin/login 200 so skip-link). **194 PHPUnit testov green.** Commity `05ff94e`…`c8a5386`, pushnuté na GitHub, `HEAD==origin/main`.
+
+Dodané: A5 AA kontrast + site-wide focus-visible + reduced-motion; A2 skip-link + single <main id=main> (footer DRY do layout.php); A3 form aria-required/alert/status; U1 SYMETRICKÝ buffer (pred+po rezervácii); U3 SK phone validácia + email datalist + sessionStorage draft + default 14:00; U4 add-to-calendar (.ics+Google) na success; B6 session cookie hardening (inert pod CLI/testami); B5 db-backup cron + docs/RECOVERY.md.
+
+Pozn.: WebSupport edge cachuje bare asset URL (bez query) ~stale; reálni používatelia dostávajú čerstvé cez `?v=filemtime` (Asset::url, Sprint 2) — overené že server súbory == local.
+
+Stav roadmap-quality.md: Sprint 1+2+3 odškrtnuté. Zostáva owner/manuál: B3 (PHPMailer CVE, Leaflet/reCAPTCHA review), B7 (OWASP ZAP, manual pentest, subdomain takeover, DNS DMARC/SPF/DKIM), A6 plain-language copy (cez /admin), S5 analytics, S3 GBP; + go-live owner items (SMTP heslo, reCAPTCHA browser test, GDPR cron registrácia na WebSupporte, Lighthouse/axe baseline, Google Business Profile, HSTS preload registrácia). Po nich: flip maintenance OFF + public_indexing ON.
+
+Ďalej podľa user plánu: **userove „pripomienky k dizajnu"** (čaká), potom go-live (#1).
