@@ -8,10 +8,13 @@
 /** @var string $seoDesc */
 /** @var string $user */
 /** @var array $flashes */
+/** @var list<array{q:string,a:string}>|null $faqItems */
 $title = 'Upraviť: ' . $label . ' — KUKO admin';
 $csrf  = \Kuko\Csrf::token();
 $baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
-$hasContent = !empty($groups);
+$faqItems = $faqItems ?? null;
+$isFaq    = is_array($faqItems);
+$hasContent = !empty($groups) || $isFaq;
 ob_start();
 ?>
 <h2>Upraviť stránku: <?= e($label) ?>
@@ -59,6 +62,50 @@ ob_start();
         <?php endforeach; ?>
       </fieldset>
     <?php endforeach; ?>
+  <?php endif; ?>
+
+  <?php if ($isFaq): ?>
+    <fieldset class="admin-fieldset" id="faq-repeater">
+      <legend>Otázky a odpovede</legend>
+      <p class="admin-lead">Každá položka má otázku (čistý text) a odpoveď (povolené je <code>&lt;strong&gt;</code> a odkazy <code>&lt;a href&gt;</code>). Poradie meníte šípkami ↑ / ↓.</p>
+      <div data-faq-list>
+        <?php foreach ($faqItems as $i => $it): ?>
+          <div class="admin-field faq-row" data-faq-row>
+            <label class="admin-field">
+              <span>Otázka</span>
+              <input type="text" name="faq_items[<?= (int) $i ?>][q]" value="<?= e((string) $it['q']) ?>" data-faq-q>
+            </label>
+            <label class="admin-field">
+              <span>Odpoveď</span>
+              <textarea name="faq_items[<?= (int) $i ?>][a]" rows="3" data-faq-a><?= e((string) $it['a']) ?></textarea>
+            </label>
+            <div class="faq-row__actions">
+              <button type="button" class="admin-pill admin-pill--ghost" data-faq-up aria-label="Posunúť otázku vyššie">↑</button>
+              <button type="button" class="admin-pill admin-pill--ghost" data-faq-down aria-label="Posunúť otázku nižšie">↓</button>
+              <button type="button" class="admin-pill admin-pill--ghost" data-faq-remove aria-label="Odstrániť otázku">Odstrániť</button>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+      <button type="button" class="admin-pill" data-faq-add>Pridať otázku</button>
+      <template data-faq-template>
+        <div class="admin-field faq-row" data-faq-row>
+          <label class="admin-field">
+            <span>Otázka</span>
+            <input type="text" name="faq_items[__IDX__][q]" value="" data-faq-q>
+          </label>
+          <label class="admin-field">
+            <span>Odpoveď</span>
+            <textarea name="faq_items[__IDX__][a]" rows="3" data-faq-a></textarea>
+          </label>
+          <div class="faq-row__actions">
+            <button type="button" class="admin-pill admin-pill--ghost" data-faq-up aria-label="Posunúť otázku vyššie">↑</button>
+            <button type="button" class="admin-pill admin-pill--ghost" data-faq-down aria-label="Posunúť otázku nižšie">↓</button>
+            <button type="button" class="admin-pill admin-pill--ghost" data-faq-remove aria-label="Odstrániť otázku">Odstrániť</button>
+          </div>
+        </div>
+      </template>
+    </fieldset>
   <?php endif; ?>
   </section>
 
@@ -122,6 +169,47 @@ document.querySelectorAll('.quill-editor').forEach(function (el) {
   q.root.innerHTML = hidden.value;
   el.closest('form').addEventListener('submit', function () { hidden.value = q.root.innerHTML; });
 });
+// FAQ repeater — add / remove / move ↑ ↓. The server (Faq::save) iterates
+// $_POST['faq_items'] values in received (= DOM) order and re-indexes, so
+// JS only needs to physically reorder/append the row nodes; indices just
+// need to stay unique (a monotonic counter does that).
+(function () {
+  var root = document.getElementById('faq-repeater');
+  if (!root) return;
+  var list = root.querySelector('[data-faq-list]');
+  var tpl  = root.querySelector('[data-faq-template]');
+  var addBtn = root.querySelector('[data-faq-add]');
+  var seq = 1000; // unique-index counter, well past server-rendered indices
+
+  function addRow() {
+    var frag = tpl.content.cloneNode(true);
+    var html = document.createElement('div');
+    html.appendChild(frag);
+    html.innerHTML = html.innerHTML.replace(/__IDX__/g, String(seq++));
+    var row = html.querySelector('[data-faq-row]');
+    list.appendChild(row);
+    var q = row.querySelector('[data-faq-q]');
+    if (q) q.focus();
+  }
+
+  addBtn.addEventListener('click', addRow);
+
+  list.addEventListener('click', function (e) {
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var row = btn.closest('[data-faq-row]');
+    if (!row) return;
+    if (btn.hasAttribute('data-faq-remove')) {
+      row.remove();
+    } else if (btn.hasAttribute('data-faq-up')) {
+      var prev = row.previousElementSibling;
+      if (prev) list.insertBefore(row, prev);
+    } else if (btn.hasAttribute('data-faq-down')) {
+      var next = row.nextElementSibling;
+      if (next) list.insertBefore(next, row);
+    }
+  });
+})();
 // SEO counter + Google preview (mirrors seo.php)
 (function () {
   function render(fs) {

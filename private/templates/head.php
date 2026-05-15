@@ -120,38 +120,19 @@ $robots = $seo['robots'];
 </script>
 
 <?php if (($pageType ?? '') === 'faq'): ?>
-<!-- NOTE: keep questions in sync with the faq.items content block (/admin Stránky → FAQ). Schema kept static to guarantee valid JSON-LD. -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Aké sú ceny vstupu do KUKO?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Dieťa do 1 roku má vstup zadarmo. Dieťa od 1 roku 5 € za hodinu, alebo 15 € na celý deň neobmedzene." }
-    },
-    {
-      "@type": "Question",
-      "name": "Akú oslavu si môžem zarezervovať?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Ponúkame 3 balíčky osláv: KUKO MINI (do 10 detí, 2 hodiny, 120–150 €), KUKO MAXI (do 20 detí, 3 hodiny, 220–260 €) a Uzavretú spoločnosť (celé KUKO len pre vás, 4 hodiny, 350 €)." }
-    },
-    {
-      "@type": "Question",
-      "name": "Aké sú otváracie hodiny?",
-      "acceptedAnswer": { "@type": "Answer", "text": "KUKO detský svet je otvorený každý deň: Pondelok – Nedeľa od 9:00 do 20:00." }
-    },
-    {
-      "@type": "Question",
-      "name": "Kde sa nachádza KUKO?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Nájdete nás na Bratislavskej 141, 921 01 Piešťany." }
-    },
-    {
-      "@type": "Question",
-      "name": "Ako môžem zrušiť alebo zmeniť rezerváciu?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Zmenu alebo zrušenie termínu vybavíme telefonicky na +421 915 319 934 alebo e-mailom na info@kuko-detskysvet.sk. Cez web rezerváciu meniť nie je možné." }
-    }
-  ]
+<?php
+// FAQPage JSON-LD — auto-generated from the same structured `faq.items`
+// source as the visible accordion (Faq helper). Always valid: on any DB
+// fault Faq::items() degrades to the 6 defaults, so the schema is always
+// present and in sync with the page.
+try {
+    $faqSchemaItems = \Kuko\Faq::items(new \Kuko\SettingsRepo(\Kuko\Db::fromConfig()));
+} catch (\Throwable $e) {
+    error_log('[head.php] FAQ schema settings unavailable, using defaults: ' . $e->getMessage());
+    $faqSchemaItems = \Kuko\Faq::defaults();
 }
+?>
+<script type="application/ld+json">
+<?= \Kuko\Faq::schemaJson($faqSchemaItems) ?>
 </script>
 <?php endif; ?>

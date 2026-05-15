@@ -272,12 +272,27 @@ $router->get('/admin/pages/{page}', function (array $p) use ($renderer, $db, $se
             $groups[$prefix] = $grouped[$prefix];
         }
     }
+    // FAQ uses a structured repeater (faq.items setting) instead of a Quill
+    // content block for the questions/answers. faq.intro stays a normal
+    // block (rendered above the repeater). Drop the legacy faq.items block
+    // from the Quill groups if an orphaned row is still present in the DB.
+    $faqItems = null;
+    if ($page === 'faq') {
+        if (isset($groups['faq'])) {
+            $groups['faq'] = array_values(array_filter(
+                $groups['faq'],
+                fn($b) => (string) ($b['block_key'] ?? '') !== 'faq.items'
+            ));
+        }
+        $faqItems = \Kuko\Faq::items($settings);
+    }
     echo $renderer->render('page-edit', [
         'page'        => $page,
         'label'       => $cfg['label'],
         'url'         => $cfg['url'],
         'seoKey'      => $cfg['seo'],
         'groups'      => $groups,
+        'faqItems'    => $faqItems,
         'seoTitle'    => (string) $settings->get('seo.' . $cfg['seo'] . '.title', ''),
         'seoDesc'     => (string) $settings->get('seo.' . $cfg['seo'] . '.description', ''),
         'user'        => $adminUser,
@@ -306,6 +321,14 @@ $router->post('/admin/pages/{page}/save', function (array $p) use ($db, $setting
             $val  = (string) ($b['value'] ?? '');
             $cb->set($key, $val, $type, $adminUser);
         }
+    }
+    // FAQ repeater: paired & ordered {q,a} rows submitted in DOM order.
+    // Faq::save sanitises answers, strips question tags, drops empty rows
+    // and re-indexes in received order (it's the source of truth).
+    if ($page === 'faq') {
+        $faqRaw = $_POST['faq_items'] ?? [];
+        \Kuko\Faq::save($settings, is_array($faqRaw) ? $faqRaw : []);
+        $audit('faq_save', 'settings', 0, []);
     }
     $settings->set('seo.' . $cfg['seo'] . '.title', trim((string) ($_POST['seo_title'] ?? '')));
     $settings->set('seo.' . $cfg['seo'] . '.description', trim((string) ($_POST['seo_description'] ?? '')));

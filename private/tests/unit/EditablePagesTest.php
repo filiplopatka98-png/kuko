@@ -15,8 +15,11 @@ final class EditablePagesTest extends TestCase
     public function testFaqUsesContentBlocks(): void
     {
         $t = file_get_contents($this->root . '/private/templates/pages/faq.php');
+        // faq.intro stays a content block; faq.items is now a structured
+        // repeater rendered via the Faq helper (not a Quill content block).
         $this->assertStringContainsString("Content::get('faq.intro'", $t);
-        $this->assertStringContainsString("Content::get('faq.items'", $t);
+        $this->assertStringContainsString('Faq::items', $t);
+        $this->assertStringNotContainsString("Content::get('faq.items'", $t);
         $this->assertSame(1, substr_count($t, '<h1'), 'faq keeps one h1');
     }
     public function testSeedListsNewBlocks(): void

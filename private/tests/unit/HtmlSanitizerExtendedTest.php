@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Kuko\Tests\Unit;
+use Kuko\Faq;
 use Kuko\HtmlSanitizer;
 use PHPUnit\Framework\TestCase;
 
@@ -122,21 +123,27 @@ final class HtmlSanitizerExtendedTest extends TestCase
     }
 
     /**
-     * Key regression guard: the verbatim faq.items block markup must round-trip
-     * losslessly (structural elements + relative links preserved).
+     * Key regression guard: the structured FAQ default answers (the repeater
+     * source of truth) must round-trip through the sanitiser losslessly —
+     * the <strong> emphasis and the relative/tel/mailto links survive.
      */
     public function testFaqItemsRoundTripLossless(): void
     {
-        $faq = $this->extractFallback($this->root . '/private/templates/pages/faq.php', 'faq.items');
-        $out = HtmlSanitizer::clean($faq);
-        $this->assertStringContainsString('<div class="faq">', $out);
-        $this->assertStringContainsString('<details class="faq__item">', $out);
-        $this->assertStringContainsString('<summary>Aké sú ceny vstupu do KUKO?</summary>', $out);
-        $this->assertStringContainsString('href="/rezervacia"', $out);
-        $this->assertStringContainsString('href="/#kontakt"', $out);
-        $this->assertStringContainsString('href="tel:+421915319934"', $out);
-        $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $out);
-        $this->assertSame(6, substr_count($out, '<details class="faq__item">'));
+        $defaults = Faq::defaults();
+        $this->assertCount(6, $defaults);
+        $joined = '';
+        foreach ($defaults as $it) {
+            $joined .= HtmlSanitizer::clean($it['a']);
+        }
+        $this->assertStringContainsString('<strong>zadarmo</strong>', $joined);
+        $this->assertStringContainsString('href="/rezervacia"', $joined);
+        $this->assertStringContainsString('href="/#kontakt"', $joined);
+        $this->assertStringContainsString('href="tel:+421915319934"', $joined);
+        $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $joined);
+        // sanitising an already-clean answer is idempotent (no mangling)
+        foreach ($defaults as $it) {
+            $this->assertSame($it['a'], HtmlSanitizer::clean($it['a']));
+        }
     }
 
     /**
@@ -172,9 +179,13 @@ final class HtmlSanitizerExtendedTest extends TestCase
         $seed = $this->extractFallback($this->root . '/private/scripts/seed-cms.php', 'privacy.body');
         $this->assertSame($tpl, $seed, 'privacy.body seed value and template fallback must be byte-identical');
 
-        $tplF  = $this->extractFallback($this->root . '/private/templates/pages/faq.php', 'faq.items');
-        $seedF = $this->extractFallback($this->root . '/private/scripts/seed-cms.php', 'faq.items');
-        $this->assertSame($tplF, $seedF, 'faq.items seed value and template fallback must be byte-identical');
+        // FAQ items: the single source is Faq::defaults(); seed-cms.php
+        // seeds the faq.items SETTING from exactly that array (seed ===
+        // in-app default ::: no drift between the page and the seed).
+        $expected = json_encode(Faq::defaults(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertStringContainsString('json_encode(\Kuko\Faq::defaults()', file_get_contents($this->root . '/private/scripts/seed-cms.php'));
+        $this->assertNotFalse($expected);
+        $this->assertJson($expected);
     }
 
     /**
