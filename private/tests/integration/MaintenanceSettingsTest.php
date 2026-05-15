@@ -38,10 +38,11 @@ final class MaintenanceSettingsTest extends TestCase
 
     public function testFallsBackToConfigWhenNoSettings(): void
     {
+        Config::reset();
+        Config::load(__DIR__ . '/../fixtures/config.maintenance.php');
         Maintenance::setSettings(null);
-        // fixture config.test.php — check what app.maintenance is there; this test
-        // asserts that with no SettingsRepo, enabled() returns the Config value
-        // (whatever the fixture defines). Just assert it does not throw and returns a bool.
-        $this->assertIsBool(Maintenance::enabled());
+        $this->assertTrue(Maintenance::enabled(), 'enabled() must honour config app.maintenance when no settings');
+        $this->assertTrue(Maintenance::passwordMatches('cfgpass'), 'passwordMatches must accept config password on fallback');
+        $this->assertFalse(Maintenance::passwordMatches('wrong'));
     }
 }

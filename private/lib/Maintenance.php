@@ -8,27 +8,28 @@ final class Maintenance
     private const COOKIE_TTL  = 30 * 86400; // 30 days
 
     private static ?SettingsRepo $settings = null;
+    private static bool $triedConfig = false;
 
     public static function setSettings(?SettingsRepo $s): void
     {
         self::$settings = $s;
+        self::$triedConfig = false;
     }
 
     private static function settings(): ?SettingsRepo
     {
         if (self::$settings !== null) return self::$settings;
+        if (self::$triedConfig) return null;
+        self::$triedConfig = true;
         try {
             self::$settings = new SettingsRepo(Db::fromConfig());
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            error_log('[Maintenance] settings DB unavailable, using config fallback: ' . $e->getMessage());
             return null;
         }
         return self::$settings;
     }
 
-    /**
-     * Maintenance password from settings (DB) with config fallback.
-     * Returns '' when neither source defines one.
-     */
     /**
      * Read a settings key, swallowing any DB error (table missing, query fails).
      * The maintenance gate must never crash on a settings-layer fault — it
@@ -38,11 +39,16 @@ final class Maintenance
     {
         try {
             return self::settings()?->get($key);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            error_log('[Maintenance] settings read failed for "' . $key . '": ' . $e->getMessage());
             return null;
         }
     }
 
+    /**
+     * Maintenance password from settings (DB) with config fallback.
+     * Returns '' when neither source defines one.
+     */
     private static function password(): string
     {
         $fromSettings = self::settingValue('maintenance.password');
