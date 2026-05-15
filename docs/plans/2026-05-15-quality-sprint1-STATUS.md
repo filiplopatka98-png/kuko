@@ -156,3 +156,9 @@ DT-1..DT-7 hotové (každá impl + review; konsolidovaný review APPROVED), DT-8
 - DT-1 logo+rainbow z Logo.jpeg · DT-2 header rebuild (topbar/center logo/pink nav) + footer logo · DT-3 hero tagline (editovateľný blok) · DT-4 O nás (hrubé bordery+ikony+straddle CTA) · DT-5 Oslavy (bordery+top icon badge+straddle CTA) · DT-6 galéria (rainbow+6 grid 30px radius+/galeria stránka, seed 6. fotka idempotentne) · DT-7 Kontakt (bordery+asset ikony+social v jednom riadku).
 - Prod seed cez `_setup.php?action=seed&token=` (pridané, idempotentné): doplní `hero.tagline` content blok + 6. galéria fotku; ostatné = skip.
 - Owner doplní cez /admin: presný hero tagline text + reálnu 6. galéria fotku (teraz dočasne = galeria_5).
+
+**DT-1..DT-8 OVERENÉ NA PROD (2026-05-15):** prod seed idempotentný (hero.tagline blok + 6. galéria fotka prítomné), nový logo/rainbow/icons assety 200, /galeria route existuje (503 = maintenance ako všetky public routes pred launchom), safety invarianty držia, _setup.php self-destruct OK. Commity po `7e68094`, GitHub sync.
+
+## ⏭️ ZOSTÁVA: DT-9 — Admin WP-style layout (NOVÁ POŽIADAVKA, ďalšia session)
+
+User chce admin prerobiť ako WordPress admin: **ľavý sidebar menu**, sekcia **Stránky**, sekcia **Nastavenia** (kam pôjde aj maintenance aj logy), **Rezervácie** ako samostatná položka s **tabmi** (blokácie atď.). Veľká architektonická zmena admin layoutu (`private/templates/admin/layout.php` + všetky admin templaty + nav štruktúra v `public/admin/index.php`). Treba vlastný plán (mapovať súčasné /admin routes → nové sekcie/sidebar/taby) + subagent-driven exekúcia + review + deploy. Súčasné admin sekcie: rezervácie(list/detail/calendar), packages, content, gallery, contact, seo, maintenance, log, gdpr, opening-hours, blocked-periods.
