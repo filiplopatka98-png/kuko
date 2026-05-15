@@ -23,6 +23,27 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 // === Login / logout routes (no auth required) ===
 
+$logAuth = function (string $action, string $user): void {
+    try {
+        $db = Db::fromConfig();
+        $secret = (string) \Kuko\Config::get('security.ip_hash_secret', '');
+        $ua = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+        $db->execStmt(
+            'INSERT INTO admin_actions (admin_user, action, target_table, target_id, payload_json, ip_hash) VALUES (?,?,?,?,?,?)',
+            [
+                $user !== '' ? $user : '(none)',
+                $action,
+                'auth',
+                0,
+                json_encode(['ua' => $ua]),
+                hash('sha256', ((string) ($_SERVER['REMOTE_ADDR'] ?? '')) . '|' . $secret),
+            ]
+        );
+    } catch (\Throwable $e) {
+        error_log('[LoginAudit] ' . $e->getMessage());
+    }
+};
+
 $router->get('/admin/login', function () use ($renderer) {
     if (Auth::isAuthenticated()) {
         header('Location: /admin');
@@ -31,7 +52,7 @@ $router->get('/admin/login', function () use ($renderer) {
     echo $renderer->render('login', ['next' => (string) ($_GET['next'] ?? '/admin')]);
 });
 
-$router->post('/admin/login', function () use ($renderer) {
+$router->post('/admin/login', function () use ($renderer, $logAuth) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) {
         $next = (string) ($_POST['next'] ?? '/admin');
         if (!preg_match('#^/admin#', $next)) $next = '/admin';
@@ -48,16 +69,19 @@ $router->post('/admin/login', function () use ($renderer) {
     $ipRaw = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
     $throttle = new \Kuko\LoginThrottle(APP_ROOT . '/private/logs/ratelimit');
     if (!$throttle->permit($ipRaw, $user)) {
+        $logAuth('login_locked', $user);
         http_response_code(429);
         echo $renderer->render('login', ['locked' => true, 'next' => $next]);
         return;
     }
     if (Auth::attempt($user, $pass, $remember)) {
         $throttle->recordSuccess($ipRaw, $user);
+        $logAuth('login_ok', $user);
         header('Location: ' . $next);
         return;
     }
     $throttle->recordFailure($ipRaw, $user);
+    $logAuth('login_fail', $user);
     http_response_code(401);
     echo $renderer->render('login', ['error' => true, 'next' => $next]);
 });
