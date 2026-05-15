@@ -45,10 +45,19 @@ $router->post('/admin/login', function () use ($renderer) {
     $next     = (string) ($_POST['next'] ?? '/admin');
     if (!preg_match('#^/admin#', $next)) $next = '/admin';
 
+    $ipRaw = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $throttle = new \Kuko\LoginThrottle(APP_ROOT . '/private/logs/ratelimit');
+    if (!$throttle->permit($ipRaw, $user)) {
+        http_response_code(429);
+        echo $renderer->render('login', ['locked' => true, 'next' => $next]);
+        return;
+    }
     if (Auth::attempt($user, $pass, $remember)) {
+        $throttle->recordSuccess($ipRaw, $user);
         header('Location: ' . $next);
         return;
     }
+    $throttle->recordFailure($ipRaw, $user);
     http_response_code(401);
     echo $renderer->render('login', ['error' => true, 'next' => $next]);
 });

@@ -36,7 +36,9 @@ ob_start();
   <h1>KUKO admin</h1>
   <p class="login__sub">Prihláste sa pre prístup k rezerváciám.</p>
 
-  <?php if (!empty($expired)): ?>
+  <?php if (!empty($locked)): ?>
+    <p class="login__error">Príliš veľa pokusov. Skúste znova o hodinu.</p>
+  <?php elseif (!empty($expired)): ?>
     <p class="login__error">Bezpečnostný token vypršal. Skúste sa prihlásiť znova.</p>
   <?php elseif (!empty($error)): ?>
     <p class="login__error">Nesprávne meno alebo heslo.</p>
