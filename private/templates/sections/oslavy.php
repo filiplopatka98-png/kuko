@@ -1,6 +1,16 @@
 <?php
 $packages = $packages ?? [];
 
+/* Map package code -> circular badge icon (assets). */
+$packageIcons = [
+    'mini'   => '/assets/icons/balloon.svg',
+    'maxi'   => '/assets/icons/little-kid.svg',
+    'closed' => '/assets/icons/uzavreta.svg',
+];
+$iconFor = static function (string $code) use ($packageIcons): string {
+    return $packageIcons[$code] ?? '/assets/icons/balloon.svg';
+};
+
 /*
  * Per-package hardcoded fallback cards (verbatim original markup).
  * Trusted developer markup — output raw. Keyed by package `code`.
@@ -10,7 +20,8 @@ $packages = $packages ?? [];
 $hardcoded = [
     'mini' => <<<'HTML'
 <article class="package package--blue">
-        <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3>Oslava KUKO MINI</h3></header>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/balloon.svg" alt="" width="36" height="36"></span>
+        <header class="package__head"><h3>Oslava KUKO MINI</h3></header>
         <p class="package__desc">Bázový balíček pre menšie oslavy s priateľmi. Zahŕňa prenájom časti herne na 2 hodiny.</p>
         <ul class="package__meta">
           <li><span class="ic" aria-hidden="true">👶</span> Počet detí: do 10</li>
@@ -22,12 +33,13 @@ $hardcoded = [
           <li>✓ Občerstvenie pre deti</li>
           <li>✓ Animátorka v cene</li>
         </ul>
-        <a class="btn package__cta" href="/rezervacia?balicek=mini">Rezervovať balíček</a>
+        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=mini">Rezervovať balíček</a>
       </article>
 HTML,
     'maxi' => <<<'HTML'
 <article class="package package--purple">
-        <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3>Oslava KUKO MAXI</h3></header>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/little-kid.svg" alt="" width="36" height="36"></span>
+        <header class="package__head"><h3>Oslava KUKO MAXI</h3></header>
         <p class="package__desc">Pre väčšie deti a väčšie skupiny. Plne vybavená oslava s programom.</p>
         <ul class="package__meta">
           <li><span class="ic" aria-hidden="true">👶</span> Počet detí: do 20</li>
@@ -40,12 +52,13 @@ HTML,
           <li>✓ Animátorka + program</li>
           <li>✓ Tematická výzdoba</li>
         </ul>
-        <a class="btn package__cta" href="/rezervacia?balicek=maxi">Rezervovať balíček</a>
+        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=maxi">Rezervovať balíček</a>
       </article>
 HTML,
     'closed' => <<<'HTML'
 <article class="package package--yellow">
-        <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3>Uzavretá spoločnosť</h3></header>
+        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/uzavreta.svg" alt="" width="36" height="36"></span>
+        <header class="package__head"><h3>Uzavretá spoločnosť</h3></header>
         <p class="package__desc">Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.</p>
         <ul class="package__meta">
           <li><span class="ic" aria-hidden="true">👶</span> Počet detí: neobmedzene</li>
@@ -58,7 +71,7 @@ HTML,
           <li>✓ Pokojná atmosféra bez verejnosti</li>
           <li>✓ Plný komfort pre rodičov</li>
         </ul>
-        <a class="btn package__cta" href="/rezervacia?balicek=closed">Rezervovať balíček</a>
+        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=closed">Rezervovať balíček</a>
       </article>
 HTML,
 ];
@@ -100,7 +113,8 @@ foreach ($renderList as $entry) {
         ob_start();
         ?>
 <article class="package package--<?= e($accent) ?>">
-        <header class="package__head"><span class="package__hat" aria-hidden="true">🎩</span><h3><?= e($p['name'] ?? '') ?></h3></header>
+        <span class="package__badge" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url($iconFor($code))) ?>" alt="" width="36" height="36"></span>
+        <header class="package__head"><h3><?= e($p['name'] ?? '') ?></h3></header>
         <p class="package__desc"><?= $p['description'] ?></p>
         <ul class="package__meta">
           <?php if (!empty($p['kids_count_text'])): ?>
@@ -116,7 +130,7 @@ foreach ($renderList as $entry) {
           <li>✓ <?= e($item) ?></li>
           <?php endforeach; ?>
         </ul>
-        <a class="btn package__cta" href="/rezervacia?balicek=<?= e($code) ?>">Rezervovať balíček</a>
+        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=<?= e($code) ?>">Rezervovať balíček</a>
       </article>
 <?php
         $articles[] = trim((string) ob_get_clean());

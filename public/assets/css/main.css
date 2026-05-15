@@ -272,11 +272,42 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .packages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin-top: var(--s-4); }
 @media (max-width: 1024px) { .packages-grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; } }
 
-.package { background: var(--c-white); border-radius: var(--r-card); padding: var(--s-3); border: 3px solid; display: flex; flex-direction: column; gap: var(--s-1); }
+.packages-grid { padding-top: 44px; padding-bottom: 36px; }
+.package {
+  position: relative;
+  background: var(--c-white);
+  border-radius: 20px;
+  padding: var(--s-3);
+  padding-top: calc(var(--s-3) + 24px);
+  border: 5px solid;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
 .package--blue   { border-color: var(--c-blue); }
 .package--purple { border-color: var(--c-purple); }
 .package--yellow { border-color: var(--c-yellow); }
-.package__head { display: flex; align-items: center; gap: var(--s-1); }
+.package__badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--bg-cream);
+  border: 3px solid currentColor;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.package--blue   .package__badge { border-color: var(--c-blue); }
+.package--purple .package__badge { border-color: var(--c-purple); }
+.package--yellow .package__badge { border-color: var(--c-yellow); }
+.package__badge img { width: 36px; height: 36px; }
+.package__head { display: flex; align-items: center; justify-content: center; gap: var(--s-1); text-align: center; }
 .package__head h3 { margin: 0; }
 .package__hat { font-size: 1.5rem; }
 .package__desc { color: var(--c-text-soft); font-size: 0.9rem; }
@@ -284,7 +315,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .package__meta .ic { display: inline-block; width: 1.25rem; }
 .package__price { font-weight: 700; font-size: 1.1rem; color: var(--c-accent); margin: var(--s-1) 0; }
 .package__incl { list-style: none; padding: 0; margin: 0 0 var(--s-2); font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.25rem; }
-.package__cta { margin-top: auto; align-self: stretch; }
+.package__cta.btn--straddle { margin-top: auto; align-self: center; }
 
 /* ===== Galéria ===== */
 .section--galeria { background: var(--bg-pink-soft); }
