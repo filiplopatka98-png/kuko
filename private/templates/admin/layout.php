@@ -13,13 +13,14 @@ $isResvGroup = (
 /**
  * Active-state helper.
  * '/admin' is matched exactly (the dashboard / reservations list);
- * every other admin destination is matched by str_starts_with prefix.
+ * every other admin destination is matched on an exact path match OR a
+ * sub-path boundary match, so e.g. '/admin/log' does not match '/admin/logout'.
  */
 $active = static function (string $href) use ($path): bool {
     if ($href === '/admin') {
         return $path === '/admin';
     }
-    return str_starts_with($path, $href);
+    return $path === $href || str_starts_with($path, $href . '/');
 };
 $aria = static function (bool $on): string {
     return $on ? ' is-active" aria-current="page' : '';
