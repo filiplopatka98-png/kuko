@@ -49,7 +49,6 @@ if ($existing === 0) {
         ['galeria_3.jpg', 'galeria_3.webp', 'Interiér KUKO — rodičia pri káve, deti sa hrajú',              3],
         ['galeria_4.jpg', 'galeria_4.webp', 'Detská oslava v KUKO — výzdoba a deti pri stole',              4],
         ['galeria_5.jpg', 'galeria_5.webp', 'Vnútorný priestor detskej herne KUKO Piešťany',               5],
-        ['galeria_5.jpg', 'galeria_5.webp', 'Hracia zóna v KUKO',                                          6],
     ];
     foreach ($photos as [$jpg, $webp, $alt, $sort]) {
         $db->execStmt('INSERT INTO gallery_photos (filename, webp, alt_text, sort_order) VALUES (?,?,?,?)',
@@ -57,6 +56,18 @@ if ($existing === 0) {
         echo "+ photo $jpg (#$sort)\n";
     }
 } else { echo "= gallery already has $existing rows\n"; }
+
+// Always-run idempotent insert of the 6th starter photo (sort_order = 6), a reuse
+// of galeria_5.{jpg,webp} so the homepage shows a full 3×2 grid. This runs OUTSIDE
+// the empty-table guard above so it also lands on existing prod DBs that already
+// have the original 5 rows. Keyed on sort_order = 6: re-running finds it present
+// and skips, so no duplicate. The empty-table block above seeds only galeria_1..5.
+$hasSixth = (int) ($db->one('SELECT COUNT(*) AS c FROM gallery_photos WHERE sort_order = 6')['c'] ?? 0);
+if ($hasSixth === 0) {
+    $db->execStmt('INSERT INTO gallery_photos (filename, webp, alt_text, sort_order) VALUES (?,?,?,?)',
+        ['galeria_5.jpg', 'galeria_5.webp', 'Hracia zóna v KUKO', 6]);
+    echo "+ photo galeria_5.jpg (#6) — 6th starter inserted\n";
+} else { echo "= 6th starter photo (sort_order=6) already present\n"; }
 
 // Settings: maintenance + SEO defaults (only if key absent)
 $s = new \Kuko\SettingsRepo($db);
