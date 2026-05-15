@@ -163,6 +163,8 @@ $seed = [
     'seo.faq.description'   => 'Odpovede na najčastejšie otázky o detskej herni KUKO v Piešťanoch — ceny, oslavy, otváracie hodiny, vek detí, rezervácie.',
     'seo.privacy.title'     => 'Ochrana osobných údajov — KUKO detský svet',
     'seo.privacy.description' => 'Zásady spracovania osobných údajov a cookies na webe kuko-detskysvet.sk.',
+    'seo.gallery.title'     => 'Fotogaléria — KUKO detský svet',
+    'seo.gallery.description' => 'Pozrite si fotografie z detskej herne a osláv v KUKO Piešťany.',
 ];
 foreach ($seed as $k => $v) {
     if ($s->get($k) === null) { $s->set($k, $v); echo "+ setting $k\n"; }

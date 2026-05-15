@@ -240,10 +240,84 @@ $router->post('/admin/settings', function () use ($settings, $audit, $flash) {
     header('Location: /admin/settings');
 });
 
+// ===== Pages ("Stránky") — canonical page model =====
+// One source of truth for the page list + per-page editor + combined save.
+// 'prefixes' = ContentBlocksRepo group keys shown in that page's Obsah tab.
+// kontakt is intentionally EXCLUDED from Domov (managed under Nastavenia→Kontakt);
+// oslavy/packages are NOT content blocks → excluded. 'seo' = seo.{x}.* key segment.
+$adminPages = [
+    'home'       => ['label' => 'Domov',          'url' => '/',               'prefixes' => ['hero', 'about', 'cennik', 'footer'], 'seo' => 'home'],
+    'rezervacia' => ['label' => 'Rezervácia',     'url' => '/rezervacia',     'prefixes' => [],                                    'seo' => 'rezervacia'],
+    'gallery'    => ['label' => 'Fotogaléria',    'url' => '/galeria',        'prefixes' => [],                                    'seo' => 'gallery'],
+    'faq'        => ['label' => 'Časté otázky',   'url' => '/faq',            'prefixes' => ['faq'],                               'seo' => 'faq'],
+    'privacy'    => ['label' => 'Ochrana údajov', 'url' => '/ochrana-udajov', 'prefixes' => ['privacy'],                           'seo' => 'privacy'],
+];
+
+$router->get('/admin/pages', function () use ($renderer, $adminPages, $adminUser, $flashes) {
+    echo $renderer->render('pages', ['pages' => $adminPages, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+
+$router->get('/admin/pages/{page}', function (array $p) use ($renderer, $db, $settings, $adminPages, $adminUser, $flashes) {
+    $page = (string) ($p['page'] ?? '');
+    if (!isset($adminPages[$page])) {
+        http_response_code(404);
+        echo $renderer->render('not-found', ['user' => $adminUser, 'flashes' => $flashes]);
+        return;
+    }
+    $cfg = $adminPages[$page];
+    $grouped = (new \Kuko\ContentBlocksRepo($db))->listGrouped();
+    $groups = [];
+    foreach ($cfg['prefixes'] as $prefix) {
+        if (isset($grouped[$prefix])) {
+            $groups[$prefix] = $grouped[$prefix];
+        }
+    }
+    echo $renderer->render('page-edit', [
+        'page'        => $page,
+        'label'       => $cfg['label'],
+        'url'         => $cfg['url'],
+        'seoKey'      => $cfg['seo'],
+        'groups'      => $groups,
+        'seoTitle'    => (string) $settings->get('seo.' . $cfg['seo'] . '.title', ''),
+        'seoDesc'     => (string) $settings->get('seo.' . $cfg['seo'] . '.description', ''),
+        'user'        => $adminUser,
+        'flashes'     => $flashes,
+    ]);
+});
+
+$router->post('/admin/pages/{page}/save', function (array $p) use ($db, $settings, $adminPages, $audit, $flash, $adminUser) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $page = (string) ($p['page'] ?? '');
+    if (!isset($adminPages[$page])) {
+        http_response_code(404);
+        echo 'not found';
+        return;
+    }
+    $cfg = $adminPages[$page];
+    $cb  = new \Kuko\ContentBlocksRepo($db);
+    $blocks = $_POST['blocks'] ?? [];
+    if (is_array($blocks)) {
+        foreach ($blocks as $b) {
+            if (!is_array($b)) continue;
+            $key  = (string) ($b['key'] ?? '');
+            if ($key === '') continue;
+            $type = (string) ($b['type'] ?? 'text');
+            if (!in_array($type, ['text', 'html'], true)) $type = 'text';
+            $val  = (string) ($b['value'] ?? '');
+            $cb->set($key, $val, $type, $adminUser);
+        }
+    }
+    $settings->set('seo.' . $cfg['seo'] . '.title', trim((string) ($_POST['seo_title'] ?? '')));
+    $settings->set('seo.' . $cfg['seo'] . '.description', trim((string) ($_POST['seo_description'] ?? '')));
+    $audit('page_save', 'content_blocks', 0, ['page' => $page]);
+    $flash('Stránka „' . $cfg['label'] . '" uložená.');
+    header('Location: /admin/pages/' . $page);
+});
+
 // ===== Content blocks =====
-$router->get('/admin/content', function () use ($renderer, $db, $adminUser, $flashes) {
-    $cb = new \Kuko\ContentBlocksRepo($db);
-    echo $renderer->render('content', ['groups' => $cb->listGrouped(), 'user' => $adminUser, 'flashes' => $flashes]);
+// Legacy GET now redirects to the unified Stránky list; POST kept for back-compat.
+$router->get('/admin/content', function () {
+    header('Location: /admin/pages');
 });
 $router->post('/admin/content/save', function () use ($db, $audit, $flash, $adminUser) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
@@ -513,19 +587,10 @@ $router->get('/admin/calendar.ics', function () use ($db, $packages) {
 });
 
 // ===== SEO (per-page meta + global indexing) =====
-$seoPages = ['default', 'home', 'rezervacia', 'faq', 'privacy'];
-$router->get('/admin/seo', function () use ($renderer, $settings, $adminUser, $flashes, $seoPages) {
-    $seo = [];
-    foreach ($seoPages as $pg) {
-        $seo["seo.$pg.title"]       = (string) $settings->get("seo.$pg.title", '');
-        $seo["seo.$pg.description"] = (string) $settings->get("seo.$pg.description", '');
-    }
-    echo $renderer->render('seo', [
-        'seo'      => $seo,
-        'indexing' => $settings->get('seo.public_indexing') === '1',
-        'user'     => $adminUser,
-        'flashes'  => $flashes,
-    ]);
+$seoPages = ['default', 'home', 'rezervacia', 'faq', 'privacy', 'gallery'];
+// Legacy GET now redirects to the unified Stránky list; POST kept for back-compat.
+$router->get('/admin/seo', function () {
+    header('Location: /admin/pages');
 });
 $router->post('/admin/seo', function () use ($settings, $audit, $flash, $seoPages) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
