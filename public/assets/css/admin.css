@@ -67,14 +67,21 @@ a { color: var(--c-accent); }
 .admin-logout:hover { color: #8a1e0f !important; }
 .admin-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .admin-main { max-width: 1100px; width: 100%; margin: 0 auto; padding: 1.5rem 1.5rem; }
-/* Reservations tab bar */
-.admin-tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; padding: 1rem 1.5rem 0; max-width: 1100px; width: 100%; margin: 0 auto; border-bottom: 1px solid #f0e3ec; }
-.admin-tab {
-  padding: 0.6rem 1rem; font-size: 0.9rem; color: var(--c-text-soft); text-decoration: none; font-weight: 600;
-  border-bottom: 3px solid transparent; margin-bottom: -1px;
+/* Reservations tab bar — prominent pill tabs */
+.admin-tabs {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+  max-width: 1100px; width: 100%; margin: 1.25rem auto 0; padding: 0.5rem 1.5rem;
 }
-.admin-tab:hover { color: var(--c-text); }
-.admin-tab.is-active { color: var(--c-accent-dark); border-bottom-color: var(--c-accent); }
+.admin-tab {
+  padding: 0.6rem 1.15rem; font-size: 0.95rem; font-weight: 700; text-decoration: none;
+  color: var(--c-text); background: var(--c-white); border: 2px solid #e3d6df;
+  border-radius: 999px; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.admin-tab:hover { border-color: var(--c-accent); color: var(--c-accent-dark); }
+.admin-tab.is-active {
+  background: var(--c-accent); border-color: var(--c-accent); color: var(--c-white);
+}
+.admin-nav-item--top { font-weight: 700; margin-bottom: 0.25rem; }
 /* Responsive: off-canvas sidebar via pure-CSS checkbox toggle */
 .admin-hamburger { display: none; }
 @media (max-width: 900px) {

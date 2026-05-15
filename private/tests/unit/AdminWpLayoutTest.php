@@ -19,23 +19,35 @@ final class AdminWpLayoutTest extends TestCase
         foreach (['/admin/calendar','/admin/blocked-periods','/admin/opening-hours'] as $h)
             $this->assertStringContainsString('href="' . $h . '"', $this->l);
     }
-    public function testReservationSidebarSubmenu(): void
+    public function testReservationsSingleSidebarItemWithVisibleTabs(): void
     {
-        // REZERVÁCIE must be a sidebar group label like STRÁNKY/NASTAVENIA.
+        // Rezervácie is ONE top-level sidebar item (the tabs are its sub-nav).
         $this->assertMatchesRegularExpression(
-            '/admin-nav-label">REZERV\x{00C1}CIE/u',
+            '/class="admin-nav-item admin-nav-item--top[^"]*">Rezerv\x{00E1}cie/u',
             $this->l,
-            'REZERVÁCIE must be a sidebar nav group label'
+            'Rezervácie must be a single top-level sidebar item'
         );
-        // The reservation sub-pages must appear as real sidebar nav items
-        // (.admin-nav-item), not only as in-content .admin-tab links.
-        foreach (['/admin/calendar','/admin/blocked-periods','/admin/opening-hours'] as $h) {
+        // The 4 reservation tabs are rendered as .admin-tab in the tab bar.
+        foreach (['/admin','/admin/calendar','/admin/blocked-periods','/admin/opening-hours'] as $h) {
             $this->assertMatchesRegularExpression(
-                '/href="' . preg_quote($h, '/') . '" class="admin-nav-item/',
+                '/href="' . preg_quote($h, '/') . '"[^>]*class="admin-tab/',
                 $this->l,
-                $h . ' must be a sidebar .admin-nav-item'
+                $h . ' must be an .admin-tab'
             );
         }
+        // The tab styling must be prominent (pill: border-radius), not the
+        // old subtle text-only underline that the user could not see.
+        $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/admin.css');
+        $this->assertMatchesRegularExpression(
+            '/\.admin-tab\s*\{[^}]*border-radius/s',
+            $css,
+            '.admin-tab must have a prominent pill style (border-radius)'
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.admin-tab\.is-active\s*\{[^}]*background/s',
+            $css,
+            'active .admin-tab must have a filled background'
+        );
     }
     public function testA11yPreserved(): void
     {

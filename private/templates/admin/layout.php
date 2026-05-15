@@ -45,13 +45,7 @@ $aria = static function (bool $on): string {
     <span>KUKO admin</span>
   </div>
   <nav class="admin-sidebar__nav" aria-label="Admin">
-    <div class="admin-nav-group">
-      <span class="admin-nav-label">REZERVÁCIE</span>
-      <a href="/admin" class="admin-nav-item<?= $aria($path === '/admin' || str_starts_with($path, '/admin/reservation')) ?>">Zoznam</a>
-      <a href="/admin/calendar" class="admin-nav-item<?= $aria($active('/admin/calendar')) ?>">Kalendár</a>
-      <a href="/admin/blocked-periods" class="admin-nav-item<?= $aria($active('/admin/blocked-periods')) ?>">Blokácie</a>
-      <a href="/admin/opening-hours" class="admin-nav-item<?= $aria($active('/admin/opening-hours')) ?>">Otváracie hodiny</a>
-    </div>
+    <a href="/admin" class="admin-nav-item admin-nav-item--top<?= $aria($isResvGroup) ?>">Rezervácie</a>
 
     <div class="admin-nav-group">
       <span class="admin-nav-label">STRÁNKY</span>
