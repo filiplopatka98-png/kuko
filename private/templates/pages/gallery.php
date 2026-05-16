@@ -25,7 +25,7 @@ ob_start();
             $jpg  = '/assets/img/gallery/' . $photo['filename'];
             $webp = !empty($photo['webp']) ? '/assets/img/gallery/' . $photo['webp'] : null;
           ?>
-          <button class="gallery__item" type="button" data-lightbox="<?= e($jpg) ?>" aria-label="Otvoriť: <?= e($alt) ?>">
+          <button class="gallery__item" type="button" data-lightbox="<?= e($jpg) ?>"<?php if ($webp !== null): ?> data-lightbox-webp="<?= e($webp) ?>"<?php endif; ?> aria-label="Otvoriť: <?= e($alt) ?>">
             <picture>
               <?php if ($webp !== null): ?>
               <source srcset="<?= e($webp) ?>" type="image/webp">
@@ -36,7 +36,7 @@ ob_start();
           <?php endforeach; ?>
         <?php else: ?>
           <?php for ($i = 1; $i <= 5; $i++): $alt = $galleryAlts[$i] ?? 'Fotka z herne KUKO Piešťany'; ?>
-          <button class="gallery__item" type="button" data-lightbox="/assets/img/galeria_<?= $i ?>.jpg" aria-label="Otvoriť: <?= e($alt) ?>">
+          <button class="gallery__item" type="button" data-lightbox="/assets/img/galeria_<?= $i ?>.jpg" data-lightbox-webp="/assets/img/galeria_<?= $i ?>.webp" aria-label="Otvoriť: <?= e($alt) ?>">
             <picture>
               <source srcset="/assets/img/galeria_<?= $i ?>.webp" type="image/webp">
               <img src="/assets/img/galeria_<?= $i ?>.jpg" loading="lazy" alt="<?= e($alt) ?>" width="400" height="300">

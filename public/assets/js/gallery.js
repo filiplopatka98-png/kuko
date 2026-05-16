@@ -20,10 +20,17 @@ if (items.length) {
   let idx = 0;
   let lastFocus = null;
 
+  const srcFor = (el) => el.dataset.lightboxWebp || el.dataset.lightbox;
+
   const show = (i) => {
     idx = (i + items.length) % items.length;
-    img.src = items[idx].dataset.lightbox;
+    img.src = srcFor(items[idx]);
     img.alt = items[idx].querySelector('img')?.alt ?? '';
+    const n = items.length;
+    if (n > 1) {
+      new Image().src = srcFor(items[(idx - 1 + n) % n]);
+      new Image().src = srcFor(items[(idx + 1) % n]);
+    }
   };
 
   const open = (i) => {
