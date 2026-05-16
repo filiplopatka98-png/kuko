@@ -38,7 +38,7 @@ $igUrl = \Kuko\Social::url('instagram', '');
         </div>
         <div class="contact-card contact-card--yellow">
           <span class="contact-card__icon" aria-hidden="true">
-            <img src="<?= e(\Kuko\Asset::url('/assets/icons/clock.svg')) ?>" alt="" aria-hidden="true" width="32" height="32">
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/clock-1.svg')) ?>" alt="" aria-hidden="true" width="32" height="32">
           </span>
           <div>
             <p class="contact-card__title">Otváracie hodiny — sme tu pre vás každý deň:</p>
