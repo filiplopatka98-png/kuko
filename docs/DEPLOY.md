@@ -122,3 +122,32 @@ open http://127.0.0.1:8000/
 WebSupport robí denné DB zálohy. Pre extra istotu:
 - Týždenne ručne stiahnuť `mysqldump` cez SSH.
 - Logy v `private/logs/` retencia 6 mesiacov.
+
+## 11. Cron úlohy (POVINNÉ pri každom deploy-i)
+
+Po nasadení **owner musí zaregistrovať tieto cron úlohy** v paneli WebSupport
+(Hosting → Cron). Bez nich príslušná logika nebeží automaticky. Absolútnu
+cestu k PHP a k projektu zisti cez `https://kuko-detskysvet.sk/_setup.php?action=path&token=<auth.secret>`
+(alebo z panela). Cesta nižšie je vzor — uprav podľa reálneho účtu.
+
+| Skript | Čo robí | Odporúčaná frekvencia |
+|---|---|---|
+| `private/cron/expire-pending.php` | Zruší (`pending` → `cancelled`) rezervácie nepotvrdené do 1 mesiaca → uvoľní termín | **denne** (napr. `0 3 * * *`) |
+| `private/cron/retention.php` | GDPR: anonymizuje rezervácie staršie ako `privacy.retention_months` (default 6 mes.) | **mesačne** (napr. `0 4 1 * *`) |
+| `private/cron/db-backup.php` | Vlastná DB záloha (nad rámec denných záloh WebSupportu) | **týždenne** (napr. `0 2 * * 1`) |
+
+Príkaz (vzor — uprav cestu):
+
+```bash
+/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/expire-pending.php
+/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/retention.php
+/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/db-backup.php
+```
+
+> **POZOR — `expire-pending.php`:** bez tohto cronu sa nepotvrdené pending
+> rezervácie síce v dostupnosti uvoľnia (availability ignoruje pending staršie
+> ako 1 mesiac ako poistku), ale v DB ostanú ako `pending` a v admin zozname
+> vyzerajú ako aktívne. Cron je autoritatívne čistenie — zaregistruj ho.
+
+Nové cron skripty pridané v budúcnosti zapíš do tejto tabuľky v rámci ich
+deploy-u, nech sa pri produkčnom nasadení nezabudnú zaregistrovať.
