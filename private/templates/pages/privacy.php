@@ -2,6 +2,7 @@
 $title = 'Ochrana osobných údajov — KUKO detský svet';
 $description = 'Zásady spracovania osobných údajov a cookies na webe kuko-detskysvet.sk.';
 $canonical = '/ochrana-udajov';
+$pageType = 'privacy';
 $pageIndexing = false;
 ob_start();
 ?>

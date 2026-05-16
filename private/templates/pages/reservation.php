@@ -2,6 +2,8 @@
 /** @var array<int,array<string,mixed>> $packages */
 $title = 'Rezervácia oslavy — KUKO detský svet';
 $description = 'Rezervujte si oslavu v KUKO detský svet. Vyberte balíček, dátum a čas v 3 krokoch.';
+$canonical = '/rezervacia';
+$pageType = 'rezervacia';
 $csrf = \Kuko\Csrf::token();
 $siteKey = \Kuko\Config::get('recaptcha.site_key', '');
 ob_start();
