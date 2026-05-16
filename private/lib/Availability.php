@@ -61,23 +61,22 @@ final class Availability
             return new AvailabilityResult([], 'closed_day', $duration);
         }
 
-        // Existing reservations on the day (status in pending,confirmed)
+        // Existing reservations on the day (status pending within the last
+        // month, or confirmed). Pending bookings older than one month are
+        // treated as abandoned and no longer hold their slot (mirrors the
+        // expire-pending cron, so a slot frees even between cron runs).
+        $pendingCutoff = $this->now->modify('-1 month')->format('Y-m-d H:i:s');
         $existing = $this->db->all(
-            "SELECT r.wished_time, r.package, p.duration_min, p.blocks_full_day
+            "SELECT r.wished_time, p.duration_min
              FROM reservations r JOIN packages p ON p.code = r.package
-             WHERE r.wished_date = ? AND r.status IN ('pending','confirmed')",
-            [$date]
+             WHERE r.wished_date = ?
+               AND (r.status = 'confirmed'
+                    OR (r.status = 'pending' AND r.created_at >= ?))",
+            [$date, $pendingCutoff]
         );
-        foreach ($existing as $e) {
-            if ((int) $e['blocks_full_day'] === 1) {
-                return new AvailabilityResult([], 'blocked_full_day', $duration);
-            }
-        }
-
-        // If the requested package itself is "full-day" but the day is already partially booked
-        if ((int) $pkg['blocks_full_day'] === 1 && count($existing) > 0) {
-            return new AvailabilityResult([], 'blocked_full_day', $duration);
-        }
+        // NOTE: every package only blocks its own time window + buffer (below);
+        // that window is then unavailable for ANY package. No package blocks
+        // the whole day — admins can still block a full day via blocked_periods.
 
         // Blocked periods
         $blockedToday = $this->blocked->listForDate($date);
@@ -102,7 +101,6 @@ final class Availability
         // Subtract existing reservations + buffer
         $buffer = $this->settings->getInt('buffer_min', 30);
         foreach ($existing as $e) {
-            if ((int) $e['blocks_full_day'] === 1) continue; // unreachable, defensive
             $rStart = $this->minutes((string) $e['wished_time']);
             $rEnd   = $rStart + (int) $e['duration_min'] + $buffer;
             $intervals = $this->subtract($intervals, max(0, $rStart - $buffer), $rEnd);

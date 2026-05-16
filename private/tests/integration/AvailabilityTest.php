@@ -170,26 +170,38 @@ final class AvailabilityTest extends TestCase
         $this->assertContains('13:00', $r->slots);
     }
 
-    public function testClosedReservationBlocksWholeDay(): void
+    public function testClosedReservationBlocksOnlyItsWindow(): void
     {
+        // A "closed" booking no longer blocks the whole day — it only blocks
+        // its own time window (+buffer), like every other package. mini slots
+        // outside [10:00-30, 14:00+30] stay available.
         $this->db->execStmt(
             "INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, ip_hash, status)
              VALUES ('closed', '2026-05-21', '10:00:00', 20, 'X', '+421900', 'x@x', '" . str_repeat('a', 64) . "', 'pending')"
         );
         $r = $this->make()->forDate('2026-05-21', 'mini');
-        $this->assertSame([], $r->slots);
-        $this->assertSame('blocked_full_day', $r->reason);
+        $this->assertNotEmpty($r->slots);
+        $this->assertNull($r->reason);
+        $this->assertNotContains('10:00', $r->slots); // inside the closed window
+        $this->assertNotContains('14:00', $r->slots); // still inside (ends 14:30)
+        $this->assertContains('14:30', $r->slots);     // first free start after buffer
+        $this->assertContains('18:00', $r->slots);     // last mini start (18:00+2h=20:00)
     }
 
-    public function testRequestingClosedWhenPartialBooking(): void
+    public function testRequestingClosedAllowedAtNonOverlappingTimes(): void
     {
+        // Requesting "closed" when a mini partial booking exists is now
+        // allowed at times that don't overlap the mini window (+buffer).
         $this->db->execStmt(
             "INSERT INTO reservations (package, wished_date, wished_time, kids_count, name, phone, email, ip_hash, status)
              VALUES ('mini', '2026-05-21', '10:00:00', 10, 'X', '+421900', 'x@x', '" . str_repeat('a', 64) . "', 'pending')"
         );
         $r = $this->make()->forDate('2026-05-21', 'closed');
-        $this->assertSame([], $r->slots);
-        $this->assertSame('blocked_full_day', $r->reason);
+        $this->assertNotEmpty($r->slots);
+        $this->assertNull($r->reason);
+        $this->assertNotContains('10:00', $r->slots); // overlaps the mini window
+        $this->assertContains('12:30', $r->slots);     // first closed start after buffer
+        $this->assertContains('16:00', $r->slots);     // last closed start (16:00+4h=20:00)
     }
 
     public function testBlockedPeriodAllDay(): void

@@ -70,7 +70,10 @@ input, select, textarea { font: inherit; }
   display: flex; gap: 0.5rem; align-items: center;
   font-size: 0.9rem; color: var(--c-text-soft);
 }
-.rezervacia__steps li { display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.5rem; }
+.rezervacia__steps li { display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.5rem; cursor: pointer; border-radius: 8px; }
+.rezervacia__steps li[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; }
+.rezervacia__steps li:not([aria-disabled="true"]):hover { background: rgba(0,0,0,0.04); }
+.rezervacia__steps li:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 .rezervacia__steps li span {
   display: inline-flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; border-radius: 50%;
@@ -99,15 +102,36 @@ input, select, textarea { font: inherit; }
 .step__heading { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
 .step__back {
   background: white; border: 1px solid #e5e7eb; color: var(--c-text);
-  width: 36px; height: 36px; border-radius: 50%; font-size: 1.5rem; display: grid; place-items: center;
+  width: 38px; height: 38px; border-radius: 50%; padding: 0; cursor: pointer;
+  display: grid; place-items: center; flex: none;
 }
 .step__back:hover { background: #f3f4f6; }
+.step__back svg { width: 18px; height: 18px; display: block; }
 .step__emoji { font-size: 4rem; margin: 0; }
 .step__error {
   color: #c0392b; background: #fdecea; padding: 0.75rem 1rem;
   border-radius: 0.5rem; border: 1px solid #f5c6cb;
 }
 .step__actions { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+
+/* ===== Summary (Step 4) ===== */
+.resv-summary {
+  margin: 0 0 1.5rem; background: white; border: 1px solid #e5e7eb;
+  border-radius: var(--r-card); overflow: hidden;
+}
+.resv-summary > div {
+  display: flex; gap: 1rem; padding: 0.7rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+.resv-summary > div:last-child { border-bottom: 0; }
+.resv-summary dt { flex: 0 0 40%; margin: 0; color: var(--c-text-soft); }
+.resv-summary dd { flex: 1; margin: 0; font-weight: 700; color: var(--c-text); word-break: break-word; }
+.field--check { display: flex; margin-bottom: 1.5rem; }
+.field--check label {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  color: var(--c-text); font-size: 0.95rem; cursor: pointer;
+}
+.field--check input { margin-top: 0.2rem; flex: none; width: 18px; height: 18px; accent-color: var(--c-accent); }
 
 /* ===== Package picker (Step 1) ===== */
 .package-picker {
@@ -139,9 +163,10 @@ input, select, textarea { font: inherit; }
 .calendar__title { margin: 0; font-size: 1.2rem; text-transform: capitalize; }
 .calendar__navbtn {
   background: var(--bg-pink-soft); border: 0; color: var(--c-accent);
-  width: 36px; height: 36px; border-radius: 50%; font-size: 1.4rem;
+  width: 40px; height: 40px; border-radius: 50%; padding: 0; cursor: pointer;
   display: grid; place-items: center;
 }
+.calendar__navbtn svg { width: 20px; height: 20px; display: block; }
 .calendar__navbtn:hover { background: var(--c-pink); }
 .calendar__navbtn:disabled { opacity: 0.3; cursor: not-allowed; }
 .calendar__head {

@@ -15,9 +15,10 @@ ob_start();
       <span>KUKO rezervácia</span>
     </a>
     <ol class="rezervacia__steps" role="list">
-      <li data-step-indicator="1" class="is-active"><span>1</span> Balíček</li>
-      <li data-step-indicator="2"><span>2</span> Termín</li>
-      <li data-step-indicator="3"><span>3</span> Kontakt</li>
+      <li data-step-indicator="1" class="is-active" role="button" tabindex="0" aria-current="step"><span>1</span> Balíček</li>
+      <li data-step-indicator="2" role="button" tabindex="0" aria-disabled="true"><span>2</span> Termín</li>
+      <li data-step-indicator="3" role="button" tabindex="0" aria-disabled="true"><span>3</span> Kontakt</li>
+      <li data-step-indicator="4" role="button" tabindex="0" aria-disabled="true"><span>4</span> Zhrnutie</li>
     </ol>
   </header>
 
@@ -50,7 +51,7 @@ ob_start();
     <section class="step" data-step="2">
       <div class="step__inner step__inner--wide">
         <div class="step__heading">
-          <button type="button" class="step__back" data-go-step="1" aria-label="Späť">‹</button>
+          <button type="button" class="step__back" data-go-step="1" aria-label="Späť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button>
           <h2 class="step__title">Vyberte deň a čas</h2>
         </div>
         <p class="step__lead">
@@ -60,9 +61,9 @@ ob_start();
 
         <div class="calendar" id="calendar" aria-label="Kalendár dostupnosti">
           <div class="calendar__nav">
-            <button type="button" class="calendar__navbtn" data-cal-nav="prev" aria-label="Predchádzajúci mesiac">‹</button>
+            <button type="button" class="calendar__navbtn" data-cal-nav="prev" aria-label="Predchádzajúci mesiac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button>
             <h2 class="calendar__title" id="calendar-title">—</h2>
-            <button type="button" class="calendar__navbtn" data-cal-nav="next" aria-label="Ďalší mesiac">›</button>
+            <button type="button" class="calendar__navbtn" data-cal-nav="next" aria-label="Ďalší mesiac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 5 16 12 9 19"/></svg></button>
           </div>
           <div class="calendar__head">
             <div>Po</div><div>Ut</div><div>St</div><div>Št</div><div>Pia</div><div>So</div><div>Ne</div>
@@ -94,7 +95,7 @@ ob_start();
     <section class="step" data-step="3">
       <div class="step__inner">
         <div class="step__heading">
-          <button type="button" class="step__back" data-go-step="2" aria-label="Späť">‹</button>
+          <button type="button" class="step__back" data-go-step="2" aria-label="Späť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button>
           <h2 class="step__title">Vaše údaje</h2>
         </div>
         <p class="step__lead">
@@ -128,6 +129,40 @@ ob_start();
           <textarea name="note" id="f-note" rows="3" maxlength="1000" placeholder="Téma oslavy, alergie, špeciálne želania…"></textarea>
         </div>
 
+        <div class="step__actions">
+          <button type="button" class="btn btn--ghost" data-go-step="2">Späť</button>
+          <button type="button" class="btn" data-go-step="4" id="to-step-4">Pokračovať na zhrnutie ›</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KROK 4: ZHRNUTIE ===== -->
+    <section class="step" data-step="4">
+      <div class="step__inner">
+        <div class="step__heading">
+          <button type="button" class="step__back" data-go-step="3" aria-label="Späť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg></button>
+          <h2 class="step__title">Zhrnutie rezervácie</h2>
+        </div>
+        <p class="step__lead">Skontrolujte údaje pred odoslaním.</p>
+
+        <dl class="resv-summary">
+          <div><dt>Balíček</dt><dd id="rs-package">—</dd></div>
+          <div><dt>Dátum</dt><dd id="rs-date">—</dd></div>
+          <div><dt>Čas</dt><dd id="rs-time">—</dd></div>
+          <div><dt>Počet detí</dt><dd id="rs-kids">—</dd></div>
+          <div><dt>Meno a priezvisko</dt><dd id="rs-name">—</dd></div>
+          <div><dt>Telefón</dt><dd id="rs-phone">—</dd></div>
+          <div><dt>E-mail</dt><dd id="rs-email">—</dd></div>
+          <div><dt>Poznámka</dt><dd id="rs-note">—</dd></div>
+        </dl>
+
+        <div class="field field--check">
+          <label for="f-gdpr">
+            <input type="checkbox" name="gdpr" id="f-gdpr" required aria-required="true">
+            <span>Súhlasím so <a href="/ochrana-udajov" target="_blank" rel="noopener">spracovaním osobných údajov</a> na účel vybavenia rezervácie <span class="req" aria-hidden="true">*</span></span>
+          </label>
+        </div>
+
         <?php if ($siteKey): ?>
         <div class="cookie-gate" id="cookie-gate" hidden>
           <p>Pre odoslanie potrebujeme váš súhlas s cookies (Google reCAPTCHA chráni formulár pred spamom).</p>
@@ -138,7 +173,7 @@ ob_start();
         <p class="step__error" id="form-error" role="alert" aria-live="assertive" hidden></p>
 
         <div class="step__actions">
-          <button type="button" class="btn btn--ghost" data-go-step="2">‹ Späť</button>
+          <button type="button" class="btn btn--ghost" data-go-step="3">Späť</button>
           <button type="submit" class="btn" id="submit-btn">Odoslať rezerváciu</button>
         </div>
       </div>

@@ -94,19 +94,96 @@ if (root) {
   }
 
   // ---------- Step navigation ----------
+  const rs = {
+    package: document.getElementById('rs-package'),
+    date:    document.getElementById('rs-date'),
+    time:    document.getElementById('rs-time'),
+    kids:    document.getElementById('rs-kids'),
+    name:    document.getElementById('rs-name'),
+    phone:   document.getElementById('rs-phone'),
+    email:   document.getElementById('rs-email'),
+    note:    document.getElementById('rs-note'),
+  };
+
+  // Native per-field validity (the <form> is novalidate, but element-level
+  // constraints — required / type=email / min-max / minlength — still apply).
+  const step3Fields = ['f-kids', 'f-name', 'f-phone', 'f-email'];
+  function step3Valid() {
+    return step3Fields.every(id => document.getElementById(id)?.checkValidity());
+  }
+  function reportStep3() {
+    for (const id of step3Fields) {
+      const el = document.getElementById(id);
+      if (el && !el.checkValidity()) { el.reportValidity(); return false; }
+    }
+    return true;
+  }
+  // Furthest step the user is allowed to be on, given what's filled.
+  function furthestStep() {
+    if (!pkgInput.value) return 1;
+    if (!dateInput.value || !timeInput.value) return 2;
+    if (!step3Valid()) return 3;
+    return 4;
+  }
+
+  function fillSummary() {
+    const v = (el) => (el && el.value.trim()) || '';
+    rs.package.textContent = sumPkg.textContent || '—';
+    rs.date.textContent    = dateInput.value || '—';
+    rs.time.textContent    = sumTime.textContent || '—';
+    rs.kids.textContent    = v(document.getElementById('f-kids')) || '—';
+    rs.name.textContent    = v(document.getElementById('f-name')) || '—';
+    rs.phone.textContent   = v(document.getElementById('f-phone')) || '—';
+    rs.email.textContent   = v(document.getElementById('f-email')) || '—';
+    rs.note.textContent    = v(document.getElementById('f-note')) || '—';
+  }
+
   function goStep(step) {
     steps.forEach(s => s.classList.toggle('is-active', s.dataset.step === String(step)));
+    const reachable = furthestStep();
     stepIndicators.forEach(li => {
       const n = li.dataset.stepIndicator;
-      li.classList.toggle('is-active', n === String(step));
-      li.classList.toggle('is-done', Number(n) < Number(step) || step === 'success');
+      const num = Number(n);
+      const isActive = n === String(step);
+      li.classList.toggle('is-active', isActive);
+      li.classList.toggle('is-done', num < Number(step) || step === 'success');
+      // Reachable = any earlier/current step, or a forward step whose
+      // prerequisites are satisfied. Unreachable steps are not clickable.
+      const ok = step === 'success' ? true : num <= Math.max(Number(step), reachable);
+      li.setAttribute('aria-disabled', ok ? 'false' : 'true');
+      if (isActive) li.setAttribute('aria-current', 'step');
+      else li.removeAttribute('aria-current');
     });
+    if (String(step) === '4') fillSummary();
     location.hash = step === 'success' ? '#hotovo' : '#krok-' + step;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // Forward navigation to the summary requires valid contact data; backward
+  // navigation is always allowed.
+  function navigateTo(step) {
+    if (String(step) === '4' && !reportStep3()) return;
+    goStep(step);
+  }
+
   document.querySelectorAll('[data-go-step]').forEach(btn => {
-    btn.addEventListener('click', () => goStep(btn.dataset.goStep));
+    btn.addEventListener('click', () => navigateTo(btn.dataset.goStep));
+  });
+
+  // Clickable step indicators: back to any completed step always; forward
+  // only as far as prerequisites allow.
+  stepIndicators.forEach(li => {
+    const target = li.dataset.stepIndicator;
+    const activate = () => {
+      if (Number(target) <= furthestStep()) navigateTo(target);
+    };
+    li.addEventListener('click', activate);
+    li.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        activate();
+      }
+    });
   });
 
   // ---------- Step 1: package pick ----------
@@ -357,17 +434,7 @@ if (root) {
       list.appendChild(b);
     });
     slotGrid.appendChild(list);
-
-    // QoL: default the time to 14:00 when the user has not yet chosen a slot
-    // for this day. selectDay() resets timeInput.value before re-rendering, so
-    // this only pre-selects on a fresh day; a manual pick keeps timeInput.value
-    // set and we leave it alone. Reuse the exact click path so the selected
-    // state / hidden input / summary / button-enable all stay consistent.
-    if (!timeInput.value) {
-      const preferred = Array.from(list.querySelectorAll('.slot'))
-        .find(s => s.dataset.start === '14:00');
-      if (preferred) preferred.click();
-    }
+    // No time is pre-selected — the user must consciously pick a start time.
   }
 
   // Calendar navigation
@@ -547,6 +614,14 @@ if (root) {
       if (!pkgInput.value || !dateInput.value || !timeInput.value) {
         throw new Error('Chýba balíček, dátum alebo čas. Vráťte sa späť.');
       }
+      if (!step3Valid()) {
+        throw new Error('Skontrolujte kontaktné údaje v kroku 3.');
+      }
+      const gdpr = document.getElementById('f-gdpr');
+      if (gdpr && !gdpr.checked) {
+        gdpr.focus();
+        throw new Error('Pre odoslanie potvrďte súhlas so spracovaním osobných údajov.');
+      }
 
       let recaptchaToken = '';
       if (siteKey) {
@@ -600,11 +675,13 @@ if (root) {
   // ---------- Hash routing for back button ----------
   if (location.hash.startsWith('#krok-')) {
     const step = location.hash.slice(6);
-    if (['1', '2', '3'].includes(step)) goStep(step);
+    // Only restore as far as the entered data actually allows.
+    if (['1', '2', '3', '4'].includes(step) && Number(step) <= furthestStep()) goStep(step);
   }
   window.addEventListener('popstate', () => {
     if (location.hash.startsWith('#krok-')) {
-      goStep(location.hash.slice(6));
+      const step = location.hash.slice(6);
+      goStep(['1', '2', '3', '4'].includes(step) && Number(step) <= furthestStep() ? step : 1);
     } else {
       goStep(1);
     }

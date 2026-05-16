@@ -49,8 +49,11 @@ final class ReservationFormQolTest extends TestCase
         $this->assertStringContainsString('removeItem', $this->js);
     }
 
-    public function testDefault1400Logic(): void
+    public function testNoTimeAutoPreselect(): void
     {
-        $this->assertStringContainsString("'14:00'", $this->js);
+        // The 14:00 auto-pick was removed — the user must consciously pick a
+        // start time, so no hard-coded time literal drives a default click.
+        $this->assertStringNotContainsString("'14:00'", $this->js);
+        $this->assertStringNotContainsString('=== \'14:00\'', $this->js);
     }
 }
