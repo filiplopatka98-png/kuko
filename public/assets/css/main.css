@@ -344,7 +344,22 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* ===== Galéria ===== */
 .section--galeria { background: var(--bg-pink-soft); }
-.section__rainbow { display: block; width: 260px; max-width: 70%; height: auto; margin: 0 auto 0.25rem; transform: rotate(-5deg); }
+/* Shared rainbow: bigger, tilted (left/girl end ~at heading height, right/boy
+   end raised above it), sitting close to the heading. Standalone gallery page
+   uses this rule only (mild placement within the section's top padding). */
+.section__rainbow { display: block; width: 400px; max-width: 78%; height: auto; margin: 0 auto -0.5rem; transform: rotate(-8deg); }
+/* Homepage only (#galeria): pull the rainbow up so it straddles the
+   oslavy(--bg-cream)/galeria(--bg-pink-soft) background boundary — roughly
+   top half over oslavy, bottom half over galeria. The negative margin-top
+   exceeds the section's top padding (--s-10 = 5rem desktop) by ~half the
+   rendered rainbow height so its midpoint lands near the boundary. */
+#galeria { overflow: visible; }
+#galeria .container { overflow: visible; }
+#galeria .section__rainbow { margin-top: -13rem; }
+@media (max-width: 768px) {
+  .section__rainbow { width: 300px; max-width: 82%; }
+  #galeria .section__rainbow { margin-top: -8.5rem; }
+}
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); margin-top: var(--s-4); }
 @media (max-width: 768px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .gallery { grid-template-columns: 1fr; } }

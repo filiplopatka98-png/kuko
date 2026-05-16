@@ -37,21 +37,18 @@ final class LightboxPerfR4Test extends TestCase
 
     public function testRainbowTiltAndTighterMargin(): void
     {
+        // Rainbow redesign (F2): bigger, still tilted, closer to the heading,
+        // and the strong upward straddle is homepage-scoped under #galeria.
         $css = file_get_contents($this->root() . '/public/assets/css/main.css');
         $this->assertMatchesRegularExpression(
-            '/\.section__rainbow\s*\{[^}]*transform:\s*rotate\(-5deg\)/',
+            '/\.section__rainbow\s*\{[^}]*transform:\s*rotate\(-?\d+deg\)/',
             $css,
-            '.section__rainbow must tilt rotate(-5deg)'
+            '.section__rainbow must keep a rotate() tilt'
         );
         $this->assertMatchesRegularExpression(
-            '/\.section__rainbow\s*\{[^}]*margin:\s*0 auto 0\.25rem/',
+            '/#galeria\s+\.section__rainbow\s*\{[^}]*margin-top:\s*-[\d.]+rem/',
             $css,
-            '.section__rainbow bottom margin must be tightened to 0.25rem'
-        );
-        $this->assertDoesNotMatchRegularExpression(
-            '/\.section__rainbow\s*\{[^}]*margin:\s*0 auto var\(--s-2\)/',
-            $css,
-            '.section__rainbow must no longer use the original var(--s-2) bottom margin'
+            '#galeria .section__rainbow must have a negative margin-top (homepage straddle)'
         );
     }
 }
