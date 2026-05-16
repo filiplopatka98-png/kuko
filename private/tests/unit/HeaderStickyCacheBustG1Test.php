@@ -36,16 +36,40 @@ final class HeaderStickyCacheBustG1Test extends TestCase
         }
     }
 
-    public function testStickyCollapseWiredUp(): void
+    public function testStickyCollapseUsesIntersectionObserverNotScrollThreshold(): void
     {
+        $css = $this->css();
+        // Whole header stays sticky page-wide (parent is body) — no height
+        // feedback loop.
+        $this->assertMatchesRegularExpression(
+            '/\.nav\s*\{[^}]*position:\s*sticky/',
+            $css,
+            '.nav must be position:sticky'
+        );
+        // Desktop: collapse the logo row to just the menu band when stuck.
         $this->assertMatchesRegularExpression(
             '/@media\s*\(min-width:\s*769px\)\s*\{\s*\.nav\.is-stuck\s+\.nav__brand-row\s*\{[^}]*display:\s*none/',
-            $this->css(),
-            'CSS must hide .nav__brand-row when .nav.is-stuck on desktop'
+            $css,
+            'desktop: .nav.is-stuck must hide .nav__brand-row'
         );
         $js = $this->mainJs();
-        $this->assertStringContainsString("classList.toggle('is-stuck'", $js, 'main.js must toggle is-stuck');
-        $this->assertStringContainsString("addEventListener('scroll'", $js, 'main.js must listen to scroll');
+        // The collapse must be driven by an IntersectionObserver on the topbar,
+        // NOT a window.scrollY threshold (which oscillates because the nav's
+        // height change feeds back into the scroll position).
+        $this->assertStringContainsString('IntersectionObserver', $js, 'collapse must use IntersectionObserver');
+        $this->assertMatchesRegularExpression(
+            '/\.observe\(\s*topbarStick\s*\)/',
+            $js,
+            'the IntersectionObserver must observe the topbar'
+        );
+        // The collapse must NOT be gated on a scrollY threshold (the source of
+        // the oscillation/jank). smooth-scroll may still use window.scrollY.
+        $this->assertDoesNotMatchRegularExpression(
+            "/is-stuck['\"]\s*,\s*window\.scrollY/",
+            $js,
+            'is-stuck must not be toggled from a window.scrollY threshold'
+        );
+        $this->assertStringNotContainsString("addEventListener('scroll', syncStuck", $js);
     }
 
     public function testGalleryImportIsCacheBusted(): void

@@ -162,9 +162,12 @@ img, svg { max-width: 100%; height: auto; display: block; }
    .nav itself stays in normal flow (no opaque block over the topbar);
    the negative bottom margin keeps the pink band snug under the logo. */
 .nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -56px; margin-bottom: -16px; }
-/* When the header is sticky (page scrolled), collapse the logo row so only
-   the pink menu band remains. Desktop only — on mobile the hamburger lives
-   in this row and must stay reachable. */
+/* Once the topbar has scrolled out of view the header collapses to just the
+   pink menu band. The collapse is driven by an IntersectionObserver on the
+   topbar (a stable element above the sticky nav, unaffected by the nav's own
+   height change) — so there is no scroll-position feedback loop / oscillation.
+   Desktop only: on mobile the hamburger lives in this row and must stay
+   reachable while scrolled. */
 @media (min-width: 769px) {
   .nav.is-stuck .nav__brand-row { display: none; }
 }

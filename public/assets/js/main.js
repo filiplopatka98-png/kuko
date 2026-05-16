@@ -17,16 +17,19 @@ if (navToggle && navMenu) {
   }));
 }
 
-// ===== Sticky nav: collapse the logo row once scrolled =====
-const navEl = $('.nav');
-const topbarEl = $('.topbar');
-if (navEl) {
-  const syncStuck = () => {
-    const threshold = (topbarEl?.offsetHeight ?? 0) + 4;
-    navEl.classList.toggle('is-stuck', window.scrollY > threshold);
-  };
-  syncStuck();
-  window.addEventListener('scroll', syncStuck, { passive: true });
+// ===== Sticky nav: collapse the logo row once the topbar scrolls out =====
+// Driven by an IntersectionObserver on the topbar (a stable element ABOVE the
+// sticky nav, so its visibility does NOT change when the nav's own height
+// changes) — this avoids the scroll-position feedback loop that makes a
+// scrollY-threshold approach oscillate/jank.
+const navStick = $('.nav');
+const topbarStick = $('.topbar');
+if (navStick && topbarStick && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver(
+    ([entry]) => navStick.classList.toggle('is-stuck', !entry.isIntersecting),
+    { threshold: 0 }
+  );
+  io.observe(topbarStick);
 }
 
 // ===== Scroll reveal =====
