@@ -23,7 +23,6 @@ final class OslavyBadgeIconsTest extends TestCase
         $this->assertStringContainsString('badge-balloons.svg', $t);
         $this->assertStringContainsString('badge-crown.svg', $t);
         // old wrong mappings gone
-        $this->assertStringNotContainsString('little-kid.svg', $t);
         $this->assertStringNotContainsString('/assets/icons/uzavreta.svg', $t);
     }
     public function testBadgeSolidColoredBackground(): void

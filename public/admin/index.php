@@ -246,7 +246,7 @@ $router->post('/admin/settings', function () use ($settings, $audit, $flash) {
 // kontakt is intentionally EXCLUDED from Domov (managed under Nastavenia→Kontakt);
 // oslavy/packages are NOT content blocks → excluded. 'seo' = seo.{x}.* key segment.
 $adminPages = [
-    'home'       => ['label' => 'Domov',          'url' => '/',               'prefixes' => ['hero', 'about', 'cennik', 'footer'], 'seo' => 'home'],
+    'home'       => ['label' => 'Domov',          'url' => '/',               'prefixes' => ['hero', 'about', 'cennik', 'oslavy', 'footer'], 'seo' => 'home'],
     'rezervacia' => ['label' => 'Rezervácia',     'url' => '/rezervacia',     'prefixes' => [],                                    'seo' => 'rezervacia'],
     'gallery'    => ['label' => 'Fotogaléria',    'url' => '/galeria',        'prefixes' => [],                                    'seo' => 'gallery'],
     'faq'        => ['label' => 'Časté otázky',   'url' => '/faq',            'prefixes' => ['faq'],                               'seo' => 'faq'],
