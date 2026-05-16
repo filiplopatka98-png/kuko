@@ -28,4 +28,15 @@ final class KontaktSectionTest extends TestCase
         // a contact/social flex-row rule exists
         $this->assertMatchesRegularExpression('/kontakt|contact|social/i', $css);
     }
+    public function testContactValueLinksMatchPlainText(): void
+    {
+        // phone/email links must look identical to the address/hours <strong>
+        // text (same colour + bold), not the global pink underlined link.
+        $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/main.css');
+        $this->assertMatchesRegularExpression(
+            '/\.contact-card__value a\s*\{[^}]*color:\s*var\(--c-text\)[^}]*font-weight:\s*700/s',
+            $css,
+            'contact-card__value links must use --c-text colour and bold to match address/hours'
+        );
+    }
 }

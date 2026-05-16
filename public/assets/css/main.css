@@ -392,6 +392,8 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .contact-card__icon svg, .contact-card__icon img { display: block; }
 .contact-card__title { font-size: 0.85rem; color: var(--c-text-soft); margin: 0; }
 .contact-card__value { margin: 0.15rem 0 0; font-size: 0.95rem; }
+.contact-card__value a { color: var(--c-text); font-weight: 700; text-decoration: none; }
+.contact-card__value a:hover { color: var(--c-accent); text-decoration: none; }
 .contact-card__socials { display: flex; gap: var(--s-1); align-items: center; margin: 0; }
 .contact-card__socials a { width: 40px; height: 40px; background: var(--c-purple); border-radius: 50%; display: grid; place-items: center; }
 .contact-card__socials img { width: 22px; height: 22px; }
