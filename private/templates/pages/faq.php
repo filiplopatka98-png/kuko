@@ -30,7 +30,11 @@ HTML) ?>      <div class="faq">
           <div class="faq__a"><?= $it['a'] /* sanitised on save; defaults are trusted */ ?></div>
         </details>
 <?php endforeach; ?>      </div>
-      <p style="text-align:center; margin-top:2rem;"><a class="btn" href="/">&larr; Späť na domov</a></p>
+      <aside class="cta-panel" aria-label="Rezervácia oslavy">
+        <h2 class="cta-panel__title"><?= e(\Kuko\Content::get('cta.faq.heading', 'Plánujete oslavu pre svoje dieťa?')) ?></h2>
+        <p class="cta-panel__text"><?= e(\Kuko\Content::get('cta.faq.text', 'Rezervujte si termín online za pár minút — vyberte balíček, dátum a čas.')) ?></p>
+        <a class="btn" href="/rezervacia">Rezervovať oslavu</a>
+      </aside>
     </div>
   </section>
 <?php

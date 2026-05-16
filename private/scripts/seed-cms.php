@@ -35,6 +35,10 @@ $blocks = [
     ['kontakt.hours', 'Kontakt — otváracie hodiny', 'text', 'Pondelok – Nedeľa: 9:00 – 20:00'],
     ['oslavy.note', 'Oslavy — poznámka pod balíčkami', 'text', '*Konečná cena závisí od možností prispôsobenia - Každý balíček si môžete upraviť podľa vašich predstáv: predĺženie času oslavy, výzdoba na mieru (téma, farby), catering pre deti aj rodičov, torta alebo sweet bar, špeciálne požiadavky…'],
     ['footer.copyright', 'Footer — copyright', 'text', 'Copyright © {{year}} KUKO-detskysvet.sk | Všetky práva vyhradené.'],
+    ['cta.faq.heading', 'CTA (FAQ) — nadpis', 'text', 'Plánujete oslavu pre svoje dieťa?'],
+    ['cta.faq.text', 'CTA (FAQ) — text', 'text', 'Rezervujte si termín online za pár minút — vyberte balíček, dátum a čas.'],
+    ['cta.reservation.heading', 'CTA (rezervácia) — nadpis', 'text', 'Páči sa vám u nás?'],
+    ['cta.reservation.text', 'CTA (rezervácia) — text', 'text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 3 krokoch.'],
     // Editable pages (admin "Stránky") — values copied verbatim from the
     // hardcoded fallbacks in pages/privacy.php and pages/faq.php.
     ['privacy.body', 'Ochrana údajov — text', 'html', <<<'HTML'

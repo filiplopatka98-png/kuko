@@ -45,7 +45,11 @@ ob_start();
           <?php endfor; ?>
         <?php endif; ?>
       </div>
-      <p style="text-align:center; margin-top:2rem;"><a class="btn" href="/">&larr; Späť na domov</a></p>
+      <aside class="cta-panel" aria-label="Rezervácia oslavy">
+        <h2 class="cta-panel__title"><?= e(\Kuko\Content::get('cta.reservation.heading', 'Páči sa vám u nás?')) ?></h2>
+        <p class="cta-panel__text"><?= e(\Kuko\Content::get('cta.reservation.text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 3 krokoch.')) ?></p>
+        <a class="btn" href="/rezervacia">Rezervovať oslavu</a>
+      </aside>
     </div>
   </section>
 <?php

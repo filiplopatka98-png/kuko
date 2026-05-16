@@ -248,8 +248,8 @@ $router->post('/admin/settings', function () use ($settings, $audit, $flash) {
 $adminPages = [
     'home'       => ['label' => 'Domov',          'url' => '/',               'prefixes' => ['hero', 'about', 'cennik', 'oslavy', 'footer'], 'seo' => 'home'],
     'rezervacia' => ['label' => 'Rezervácia',     'url' => '/rezervacia',     'prefixes' => [],                                    'seo' => 'rezervacia'],
-    'gallery'    => ['label' => 'Fotogaléria',    'url' => '/galeria',        'prefixes' => [],                                    'seo' => 'gallery'],
-    'faq'        => ['label' => 'Časté otázky',   'url' => '/faq',            'prefixes' => ['faq'],                               'seo' => 'faq'],
+    'gallery'    => ['label' => 'Fotogaléria',    'url' => '/galeria',        'prefixes' => ['cta'],                               'seo' => 'gallery'],
+    'faq'        => ['label' => 'Časté otázky',   'url' => '/faq',            'prefixes' => ['faq', 'cta'],                        'seo' => 'faq'],
     'privacy'    => ['label' => 'Ochrana údajov', 'url' => '/ochrana-udajov', 'prefixes' => ['privacy'],                           'seo' => 'privacy'],
 ];
 

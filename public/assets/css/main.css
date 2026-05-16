@@ -326,6 +326,19 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .package__cta.btn--straddle { margin-top: auto; align-self: center; }
 .oslavy__note { max-width: 760px; margin: var(--s-3) auto 0; text-align: center; color: var(--c-text-soft); font-size: 0.85rem; line-height: 1.6; }
 
+/* Standalone FAQ / Fotogaléria pages: center the page <h1> (global CSS
+   centers h2 but not h1). Scoped so the homepage is unaffected — its
+   .section--galeria has no h1 and the hero h1 lives elsewhere. */
+.section--faq h1, .section--galeria h1 { text-align: center; }
+
+/* Soft reservation CTA panel on the standalone FAQ / Fotogaléria pages. */
+.cta-panel {
+  background: var(--bg-pink-soft); border-radius: var(--r-card); padding: var(--s-4);
+  margin-top: var(--s-4); text-align: center; max-width: 680px; margin-inline: auto;
+}
+.cta-panel__title { margin: 0 0 var(--s-1); }
+.cta-panel__text { color: var(--c-text-soft); margin: 0 0 var(--s-2); }
+
 /* ===== Galéria ===== */
 .section--galeria { background: var(--bg-pink-soft); }
 .section__rainbow { display: block; width: 260px; max-width: 70%; height: auto; margin: 0 auto 0.25rem; transform: rotate(-5deg); }

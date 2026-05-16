@@ -49,7 +49,7 @@ $ig = \Kuko\Social::url('instagram', '');
       <a href="/#o-nas">O detskom svete</a>
       <a href="/#oslavy">Detské oslavy</a>
       <a href="/#cennik">Cenník služieb</a>
-      <a href="/#galeria">Fotogaléria</a>
+      <a href="/galeria">Fotogaléria</a>
       <a href="/#kontakt">Kontakt</a>
     </nav>
   </div>

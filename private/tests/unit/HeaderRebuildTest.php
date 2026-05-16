@@ -23,9 +23,13 @@ final class HeaderRebuildTest extends TestCase
     }
     public function testNavLinksIntact(): void
     {
-        foreach (['/#domov','/#o-nas','/#oslavy','/#cennik','/#galeria','/#kontakt'] as $href) {
+        // Fotogaléria points at the standalone /galeria page (R5), not the
+        // homepage #galeria anchor; the remaining links are still anchors.
+        foreach (['/#domov','/#o-nas','/#oslavy','/#cennik','/#kontakt'] as $href) {
             $this->assertStringContainsString('href="' . $href . '"', $this->nav);
         }
+        $this->assertStringContainsString('href="/galeria"', $this->nav);
+        $this->assertStringNotContainsString('href="/#galeria"', $this->nav);
     }
     public function testPinkNavBandCss(): void
     {
