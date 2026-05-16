@@ -231,3 +231,11 @@ Plán `docs/plans/2026-05-16-frontend-remarks.md`. 13 pripomienok cez subagent-d
 **Regresia (lokálne, všetko green):** PHPUnit **334 testov** · PHP lint čistý · stale-min guard green · dev smoke (`/`,`/faq`,`/galeria`,`/rezervacia`,`/ochrana-udajov` → 200, 1×`<h1>`, 0 PHP chýb) · `seed-cms.php` nacvičený na dev DB — 5 nových blokov (`oslavy.note`, `cta.faq.heading/text`, `cta.reservation.heading/text`) idempotentne insertne a renderuje sa.
 
 **ZOSTÁVA na nasadenie (keď user povie):** `git push` → `lftp` mirror public/+private/ → token-gated prod seed (5 nových blokov) → overiť invarianty (public 503, robots `Disallow: /`). + open dependency: house SVG (#8 adresa).
+
+---
+
+## ✅ Frontend remarks batch — NASADENÉ na produkciu (2026-05-16)
+
+GitHub push `b35c1e9..cb15be6` (origin/main). Surgical lftp deploy: 17 zmenených súborov (9→`web/`, 8→`private/`; docs/testy NEdeployované) — `--only-newer` mirror by re-uploadol celý strom (git checkout resetuje mtimes), preto cielený `put` len reálne zmenených súborov z `git diff b35c1e9..cb15be6`. Prod seed cez token-gated `_setup.php?action=seed` — idempotentný: všetko existujúce `= skip`, pridané LEN 5 nových blokov (`oslavy.note`, `cta.faq.heading/text`, `cta.reservation.heading/text`); `_setup.php` self-destruct OK. **Invarianty overené:** public `/`=**503** (maintenance stále ON), `robots.txt`=`Disallow: /` (indexácia OFF), `/admin/login`=200, sitemap=200, `home.svg` 200 a byte-identický s repom, `main.min.css` 200 (19194 B). Prod `config.php` nedotknutý (maintenance:true, public_indexing:false). DB migrácia žiadna (len content blocks). SFTP heslo ani prod config nezostali na disku (shred).
+
+**Stav: celý 13-pripomienkový batch hotový, reviewnutý, nasadený. Žiadne otvorené závislosti.** Zostáva už len go-live #1 (owner kroky — SMTP, reCAPTCHA test, GDPR cron, Lighthouse, GBP, HSTS → flip maintenance OFF + indexing ON).
