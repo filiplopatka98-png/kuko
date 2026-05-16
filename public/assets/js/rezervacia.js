@@ -105,19 +105,87 @@ if (root) {
     note:    document.getElementById('rs-note'),
   };
 
-  // Native per-field validity (the <form> is novalidate, but element-level
-  // constraints — required / type=email / min-max / minlength — still apply).
+  // ---------- Custom step-3 validation (no native browser bubbles) ----------
+  // The <form> is novalidate; we validate ourselves and render inline messages
+  // in #err-<id> so the styling/wording is fully ours and a11y-friendly.
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const PHONE_RE = /^\+?[0-9\s/().-]{9,}$/;
   const step3Fields = ['f-kids', 'f-name', 'f-phone', 'f-email'];
-  function step3Valid() {
-    return step3Fields.every(id => document.getElementById(id)?.checkValidity());
-  }
-  function reportStep3() {
-    for (const id of step3Fields) {
-      const el = document.getElementById(id);
-      if (el && !el.checkValidity()) { el.reportValidity(); return false; }
+
+  // Returns an error message for the field, or '' when valid.
+  function fieldError(id) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    const v = el.value.trim();
+    switch (id) {
+      case 'f-kids': {
+        if (v === '') return 'Zadajte počet detí.';
+        const n = Number(v);
+        if (!Number.isInteger(n) || n < 1 || n > 50) return 'Počet detí musí byť celé číslo od 1 do 50.';
+        return '';
+      }
+      case 'f-name':
+        if (v === '') return 'Zadajte meno a priezvisko.';
+        if (v.length < 2) return 'Meno musí mať aspoň 2 znaky.';
+        if (v.length > 120) return 'Meno je príliš dlhé (max. 120 znakov).';
+        return '';
+      case 'f-phone':
+        if (v === '') return 'Zadajte telefónne číslo.';
+        if (!PHONE_RE.test(v)) return 'Zadajte platné telefónne číslo.';
+        return '';
+      case 'f-email':
+        if (v === '') return 'Zadajte e-mailovú adresu.';
+        if (!EMAIL_RE.test(v)) return 'Zadajte platnú e-mailovú adresu.';
+        return '';
+      default:
+        return '';
     }
+  }
+  function showFieldError(id, msg) {
+    const el = document.getElementById(id);
+    const box = document.getElementById('err-' + id);
+    if (box) box.textContent = msg;
+    if (el) {
+      el.setAttribute('aria-invalid', 'true');
+      el.closest('.field')?.classList.add('has-error');
+    }
+  }
+  function clearFieldError(id) {
+    const el = document.getElementById(id);
+    const box = document.getElementById('err-' + id);
+    if (box) box.textContent = '';
+    if (el) {
+      el.removeAttribute('aria-invalid');
+      el.closest('.field')?.classList.remove('has-error');
+    }
+  }
+  // Silent check (used by the step-indicator/forward guard — no UI side effects).
+  function step3Valid() {
+    return step3Fields.every(id => fieldError(id) === '');
+  }
+  // Validate + render messages; focus the first invalid field. Returns bool.
+  function validateStep3() {
+    let firstBad = null;
+    for (const id of step3Fields) {
+      const msg = fieldError(id);
+      if (msg) {
+        showFieldError(id, msg);
+        if (!firstBad) firstBad = document.getElementById(id);
+      } else {
+        clearFieldError(id);
+      }
+    }
+    if (firstBad) { firstBad.focus(); return false; }
     return true;
   }
+  // Clear a field's error as soon as the user fixes it (live feedback).
+  step3Fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const revalidate = () => { if (el.getAttribute('aria-invalid') === 'true' && fieldError(id) === '') clearFieldError(id); };
+    el.addEventListener('input', revalidate);
+    el.addEventListener('blur', () => { const m = fieldError(id); if (m) showFieldError(id, m); else clearFieldError(id); });
+  });
   // Furthest step the user is allowed to be on, given what's filled.
   function furthestStep() {
     if (!pkgInput.value) return 1;
@@ -155,14 +223,13 @@ if (root) {
       else li.removeAttribute('aria-current');
     });
     if (String(step) === '4') fillSummary();
-    location.hash = step === 'success' ? '#hotovo' : '#krok-' + step;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Forward navigation to the summary requires valid contact data; backward
   // navigation is always allowed.
   function navigateTo(step) {
-    if (String(step) === '4' && !reportStep3()) return;
+    if (String(step) === '4' && !validateStep3()) return;
     goStep(step);
   }
 
@@ -615,7 +682,9 @@ if (root) {
         throw new Error('Chýba balíček, dátum alebo čas. Vráťte sa späť.');
       }
       if (!step3Valid()) {
-        throw new Error('Skontrolujte kontaktné údaje v kroku 3.');
+        goStep(3);
+        validateStep3();
+        throw new Error('Skontrolujte vyznačené kontaktné údaje.');
       }
       const gdpr = document.getElementById('f-gdpr');
       if (gdpr && !gdpr.checked) {
@@ -672,20 +741,10 @@ if (root) {
     }
   });
 
-  // ---------- Hash routing for back button ----------
-  if (location.hash.startsWith('#krok-')) {
-    const step = location.hash.slice(6);
-    // Only restore as far as the entered data actually allows.
-    if (['1', '2', '3', '4'].includes(step) && Number(step) <= furthestStep()) goStep(step);
-  }
-  window.addEventListener('popstate', () => {
-    if (location.hash.startsWith('#krok-')) {
-      const step = location.hash.slice(6);
-      goStep(['1', '2', '3', '4'].includes(step) && Number(step) <= furthestStep() ? step : 1);
-    } else {
-      goStep(1);
-    }
-  });
+  // NOTE: no location.hash / popstate step routing. It made the success step
+  // vanish (a popstate on the '#hotovo' hash hit the reset-to-step-1 branch)
+  // and is unnecessary — explicit Späť buttons and the clickable step
+  // indicators already cover in-wizard navigation.
 
   // ---------- Auto-pick package from URL query (?balicek=mini) ----------
   // Runs last so all consts/functions (MONTH_NAMES, loadMonth, …) are initialized.

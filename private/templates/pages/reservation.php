@@ -105,23 +105,27 @@ ob_start();
         <p class="form-legend"><span class="req" aria-hidden="true">*</span> povinné pole</p>
         <div class="field">
           <label for="f-kids">Počet detí <span class="req" aria-hidden="true">*</span></label>
-          <input type="number" name="kids_count" id="f-kids" required aria-required="true" min="1" max="50" value="10">
+          <input type="number" name="kids_count" id="f-kids" required aria-required="true" min="1" max="50" value="10" aria-describedby="err-f-kids">
+          <p class="field__error" id="err-f-kids" role="alert"></p>
         </div>
         <div class="field">
           <label for="f-name">Meno a priezvisko <span class="req" aria-hidden="true">*</span></label>
-          <input type="text" name="name" id="f-name" required aria-required="true" minlength="2" maxlength="120" autocomplete="name">
+          <input type="text" name="name" id="f-name" required aria-required="true" minlength="2" maxlength="120" autocomplete="name" aria-describedby="err-f-name">
+          <p class="field__error" id="err-f-name" role="alert"></p>
         </div>
         <div class="field-row">
           <div class="field">
             <label for="f-phone">Telefón <span class="req" aria-hidden="true">*</span></label>
-            <input type="tel" name="phone" id="f-phone" required aria-required="true" autocomplete="tel">
+            <input type="tel" name="phone" id="f-phone" required aria-required="true" autocomplete="tel" aria-describedby="err-f-phone">
+            <p class="field__error" id="err-f-phone" role="alert"></p>
           </div>
           <div class="field">
             <label for="f-email">E-mail <span class="req" aria-hidden="true">*</span></label>
-            <input type="email" name="email" id="f-email" required aria-required="true" autocomplete="email" list="email-domains">
+            <input type="email" name="email" id="f-email" required aria-required="true" autocomplete="email" list="email-domains" aria-describedby="err-f-email">
             <datalist id="email-domains">
               <option value="@gmail.com"><option value="@azet.sk"><option value="@zoznam.sk"><option value="@centrum.sk"><option value="@outlook.com"><option value="@icloud.com">
             </datalist>
+            <p class="field__error" id="err-f-email" role="alert"></p>
           </div>
         </div>
         <div class="field">
