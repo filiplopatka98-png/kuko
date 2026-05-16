@@ -161,7 +161,13 @@ img, svg { max-width: 100%; height: auto; display: block; }
 /* Lift ONLY the transparent logo so it overlaps the white topbar visually.
    .nav itself stays in normal flow (no opaque block over the topbar);
    the negative bottom margin keeps the pink band snug under the logo. */
-.nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -42px; margin-bottom: -42px; }
+.nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -56px; margin-bottom: -16px; }
+/* When the header is sticky (page scrolled), collapse the logo row so only
+   the pink menu band remains. Desktop only — on mobile the hamburger lives
+   in this row and must stay reachable. */
+@media (min-width: 769px) {
+  .nav.is-stuck .nav__brand-row { display: none; }
+}
 .nav__brand img { width: auto; height: 160px; display: block; }
 
 /* Row 3: full-bleed pink nav band, centered horizontal menu */
@@ -347,18 +353,14 @@ img, svg { max-width: 100%; height: auto; display: block; }
 /* Shared rainbow: bigger, tilted (left/girl end ~at heading height, right/boy
    end raised above it), sitting close to the heading. Standalone gallery page
    uses this rule only (mild placement within the section's top padding). */
-.section__rainbow { display: block; width: 400px; max-width: 78%; height: auto; margin: 0 auto -0.5rem; transform: rotate(-8deg); }
-/* Homepage only (#galeria): pull the rainbow up so it straddles the
-   oslavy(--bg-cream)/galeria(--bg-pink-soft) background boundary — roughly
-   top half over oslavy, bottom half over galeria. The negative margin-top
-   exceeds the section's top padding (--s-10 = 5rem desktop) by ~half the
-   rendered rainbow height so its midpoint lands near the boundary. */
-#galeria { overflow: visible; }
-#galeria .container { overflow: visible; }
-#galeria .section__rainbow { margin-top: -13rem; }
+.section__rainbow { display: block; width: 350px; max-width: 78%; height: auto; margin-top: -132px; margin-bottom: -85px; margin-left: calc(50% - 225px); margin-right: auto; transform: rotate(-15deg); }
+/* Identical on the homepage section and the standalone gallery page; the
+   negative margin-top bleeds the rainbow upward over the section above, so
+   neither galeria container may clip it. */
+.section--galeria { overflow: visible; }
+.section--galeria .container { overflow: visible; }
 @media (max-width: 768px) {
   .section__rainbow { width: 300px; max-width: 82%; }
-  #galeria .section__rainbow { margin-top: -8.5rem; }
 }
 .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); margin-top: var(--s-4); }
 @media (max-width: 768px) { .gallery { grid-template-columns: repeat(2, 1fr); } }

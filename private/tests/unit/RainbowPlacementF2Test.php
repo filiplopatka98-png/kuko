@@ -26,12 +26,27 @@ final class RainbowPlacementF2Test extends TestCase
         $this->assertGreaterThan(260, (int) $m[1], 'rainbow must be bigger than the old 260px');
     }
 
-    public function testStraddleIsHomepageScoped(): void
+    public function testRainbowUnifiedAcrossPagesWithUpwardBleed(): void
     {
+        $css = $this->css();
+        // The rainbow must be identical on the homepage and the standalone
+        // gallery page: no page-specific (#galeria) .section__rainbow override.
+        $this->assertDoesNotMatchRegularExpression(
+            '/#galeria\s+\.section__rainbow\s*\{/',
+            $css,
+            'rainbow must not be page-scoped — same on homepage and /galeria'
+        );
+        // Shared rule bleeds upward over the section above (negative px margin-top).
         $this->assertMatchesRegularExpression(
-            '/#galeria\s+\.section__rainbow\s*\{[^}]*margin-top:\s*-[\d.]+rem/',
-            $this->css(),
-            '#galeria .section__rainbow must pull up with a negative margin-top'
+            '/\.section__rainbow\s*\{[^}]*margin-top:\s*-\d+px/',
+            $css,
+            'shared .section__rainbow must pull up with a negative px margin-top'
+        );
+        // Neither galeria container may clip the upward bleed.
+        $this->assertMatchesRegularExpression(
+            '/\.section--galeria\s*\{[^}]*overflow:\s*visible/',
+            $css,
+            '.section--galeria must allow the rainbow to overflow'
         );
     }
 }

@@ -17,6 +17,18 @@ if (navToggle && navMenu) {
   }));
 }
 
+// ===== Sticky nav: collapse the logo row once scrolled =====
+const navEl = $('.nav');
+const topbarEl = $('.topbar');
+if (navEl) {
+  const syncStuck = () => {
+    const threshold = (topbarEl?.offsetHeight ?? 0) + 4;
+    navEl.classList.toggle('is-stuck', window.scrollY > threshold);
+  };
+  syncStuck();
+  window.addEventListener('scroll', syncStuck, { passive: true });
+}
+
 // ===== Scroll reveal =====
 const revealEls = $$('[data-reveal]');
 if (revealEls.length && 'IntersectionObserver' in window) {
@@ -85,5 +97,9 @@ document.addEventListener('click', e => {
 });
 
 // ===== Lazy-load feature modules =====
-import('./gallery.js').catch(err => console.warn('gallery.js failed', err));
-import('./map.js').catch(err => console.warn('map.js failed', err));
+// Versioned URLs injected by the layout (Asset::url adds ?v=<mtime>) so a
+// changed gallery.js/map.js is not served stale from the CDN/browser cache —
+// a bare './gallery.js' specifier carries no cache-busting query.
+const A = window.__kukoAssets || {};
+import(A.gallery || './gallery.js').catch(err => console.warn('gallery.js failed', err));
+import(A.map || './map.js').catch(err => console.warn('map.js failed', err));
