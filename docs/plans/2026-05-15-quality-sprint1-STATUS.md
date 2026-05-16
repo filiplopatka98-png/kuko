@@ -239,3 +239,15 @@ Plán `docs/plans/2026-05-16-frontend-remarks.md`. 13 pripomienok cez subagent-d
 GitHub push `b35c1e9..cb15be6` (origin/main). Surgical lftp deploy: 17 zmenených súborov (9→`web/`, 8→`private/`; docs/testy NEdeployované) — `--only-newer` mirror by re-uploadol celý strom (git checkout resetuje mtimes), preto cielený `put` len reálne zmenených súborov z `git diff b35c1e9..cb15be6`. Prod seed cez token-gated `_setup.php?action=seed` — idempotentný: všetko existujúce `= skip`, pridané LEN 5 nových blokov (`oslavy.note`, `cta.faq.heading/text`, `cta.reservation.heading/text`); `_setup.php` self-destruct OK. **Invarianty overené:** public `/`=**503** (maintenance stále ON), `robots.txt`=`Disallow: /` (indexácia OFF), `/admin/login`=200, sitemap=200, `home.svg` 200 a byte-identický s repom, `main.min.css` 200 (19194 B). Prod `config.php` nedotknutý (maintenance:true, public_indexing:false). DB migrácia žiadna (len content blocks). SFTP heslo ani prod config nezostali na disku (shred).
 
 **Stav: celý 13-pripomienkový batch hotový, reviewnutý, nasadený. Žiadne otvorené závislosti.** Zostáva už len go-live #1 (owner kroky — SMTP, reCAPTCHA test, GDPR cron, Lighthouse, GBP, HSTS → flip maintenance OFF + indexing ON).
+
+---
+
+## ✅ Post-deploy fix batch (2026-05-16) — 4 vizuálne opravy NASADENÉ
+
+Po prvom deployi user nahlásil 4 veci; opravené subagent-driven (implementer→review), vizuálne overené na dev serveri (Claude Preview), JEDEN deploy. Commity `73038ba`,`9954287`,`d5a0432`,`a1b87c7` (push `8de79d7..a1b87c7`).
+- **#1 hlavička (regresia z R2):** `.nav__brand-row{margin-top:-42px}` ťahal nepriehľadný biely `.nav` cez topbar → topbar obsah zmizol. Fix: záporný offset presunutý na `.nav__brand` (z-index:210), topbar v normálnom flow viditeľný, prekrýva len priehľadné logo PNG. Overené desktop screenshotom (sedí s 1-hero.png). Známy kompromis: pri scrolle je vrchol loga tesný (sticky stav) — akceptované.
+- **#2 dúha:** zväčšená (width 400, bbox 433), tilt `rotate(-8deg)` zostáva (ľavý ~nadpis / pravý vyššie), `#galeria`-scoped `margin-top:-13rem` → presah cez rozhranie oslavy(`--bg-cream`)/galéria(`--bg-pink-soft`) namerané 155/165px ≈ 50/50; `margin-bottom:-8px` bližšie k nadpisu; samostatná /galeria sa NEťahá pod sticky header (shared rule bez záporného margin-top).
+- **#3 lightbox:** textové glyfy `‹/›/×` → vycentrované SVG v 48px kruhu; pridaný pás 6 miniatúr pod hlavnou fotkou s `is-active`/`aria-current`, klik=prepnutie, klávesnica zachovaná, otvára webp. Overené screenshotom otvoreného lightboxu.
+- **#4 kontakt:** `.contact-card__value a` → `--c-text` + 700 + bez podčiarknutia; počítané štýly identické s adresou/hodinami (rgb(98,83,76), 700, Nunito Sans).
+
+Deploy: len 3 súbory (`main.css`,`main.min.css`,`gallery.js`) → `web/`; testy/docs nedeployované; **žiadny DB seed** (len CSS/JS). Prod==repo byte-identicky (overené curl/diff). Invarianty držia: public `/`=503, robots `Disallow: /`, /admin/login=200, sitemap=200. Prod config nedotknutý. SFTP heslo `shred`-nuté. Suite 340 testov green. Žiadne otvorené závislosti.
