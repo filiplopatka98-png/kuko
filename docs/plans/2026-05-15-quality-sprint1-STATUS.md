@@ -215,3 +215,19 @@ Code prod==local==`021e545`, **310 PHPUnit testov green**, lint čistý, git syn
 - ⚠️ Admin UI za auth nebol klik-testovaný automaticky (bez creds) — pokryté 310 testami + štruktúrnym review; owner nech spraví rýchly manuálny klik-through pri go-live.
 
 **Verdikt: žiadne vývojárske blokátory. Pripravené na go-live #1 (owner kroky).**
+
+---
+
+## ✅ Frontend remarks batch (2026-05-16) — IMPLEMENTOVANÉ + LOKÁLNE OVERENÉ, NASADENIE POZASTAVENÉ (rozhodnutie usera)
+
+Plán `docs/plans/2026-05-16-frontend-remarks.md`. 13 pripomienok cez subagent-driven (implementer→spec+quality review per task). **6 commitov LEN LOKÁLNE na `main`** (`e24280e`…`fa23c09`) — user zvolil „Hold everything": NEpushovať, NEnasadzovať; nasadenie spraví neskôr.
+- **R1** (#13) CSS tokeny presne podľa design palety (main.css+admin.css+rezervacia.css); WCAG AA overené (#62534C na cream 7.01:1, #725F56 5.75:1).
+- **R2** (#1,#11) konzistentné topbar ikony 18px, veľké logo cez topbar (neg. margin), topbar bez border-bottom.
+- **R3** (#2,#3,#4,#5) badge bez cream borderu (shadow ostáva), emoji 👶/⏰ → `little-kid.svg`/`clock.svg` (Asset::url + raw v HEREDOC), editovateľný blok `oslavy.note` (seed===fallback, byte-identické), dot bullets v `.package__incl`.
+- **R4** (#6,#7) `.section__rainbow` `rotate(-5deg)` + margin `0 auto .25rem` (bližšie k nadpisu); lightbox otvára webp (`data-lightbox-webp`, ~70–140KB vs ~2MB) + preload prev/next na open aj navigate; a11y (focus/Esc/šípky) zachované.
+- **R5** (#9,#10) FAQ/galéria h1 centrovaný (scoped, homepage netknutá), „Späť na domov" → editovateľný rezervačný CTA `<aside>` (`cta.faq.*` / `cta.reservation.*`, seed===fallback), nav+footer `/#galeria`→`/galeria`. Admin: faq prefixes `['faq','cta']`, gallery `['cta']`.
+- **R6** (#8) otváracie hodiny ikona → `clock-1.svg` (žltý smajlík). **Adresa/domček ikona POZASTAVENÁ** — čaká sa na house SVG od usera (potom 1-riadkový follow-up swap).
+
+**Regresia (lokálne, všetko green):** PHPUnit **334 testov** · PHP lint čistý · stale-min guard green · dev smoke (`/`,`/faq`,`/galeria`,`/rezervacia`,`/ochrana-udajov` → 200, 1×`<h1>`, 0 PHP chýb) · `seed-cms.php` nacvičený na dev DB — 5 nových blokov (`oslavy.note`, `cta.faq.heading/text`, `cta.reservation.heading/text`) idempotentne insertne a renderuje sa.
+
+**ZOSTÁVA na nasadenie (keď user povie):** `git push` → `lftp` mirror public/+private/ → token-gated prod seed (5 nových blokov) → overiť invarianty (public 503, robots `Disallow: /`). + open dependency: house SVG (#8 adresa).
