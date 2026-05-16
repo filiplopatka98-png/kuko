@@ -1,15 +1,15 @@
 /* /rezervacia page — full-bleed multi-step booking */
 
 :root {
-  --bg-cream: #FFF8EE;
-  --bg-pink-soft: #FBEEF5;
-  --c-blue: #9ED7E3;
-  --c-peach: #F8B49D;
-  --c-yellow: #F7D87E;
-  --c-purple: #C9A8E1;
+  --bg-cream: #FEF9F3;
+  --bg-pink-soft: #FDF7FF;
+  --c-blue: #9DDBE8;
+  --c-peach: #FBC3AA;
+  --c-yellow: #F8E179;
+  --c-purple: #D0BBDA;
   --c-pink: #F5C3DE;
-  --c-text: #3D3D3D;
-  --c-text-soft: #6A6A6A;
+  --c-text: #62534C;
+  --c-text-soft: #725F56;
   --c-accent: #D88BBE;
   --c-white: #FFFFFF;
   --c-success: #2ecc71;
@@ -260,4 +260,4 @@ input, select, textarea { font: inherit; }
 
 /* Required-field marker + legend (a11y) */
 .req { color: #c0392b; margin-left: 0.15rem; }
-.form-legend { font-size: 0.85rem; color: var(--c-text-soft, #6A6A6A); margin: 0.25rem 0 0.75rem; }
+.form-legend { font-size: 0.85rem; color: var(--c-text-soft, #725F56); margin: 0.25rem 0 0.75rem; }
