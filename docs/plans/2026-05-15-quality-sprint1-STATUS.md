@@ -201,3 +201,17 @@ AD-1..AD-4b cez subagent-driven (každý implementer→review; AD-3b prísny sec
 - Owner doplní cez /admin: presný hero tagline, reálna 6. galéria fotka, výber homepage fotiek (checkbox max6), per-page obsah/SEO.
 
 **Zostáva už LEN go-live #1 (owner/manuál):** SMTP heslo, reCAPTCHA browser test, GDPR retention cron registrácia na WebSupporte, Lighthouse/axe, Google Business Profile, HSTS preload → potom flip maintenance OFF + public_indexing ON. Žiadny ďalší kód odo mňa nie je potrebný.
+
+---
+
+## ✅ Pre-launch QA (2026-05-16) — READY for go-live
+
+Code prod==local==`021e545`, **310 PHPUnit testov green**, lint čistý, git sync.
+- Verejné stránky (/, /rezervacia, /faq, /ochrana-udajov, /galeria): všetky **200**, presne **1 `<h1>`**, 1 `<main>`, skip-link, správny JSON-LD (/ LocalBusiness, /faq +FAQPage 6 otázok, /galeria, /ochrana-udajov, /rezervacia). Žiadne PHP errory/warningy počas crawlu.
+- FAQ repeater: 6 otázok renderuje + FAQPage schema auto z `Faq::items`.
+- Admin: všetkých 14 routov auth-gated (unauth → 302 login), /admin/login 200.
+- Safety invarianty držia: public 503 (maintenance), robots `Disallow: /` (noindex), sitemap 200.
+- 🔧 **QA našla a opravila reálny SEO bug:** `/rezervacia` + `/ochrana-udajov` mali generický duplicitný `<title>`/meta (chýbal `$pageType` → Seo::resolve padlo na `seo.default`). Opravené (pridaný `$pageType` + canonical), distinct tituly overené, regresný test `PageSeoTypeTest` (pokrýva všetky public stránky), nasadené.
+- ⚠️ Admin UI za auth nebol klik-testovaný automaticky (bez creds) — pokryté 310 testami + štruktúrnym review; owner nech spraví rýchly manuálny klik-through pri go-live.
+
+**Verdikt: žiadne vývojárske blokátory. Pripravené na go-live #1 (owner kroky).**
