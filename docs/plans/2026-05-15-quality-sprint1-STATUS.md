@@ -282,3 +282,16 @@ Push `fb915d5..f21c691`, lftp 10 súborov (7 web/ assets + Availability.php, exp
 **⚠️ OWNER krok (manuál na WebSupporte):** zaregistrovať nový cron, napr. denne:
 `/usr/bin/php /data/.../kuko-detskysvet.sk/private/cron/expire-pending.php`
 (rovnako ako existujúce retention.php / db-backup.php). Bez neho funguje len availability-filter safety-net (slot sa uvoľní v zobrazení, ale pending zostane v DB ako pending).
+
+---
+
+## ✅ Rezervácia: thank-you / custom validation / sr-only + README+CLAUDE — NASADENÉ (2026-05-16, commit 8169919)
+
+Push `17f0f79..8169919`, lftp 5 súborov (reservation.php → private/, rezervacia.{css,min.css,js,min.js} → web/). Bez DB seed/migrácie. README.md/CLAUDE.md = repo docs (nenasadené).
+- **T1 thank-you fix:** odstránené `location.hash`/`popstate` krokové smerovanie — popstate na `#hotovo` hash spadol do reset-na-krok-1 vetvy, takže success/poďakovacia stránka sa nikdy nezobrazila. Nav pokrývajú Späť tlačidlá + klikateľné indikátory. Dev-overené: submit → „Ďakujeme!" sa zobrazí a ostane (screenshot).
+- **T2 custom validácia:** nahradené natívne `reportValidity()` bubliny vlastnou inline validáciou (`.field__error`, `aria-invalid`, `.has-error`, `aria-describedby`, SK hlášky, focus prvého chybného, live-clear). Dev-overené.
+- **T5 sr-only:** `.sr-only` doplnené do `rezervacia.css` (stránka používa layout-minimal bez main.css) → `calendar-announcer` je vizuálne skrytý (ostáva v a11y strome). Dev-overené (1×1 clip).
+- README.md + CLAUDE.md vytvorené.
+- 4 statické assety prod==repo byte-identicky; invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **353 testov** zelená (+3 regresné T1/T2/T5).
+
+(Pozn.: stále platí owner krok zaregistrovať cron `expire-pending.php` — viď DEPLOY.md §11.)
