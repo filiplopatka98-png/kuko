@@ -140,7 +140,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* ===== Topbar + Nav (3-row header) ===== */
 /* Row 1: topbar — contacts left, social right */
-.topbar { background: var(--c-white); font-size: 0.85rem; }
+.topbar { background: var(--c-white); font-size: 0.85rem; position: relative; z-index: 1; }
 .topbar__inner { display: flex; align-items: center; justify-content: space-between; padding-block: 0.45rem; gap: var(--s-2); flex-wrap: wrap; }
 .topbar__contact { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
 .topbar__link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--c-text-soft); }
@@ -157,8 +157,11 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* Row 2: centered logo brand */
 .nav { background: var(--c-white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-.nav__brand-row { position: relative; display: flex; align-items: center; justify-content: center; padding-block: var(--s-2); margin-top: -42px; }
-.nav__brand { display: inline-flex; position: relative; z-index: 1; }
+.nav__brand-row { position: relative; display: flex; align-items: center; justify-content: center; padding-block: var(--s-2); }
+/* Lift ONLY the transparent logo so it overlaps the white topbar visually.
+   .nav itself stays in normal flow (no opaque block over the topbar);
+   the negative bottom margin keeps the pink band snug under the logo. */
+.nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -42px; margin-bottom: -42px; }
 .nav__brand img { width: auto; height: 160px; display: block; }
 
 /* Row 3: full-bleed pink nav band, centered horizontal menu */
@@ -171,7 +174,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--c-text); transition: transform 0.2s; }
 
 @media (max-width: 768px) {
-  .nav__brand-row { margin-top: -34px; }
+  .nav__brand { margin-top: -34px; margin-bottom: -34px; }
   .nav__brand img { height: 115px; }
   .nav__toggle { display: flex; }
   .nav__menu {
