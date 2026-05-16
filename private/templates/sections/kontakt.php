@@ -15,9 +15,7 @@ $igUrl = \Kuko\Social::url('instagram', '');
       <div class="kontakt__cards">
         <div class="contact-card contact-card--blue">
           <span class="contact-card__icon" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>
-            </svg>
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/home.svg')) ?>" alt="" aria-hidden="true" width="34" height="27">
           </span>
           <div>
             <p class="contact-card__title">Navštívte náš Detský svet KUKO:</p>

@@ -8,6 +8,7 @@ final class KontaktSectionTest extends TestCase
     protected function setUp(): void { $this->t = file_get_contents(\dirname(__DIR__, 3) . '/private/templates/sections/kontakt.php'); }
     public function testIconsFromAssetsAndSocial(): void
     {
+        $this->assertStringContainsString('/assets/icons/home.svg', $this->t);
         $this->assertStringContainsString('/assets/icons/clock-1.svg', $this->t);
         $this->assertStringContainsString('/assets/icons/facebook-app-symbol.svg', $this->t);
         $this->assertStringContainsString('/assets/icons/instagram.svg', $this->t);
