@@ -20,7 +20,6 @@ if (root) {
   const sumPkg       = document.getElementById('summary-package');
   const sumDate      = document.getElementById('summary-date');
   const sumTime      = document.getElementById('summary-time');
-  const successLink  = document.getElementById('success-link');
 
   const siteKey = document.querySelector('meta[name="recaptcha-site-key"]')?.content ?? '';
   let recaptchaPromise = null;
@@ -41,8 +40,8 @@ if (root) {
   // try/catch so a calendar failure can never break the success display.
   function buildCalendarLinks() {
     try {
-      const cal = document.getElementById('success-cal');
-      if (!cal) return;
+      const gcalLink = document.getElementById('cal-gcal');
+      if (!gcalLink) return;
       const isoDate = dateInput.value;            // YYYY-MM-DD
       const hm      = timeInput.value;            // HH:MM
       if (!isoDate || !hm) return;
@@ -55,41 +54,14 @@ if (root) {
       const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
       const startU = stamp(start);
       const endU   = stamp(end);
-      const nowU   = stamp(new Date());
-      const uid    = (Date.now().toString(36) + Math.random().toString(36).slice(2)) + '@kuko-detskysvet.sk';
 
-      const ics = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//KUKO//rezervacia//SK',
-        'BEGIN:VEVENT',
-        'UID:' + uid,
-        'DTSTAMP:' + nowU,
-        'DTSTART:' + startU,
-        'DTEND:' + endU,
-        'SUMMARY:Oslava v KUKO',
-        'LOCATION:KUKO detský svet\\, Bratislavská 141\\, 921 01 Piešťany',
-        'END:VEVENT',
-        'END:VCALENDAR',
-      ].join('\r\n');
-
-      const icsLink = document.getElementById('cal-ics');
-      if (icsLink) {
-        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-        icsLink.href = URL.createObjectURL(blob);
-      }
-
-      const gcalLink = document.getElementById('cal-gcal');
-      if (gcalLink) {
-        const loc = encodeURIComponent('KUKO detský svet, Bratislavská 141, 921 01 Piešťany');
-        gcalLink.href =
-          'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-          '&text=' + encodeURIComponent('Oslava v KUKO') +
-          '&dates=' + startU + '/' + endU +
-          '&location=' + loc;
-      }
-
-      cal.hidden = false;
+      const loc = encodeURIComponent('KUKO detský svet, Bratislavská 141, 921 01 Piešťany');
+      gcalLink.href =
+        'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+        '&text=' + encodeURIComponent('Oslava v KUKO') +
+        '&dates=' + startU + '/' + endU +
+        '&location=' + loc;
+      gcalLink.hidden = false;
     } catch (e) { /* nice-to-have only — never break the success screen */ }
   }
 
@@ -208,6 +180,8 @@ if (root) {
 
   function goStep(step) {
     steps.forEach(s => s.classList.toggle('is-active', s.dataset.step === String(step)));
+    // On the thank-you screen hide the wizard header (brand + step indicators).
+    root.classList.toggle('is-finished', String(step) === 'success');
     const reachable = furthestStep();
     stepIndicators.forEach(li => {
       const n = li.dataset.stepIndicator;

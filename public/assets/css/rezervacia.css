@@ -105,7 +105,25 @@ input, select, textarea { font: inherit; }
 }
 .step__inner { max-width: 720px; margin: 0 auto; }
 .step__inner--wide { max-width: 980px; }
-.step__inner--success { text-align: center; padding-top: 4rem; }
+.step__inner--success {
+  text-align: center; max-width: 620px; margin: 0 auto;
+  padding: 3.5rem 2rem; margin-top: 2.5rem;
+  background: var(--c-white); border-radius: var(--r-card); box-shadow: var(--shadow);
+}
+.success__icon {
+  display: inline-grid; place-items: center;
+  width: 132px; height: 132px; margin: 0 auto 1.25rem;
+  font-size: 4.5rem; line-height: 1;
+  background: var(--bg-pink-soft); border-radius: 50%;
+}
+.success__lead { color: var(--c-text); font-size: 1.05rem; line-height: 1.6; margin: 0.75rem 0 0; }
+.success__sub { color: var(--c-text-soft); margin: 0.6rem 0 0; }
+.success-actions {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;
+}
+.success-actions .btn { flex: 0 1 auto; }
+@media (max-width: 480px) { .success-actions .btn { flex: 1 1 100%; } }
+.rezervacia.is-finished .rezervacia__header { display: none; }
 .step__lead { color: var(--c-text-soft); margin-bottom: 2rem; }
 .step__heading { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
 .step__back {
@@ -115,7 +133,6 @@ input, select, textarea { font: inherit; }
 }
 .step__back:hover { background: #f3f4f6; }
 .step__back svg { width: 18px; height: 18px; display: block; }
-.step__emoji { font-size: 4rem; margin: 0; }
 .step__error {
   color: #c0392b; background: #fdecea; padding: 0.75rem 1rem;
   border-radius: 0.5rem; border: 1px solid #f5c6cb;
@@ -274,9 +291,6 @@ input, select, textarea { font: inherit; }
   margin-bottom: 1rem; text-align: center;
 }
 
-/* ===== Footer disclaimer in success ===== */
-#success-link { color: var(--c-text-soft); font-size: 0.9rem; margin: 1.5rem 0; }
-.success-cal { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
 
 /* ===== Cookie banner (compact, since we import the standard one) ===== */
 .cookie-banner {
