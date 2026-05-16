@@ -30,6 +30,6 @@ final class HeaderRebuildTest extends TestCase
     public function testPinkNavBandCss(): void
     {
         $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/main.css');
-        $this->assertStringContainsString('#FBEEF5', $css);
+        $this->assertStringContainsString('#FDF7FF', $css);
     }
 }

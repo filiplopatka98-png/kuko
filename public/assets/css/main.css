@@ -1,15 +1,15 @@
 /* KUKO detský svet — main stylesheet */
 
 :root {
-  --bg-cream: #FFF8EE;
-  --bg-pink-soft: #FBEEF5;
-  --c-blue: #9ED7E3;
-  --c-peach: #F8B49D;
-  --c-yellow: #F7D87E;
-  --c-purple: #C9A8E1;
+  --bg-cream: #FEF9F3;
+  --bg-pink-soft: #FDF7FF;
+  --c-blue: #9DDBE8;
+  --c-peach: #FBC3AA;
+  --c-yellow: #F8E179;
+  --c-purple: #D0BBDA;
   --c-pink: #F5C3DE;
-  --c-text: #3D3D3D;
-  --c-text-soft: #6A6A6A;
+  --c-text: #62534C;
+  --c-text-soft: #725F56;
   --c-accent: #D88BBE;
   --c-white: #FFFFFF;
 
