@@ -263,3 +263,22 @@ User dal presné CSS hodnoty + nahlásil že lightbox stále nesedí. 4 zmeny, v
 - **🔧 ROOT CAUSE lightboxu:** `main.min.js` robil `import("./gallery.js")` **bez `?v=`** → WebSupport edge cachuje holé asset URL → user dostával STARÝ gallery.js (staré šípky, žiadne miniatúry) hoci nový bol na serveri. Fix: `layout.php` vstrekuje `window.__kukoAssets={gallery:Asset::url('/assets/js/gallery.js'),map:…}` (Asset::url pridá `?v=<mtime>`), main.js importuje tie verzované URL. Overené na prode: main.min.js má `import(v.gallery||"./gallery.js")`, `gallery.js?v=` servíruje nový obsah (lightbox__thumb ×3).
 
 Deploy: 5 súborov (`main.css/.min`, `main.js/.min` → web/; `layout.php` → private/). Žiadny DB seed. Prod==repo byte-identicky (4 statické overené diffom). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. Prod config nedotknutý. SFTP heslo `shred`. Suite 344 zelená. Žiadne otvorené závislosti.
+
+---
+
+## ✅ Header-jank + Reservation-system overhaul — NASADENÉ (2026-05-16, commits 04ac700 + f21c691)
+
+Push `fb915d5..f21c691`, lftp 10 súborov (7 web/ assets + Availability.php, expire-pending.php, reservation.php). Žiadny DB seed/migrácia.
+- **04ac700 header-jank:** sticky-collapse riadený `IntersectionObserver(topbar)` namiesto scrollY prahu → koniec oscilácie/„skákania". Overené dev: docHeight konštantná pri scrolle, jeden čistý prechod, mobil zachováva hamburger. Prod main.min.js má IntersectionObserver.
+- **f21c691 rezervácia (decízie usera):**
+  - **#3 fix:** `Availability` — žiadny package neblokuje celý deň; každá rezervácia blokuje len svoj čas+buffer a ten čas je nedostupný pre hocijaký balíček (blocks_full_day logika odstránená; blocked_full_day ostáva len pre admin all-day blocked_period). Overené cez prod-identický dev API: mini@14:00 → deň ostáva bookovateľný (09:00–11:30, 16:30–18:00), month=available; cross-package overené.
+  - Pending staršie ako 1 mesiac neblokujú slot (availability filter `created_at >=` cutoff) + nový cron `private/cron/expire-pending.php` (pending→cancelled).
+  - Nový krok 4 „Zhrnutie" (kompletný prehľad pred odoslaním) → thank-you (success krok zachovaný).
+  - Indikátory krokov klikateľné: späť vždy, vpred len ak splnené podmienky (role=button, klávesnica, aria-disabled).
+  - Povinný GDPR checkbox (link /ochrana-udajov) gate-uje submit.
+  - Kalendár/„späť" šípky = vycentrované SVG (boli textové glyfy); zrušený auto-výber 14:00.
+- 7 statických assetov prod==repo byte-identicky (vrátane rezervacia.min.js s novou wizard logikou). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **350 testov** zelená.
+
+**⚠️ OWNER krok (manuál na WebSupporte):** zaregistrovať nový cron, napr. denne:
+`/usr/bin/php /data/.../kuko-detskysvet.sk/private/cron/expire-pending.php`
+(rovnako ako existujúce retention.php / db-backup.php). Bez neho funguje len availability-filter safety-net (slot sa uvoľní v zobrazení, ale pending zostane v DB ako pending).
