@@ -44,7 +44,7 @@ $igUrl = \Kuko\Social::url('instagram', '');
           </div>
         </div>
         <div class="contact-card contact-card--social">
-          <p class="contact-card__title">Sledujte nás na sociálnych sieťach:</p>
+          <p class="contact-card__title">Sledujte nás:</p>
           <div class="contact-card__socials">
             <?php if ($fbUrl !== ''): ?>
             <a href="<?= e($fbUrl) ?>" aria-label="Facebook" rel="noopener" target="_blank">

@@ -43,7 +43,7 @@ final class MobileHeaderTest extends TestCase
             'logo left-aligned on mobile'
         );
         $this->assertMatchesRegularExpression(
-            '/@media \(max-width: 768px\)[\s\S]*\.nav__brand img \{ height: 52px/',
+            '/@media \(max-width: 768px\)[\s\S]*\.nav__brand img \{ height: 57px/',
             $this->css,
             'smaller logo on mobile'
         );
