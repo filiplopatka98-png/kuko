@@ -51,6 +51,33 @@ $ig = \Kuko\Social::url('instagram', '');
       <a href="/#cennik">Cenník služieb</a>
       <a href="/galeria">Fotogaléria</a>
       <a href="/#kontakt">Kontakt</a>
+      <div class="nav__contact" aria-label="Kontakt a sociálne siete">
+        <a href="mailto:info@kuko-detskysvet.sk" class="nav__contact-link">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2 4l6 4.5L14 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>info@kuko-detskysvet.sk</span>
+        </a>
+        <a href="tel:+421915319934" class="nav__contact-link">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M5.1 2.2c.3-.3.8-.3 1 .1l1.2 2c.2.3.1.7-.1 1l-.9.9c-.1.1-.1.3-.1.4.3.9 1.4 2 2.3 2.3.2 0 .3 0 .4-.1l.9-.9c.2-.3.6-.3 1-.1l2 1.2c.4.2.4.7.1 1l-.9.9c-.5.5-1.2.7-1.9.5C7.4 10.6 5.4 8.6 3.7 4.9c-.2-.7 0-1.4.5-1.9z" fill="currentColor"/>
+          </svg>
+          <span>+421 915 319 934</span>
+        </a>
+        <div class="nav__socials">
+          <?php if ($fb !== ''): ?>
+          <a href="<?= e($fb) ?>" class="topbar__social-link" aria-label="Facebook" rel="noopener" target="_blank">
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/facebook-app-symbol.svg')) ?>" width="16" height="16" alt="Facebook">
+          </a>
+          <?php endif; ?>
+          <?php if ($ig !== ''): ?>
+          <a href="<?= e($ig) ?>" class="topbar__social-link" aria-label="Instagram" rel="noopener" target="_blank">
+            <img src="<?= e(\Kuko\Asset::url('/assets/icons/instagram.svg')) ?>" width="16" height="16" alt="Instagram">
+          </a>
+          <?php endif; ?>
+        </div>
+      </div>
     </nav>
   </div>
 </header>
