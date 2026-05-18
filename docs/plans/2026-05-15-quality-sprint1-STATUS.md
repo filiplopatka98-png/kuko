@@ -295,3 +295,13 @@ Push `17f0f79..8169919`, lftp 5 súborov (reservation.php → private/, rezervac
 - 4 statické assety prod==repo byte-identicky; invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **353 testov** zelená (+3 regresné T1/T2/T5).
 
 (Pozn.: stále platí owner krok zaregistrovať cron `expire-pending.php` — viď DEPLOY.md §11.)
+
+---
+
+## ✅ Thank-you redesign + mobile design pass — NASADENÉ (2026-05-18, commits 5e33ec8/f17ece9/617fc78)
+
+Push `c9d638b..617fc78`, lftp 9 súborov (nav.php/reservation.php/kontakt.php → private/, main+rezervacia .css/.min.css/.js/.min.js → web/). Bez DB seed/migrácie.
+- **5e33ec8** thank-you redizajn: nový text „Ďakujeme za rezerváciu!" + vrelý podtext, väčšia 🎉 ikona v pastelovom krúžku, panel; len 2 buttony vedľa seba (Google kalendár + Späť na domov), .ics odstránené (aj ICS v JS); header (brand+kroky) skrytý na success (`.rezervacia.is-finished`).
+- **f17ece9** mobil header: topbar (mail/tel/social) presunutý do hamburger panelu (`#primary-nav .nav__contact`), logo vľavo+menšie, ružový okrúhly hamburger → X; opravený 1px skip-link prúžok (top -44→-60px) a uppercase v kontakt linkoch.
+- **617fc78** mobil batch 2: otvorené menu `position:absolute` (prekrýva obsah, neposúva), social ikony okrúhle 38px, logo 52→57px; Cenník foto nalepené na box (gap 0), balíčky single-col gap `--s-10`, Fotogaléria 2 stĺpce na mobile, Kontakt „Sledujte nás:" 1 riadok + menšie ikony, footer menu tesnejšie medzery.
+- 6 statických assetov prod==repo byte-identicky; invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **363 testov** zelená (+MobileHeaderTest/MobileSectionsTest/AddToCalendarTest aktualizované/pridané). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11).
