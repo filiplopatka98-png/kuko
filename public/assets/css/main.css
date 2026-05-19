@@ -228,6 +228,9 @@ img, svg { max-width: 100%; height: auto; display: block; }
     display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     color: var(--c-text); font-size: 0.9rem;
     text-transform: none; letter-spacing: normal; font-weight: 600;
+    /* Drop the menu-item padding/border these <a>s inherit from
+       `.nav__menu a` — spacing comes from `.nav__contact` gap only. */
+    padding: 0; border-bottom: 0;
   }
   .nav__contact-link svg { color: var(--c-accent); flex: none; }
   /* Social: perfectly round, equal, centered (was distorted by flex). */
