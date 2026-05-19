@@ -23,6 +23,13 @@ $seo = \Kuko\Seo::resolve($pageType ?? null, $titleFinal, $descriptionFinal, $gl
 $titleFinal = $seo['title'];
 $descriptionFinal = $seo['description'];
 $robots = $seo['robots'];
+// Per-page OG image (admin → Stránky → SEO) wins; then a page-passed
+// $ogImage; then the site-wide default. Relative paths get the base URL.
+if (!empty($seo['image'])) {
+    $ogImageUrl = preg_match('~^https?://~', $seo['image'])
+        ? $seo['image']
+        : $baseUrl . '/' . ltrim($seo['image'], '/');
+}
 ?>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -6,6 +6,7 @@
 /** @var array<string,array<int,array<string,mixed>>> $groups */
 /** @var string $seoTitle */
 /** @var string $seoDesc */
+/** @var string $seoImage */
 /** @var string $user */
 /** @var array $flashes */
 /** @var list<array{q:string,a:string}>|null $faqItems */
@@ -27,7 +28,7 @@ ob_start();
   <button type="button" class="admin-tab" data-pagetab="seo">SEO</button>
 </nav>
 
-<form method="post" action="/admin/pages/<?= e($page) ?>/save" class="admin-form">
+<form method="post" action="/admin/pages/<?= e($page) ?>/save" class="admin-form" enctype="multipart/form-data">
   <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
 
   <section data-pagepanel="obsah">
@@ -133,7 +134,18 @@ HTML;
         <small class="admin-counter"><span data-seo-desc-count>0</span>/155 znakov</small>
       </label>
 
+      <?php $seoImage = $seoImage ?? ''; ?>
+      <div class="admin-field">
+        <span>Náhľadový obrázok (zdieľanie na FB / Google) <button type="button" class="admin-help" tabindex="0" data-help="Odporúčaný rozmer 1200×630 px, JPG/PNG/WebP do 5 MB. Ak nenahráte, použije sa predvolený obrázok webu.">?</button></span>
+        <?php if ($seoImage !== ''): ?>
+          <img class="admin-seo-thumb" src="<?= e($seoImage) ?>" alt="" width="240">
+          <label class="admin-field--check"><input type="checkbox" name="seo_image_clear" value="1"> <span>Odstrániť obrázok (použiť predvolený)</span></label>
+        <?php endif; ?>
+        <input type="file" name="seo_image" accept="image/jpeg,image/png,image/webp">
+      </div>
+
       <div class="admin-seo-preview" aria-hidden="true">
+        <?php if ($seoImage !== ''): ?><img class="admin-seo-preview__img" src="<?= e($seoImage) ?>" alt=""><?php endif; ?>
         <div class="admin-seo-preview__url"><?= e($baseUrl . $url) ?></div>
         <div class="admin-seo-preview__title" data-seo-prev-title></div>
         <div class="admin-seo-preview__desc" data-seo-prev-desc></div>

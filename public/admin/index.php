@@ -185,9 +185,7 @@ $router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, 
                 $statusLink = $appUrl . '/rezervacia/' . (string) $current['view_token'];
 
                 $template = $status === 'confirmed' ? 'reservation_confirmed' : 'reservation_cancelled';
-                $subject  = $status === 'confirmed'
-                    ? 'Rezervácia potvrdená — KUKO detský svet'
-                    : 'Rezervácia zrušená — KUKO detský svet';
+                $subject  = \Kuko\MailContent::subject($template, $current);
                 $html = $mailRenderer->render($template . '.html', ['r' => $current, 'statusLink' => $statusLink]);
                 $text = $mailRenderer->render($template . '.text', ['r' => $current, 'statusLink' => $statusLink]);
                 $mailer->send((string) $current['email'], $subject, $html, $text);
@@ -296,6 +294,7 @@ $router->get('/admin/pages/{page}', function (array $p) use ($renderer, $db, $se
         'faqItems'    => $faqItems,
         'seoTitle'    => (string) $settings->get('seo.' . $cfg['seo'] . '.title', ''),
         'seoDesc'     => (string) $settings->get('seo.' . $cfg['seo'] . '.description', ''),
+        'seoImage'    => (string) $settings->get('seo.' . $cfg['seo'] . '.image', ''),
         'user'        => $adminUser,
         'flashes'     => $flashes,
     ]);
@@ -333,6 +332,29 @@ $router->post('/admin/pages/{page}/save', function (array $p) use ($db, $setting
     }
     $settings->set('seo.' . $cfg['seo'] . '.title', trim((string) ($_POST['seo_title'] ?? '')));
     $settings->set('seo.' . $cfg['seo'] . '.description', trim((string) ($_POST['seo_description'] ?? '')));
+    // Per-page OG image: optional upload (jpg/png/webp ≤5MB) or clear.
+    $imgKey = 'seo.' . $cfg['seo'] . '.image';
+    if (!empty($_POST['seo_image_clear'])) {
+        $settings->set($imgKey, '');
+    }
+    $up = $_FILES['seo_image'] ?? null;
+    if (is_array($up) && ($up['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK && is_uploaded_file($up['tmp_name'])) {
+        $ext = strtolower(pathinfo((string) $up['name'], PATHINFO_EXTENSION));
+        $okExt = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp'];
+        $mime = function_exists('mime_content_type') ? (string) @mime_content_type($up['tmp_name']) : ($okExt[$ext] ?? '');
+        if (isset($okExt[$ext]) && in_array($mime, $okExt, true) && (int) $up['size'] <= 5 * 1024 * 1024) {
+            $dir = \Kuko\Asset::docRoot() . '/assets/img/seo';
+            if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
+            $fname = 'og-' . preg_replace('/[^a-z0-9]+/', '-', strtolower($cfg['seo'])) . '-' . time() . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
+            if (@move_uploaded_file($up['tmp_name'], $dir . '/' . $fname)) {
+                $settings->set($imgKey, '/assets/img/seo/' . $fname);
+            } else {
+                $flash('Nahranie SEO obrázka zlyhalo.', 'err');
+            }
+        } else {
+            $flash('SEO obrázok musí byť JPG/PNG/WebP do 5 MB.', 'err');
+        }
+    }
     $audit('page_save', 'content_blocks', 0, ['page' => $page]);
     $flash('Stránka „' . $cfg['label'] . '" uložená.');
     header('Location: /admin/pages/' . $page);
@@ -649,6 +671,37 @@ $router->post('/admin/maintenance', function () use ($settings, $audit, $flash) 
         ? 'ZAPNUTÝ — verejnosť vidí údržbovú stránku.'
         : 'vypnutý — web je verejne dostupný.'));
     header('Location: /admin/maintenance');
+});
+
+// ===== E-mail texts (subject + intro per mail type) =====
+$router->get('/admin/emails', function () use ($renderer, $settings, $adminUser, $flashes) {
+    \Kuko\MailContent::setSettings($settings);
+    $types = [];
+    foreach (\Kuko\MailContent::TYPES as $key => $label) {
+        $r = \Kuko\MailContent::resolve($key);
+        $types[$key] = [
+            'label'    => $label,
+            'subject'  => $r['subject'],
+            'intro'    => $r['intro'],
+            'defaults' => \Kuko\MailContent::defaults()[$key],
+        ];
+    }
+    echo $renderer->render('emails', [
+        'types'   => $types,
+        'sample'  => \Kuko\MailContent::tokens(\Kuko\MailContent::sampleRecord()),
+        'user'    => $adminUser,
+        'flashes' => $flashes,
+    ]);
+});
+$router->post('/admin/emails', function () use ($settings, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    foreach (array_keys(\Kuko\MailContent::TYPES) as $key) {
+        $settings->set("mail.$key.subject", trim((string) ($_POST["{$key}_subject"] ?? '')));
+        $settings->set("mail.$key.intro", trim((string) ($_POST["{$key}_intro"] ?? '')));
+    }
+    $audit('emails_save', 'settings', 0);
+    $flash('Texty e-mailov uložené.');
+    header('Location: /admin/emails');
 });
 
 // ===== Audit log (read-only) =====

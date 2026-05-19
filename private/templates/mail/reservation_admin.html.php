@@ -3,7 +3,7 @@
 <html lang="sk">
 <body style="font-family:system-ui,sans-serif;line-height:1.5;max-width:600px;margin:0 auto;padding:1rem;color:#3D3D3D">
 <h2 style="color:#D88BBE">Nová rezervácia oslavy</h2>
-<p>Prišla nová požiadavka na balíček <strong><?= e(strtoupper((string) $r['package'])) ?></strong>.</p>
+<?= \Kuko\MailContent::introHtml('reservation_admin', $r) ?>
 <table style="border-collapse:collapse;width:100%">
   <tr><td style="padding:4px 8px;vertical-align:top"><strong>Termín:</strong></td><td style="padding:4px 8px"><?= e($r['wished_date']) ?> o <?= e(substr((string) $r['wished_time'], 0, 5)) ?></td></tr>
   <tr><td style="padding:4px 8px;vertical-align:top"><strong>Počet detí:</strong></td><td style="padding:4px 8px"><?= (int) $r['kids_count'] ?></td></tr>

@@ -1,5 +1,7 @@
 <?php /** @var array $r */ ?>
-Nová rezervácia oslavy — balíček <?= strtoupper((string) $r['package']) ?>
+Nová rezervácia oslavy
+
+<?= \Kuko\MailContent::introText('reservation_admin', $r) ?>
 
 
 Termín: <?= $r['wished_date'] ?> o <?= substr((string) $r['wished_time'], 0, 5) ?>

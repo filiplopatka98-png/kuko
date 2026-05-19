@@ -170,7 +170,7 @@ try {
     $adminText = $renderer->render('reservation_admin.text', ['r' => $record]);
     $mailer->send(
         (string) $mailCfg['admin_to'],
-        '[KUKO] Nová rezervácia — ' . strtoupper((string) $record['package']),
+        \Kuko\MailContent::subject('reservation_admin', $record),
         $adminHtml,
         $adminText,
         (string) $record['email']
@@ -180,7 +180,7 @@ try {
     $custText = $renderer->render('reservation_customer.text', ['r' => $record, 'statusLink' => $statusLink]);
     $mailer->send(
         (string) $record['email'],
-        'Potvrdenie prijatia rezervácie — KUKO detský svet',
+        \Kuko\MailContent::subject('reservation_customer', $record),
         $custHtml,
         $custText
     );

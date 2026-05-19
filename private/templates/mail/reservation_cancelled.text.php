@@ -2,7 +2,7 @@
 Dobrý deň <?= $r['name'] ?>,
 
 
-Vaša rezervácia balíčka <?= strtoupper((string) $r['package']) ?> dňa <?= $r['wished_date'] ?> o <?= substr((string) $r['wished_time'], 0, 5) ?> bola ZRUŠENÁ.
+<?= \Kuko\MailContent::introText('reservation_cancelled', $r) ?>
 <?php if (!empty($r['cancelled_reason'])): ?>
 
 Dôvod: <?= $r['cancelled_reason'] ?>

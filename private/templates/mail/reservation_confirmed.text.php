@@ -2,9 +2,7 @@
 Dobrý deň <?= $r['name'] ?>,
 
 
-Vaša rezervácia balíčka <?= strtoupper((string) $r['package']) ?> dňa <?= $r['wished_date'] ?> o <?= substr((string) $r['wished_time'], 0, 5) ?> pre <?= (int) $r['kids_count'] ?> detí je POTVRDENÁ.
-
-Tešíme sa na Vás!
+<?= \Kuko\MailContent::introText('reservation_confirmed', $r) ?>
 
 Status rezervácie: <?= $statusLink ?>
 

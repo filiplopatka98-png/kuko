@@ -52,8 +52,9 @@ ob_start();
       $blocks = $blockedByDay[$iso] ?? [];
       $resvs  = $byDay[$iso] ?? [];
     ?>
-      <div class="admin-calendar__cell <?= $isCurrentMonth ? '' : 'admin-calendar__cell--off' ?> <?= $closedDay ? 'admin-calendar__cell--closed' : '' ?> <?= $iso === $today ? 'admin-calendar__cell--today' : '' ?>">
-        <div class="admin-calendar__date"><?= (int)$day->format('j') ?></div>
+      <div class="admin-calendar__cell <?= $isCurrentMonth ? '' : 'admin-calendar__cell--off' ?> <?= $closedDay ? 'admin-calendar__cell--closed' : '' ?> <?= $iso === $today ? 'admin-calendar__cell--today' : '' ?> <?= $resvs ? 'admin-calendar__cell--has' : '' ?>"
+           <?php if ($isCurrentMonth): ?>data-cal-day="<?= e($iso) ?>" role="button" tabindex="0" aria-label="<?= e($day->format('j. n.')) ?> — <?= count($resvs) ?> rezervácií"<?php endif; ?>>
+        <div class="admin-calendar__date"><?= (int)$day->format('j') ?><?php if ($resvs): ?> <span class="admin-calendar__count"><?= count($resvs) ?></span><?php endif; ?></div>
         <?php if ($closedDay): ?>
           <div class="admin-calendar__tag admin-calendar__tag--closed">zatvorené</div>
         <?php endif; ?>
@@ -86,6 +87,52 @@ ob_start();
   <span class="legend-item legend-item--cancelled">zrušené</span>
   <span class="legend-item legend-item--block">blokácia</span>
 </div>
+
+<section class="admin-day-panel" id="calDayPanel" hidden aria-live="polite">
+  <h3 class="admin-day-panel__title" id="calDayTitle"></h3>
+  <div id="calDayList"></div>
+</section>
+<script>
+(function () {
+  var byDay = <?= json_encode($byDay, JSON_UNESCAPED_UNICODE) ?>;
+  var cal = document.querySelector('.admin-calendar');
+  var panel = document.getElementById('calDayPanel');
+  var titleEl = document.getElementById('calDayTitle');
+  var listEl = document.getElementById('calDayList');
+  if (!cal || !panel) return;
+  var PKG = { mini: 'MINI', maxi: 'MAXI', closed: 'UZAVRETÁ' };
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function show(iso) {
+    var rows = byDay[iso] || [];
+    titleEl.textContent = 'Rezervácie — ' + iso + ' (' + rows.length + ')';
+    if (!rows.length) {
+      listEl.innerHTML = '<p class="admin-empty">Žiadne rezervácie v tento deň.</p>';
+    } else {
+      listEl.innerHTML = '<ul class="admin-day-list">' + rows.map(function (r) {
+        return '<li class="admin-day-list__item admin-day-list__item--' + esc(r.status) + '">' +
+          '<a href="/admin/reservation/' + encodeURIComponent(r.id) + '">' +
+          '<strong>' + esc((r.wished_time || '').slice(0, 5)) + '</strong> · ' +
+          esc(PKG[r.package] || r.package) + ' · ' + esc(r.name) +
+          ' <span class="admin-day-list__status">' + esc(r.status) + '</span></a></li>';
+      }).join('') + '</ul>';
+    }
+    panel.hidden = false;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function handle(e) {
+    var cell = e.target.closest('[data-cal-day]');
+    if (!cell) return;
+    if (e.target.closest('.admin-calendar__resv')) return; // let resv links navigate
+    show(cell.getAttribute('data-cal-day'));
+  }
+  cal.addEventListener('click', handle);
+  cal.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-cal-day]')) {
+      e.preventDefault(); handle(e);
+    }
+  });
+})();
+</script>
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/layout.php';

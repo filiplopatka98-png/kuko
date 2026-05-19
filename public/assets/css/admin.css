@@ -205,6 +205,17 @@ a { color: var(--c-accent); }
 .admin-iconbtn--danger { border-color: #e3b4ad; color: #c0392b; }
 .admin-iconbtn--danger:hover { background: #fdecea; border-color: #c0392b; }
 
+/* Google-result-style SEO preview (+ per-page OG image). */
+.admin-seo-preview { max-width: 600px; margin-top: 1rem; padding: 0.9rem 1rem;
+  border: 1px solid #e3d9e6; border-radius: 10px; background: #fff; font-family: arial, sans-serif; }
+.admin-seo-preview__img { display: block; width: 100%; max-width: 100%; aspect-ratio: 1200/630;
+  object-fit: cover; border-radius: 8px; margin-bottom: 0.6rem; }
+.admin-seo-preview__url { color: #202124; font-size: 0.82rem; }
+.admin-seo-preview__url::after { content: ''; }
+.admin-seo-preview__title { color: #1a0dab; font-size: 1.15rem; line-height: 1.3; margin: 0.15rem 0; }
+.admin-seo-preview__desc { color: #4d5156; font-size: 0.85rem; line-height: 1.45; }
+.admin-seo-thumb { display: block; border-radius: 8px; border: 1px solid #e3d9e6; margin: 0.35rem 0; }
+
 /* WYSIWYG ↔ raw HTML toggle. */
 .quill-wrap { display: flex; flex-direction: column; }
 .quill-html { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; }
@@ -248,3 +259,36 @@ a { color: var(--c-accent); }
 .legend-item--closed { background: #fceabf; }
 .legend-item--cancelled { background: #f5f5f7; text-decoration: line-through; }
 .legend-item--block  { background: #fff3cd; color: #856404; }
+
+/* Clickable calendar days → reservations list below. */
+.admin-calendar__cell[data-cal-day] { cursor: pointer; }
+.admin-calendar__cell[data-cal-day]:hover { background: #faf5fc; }
+.admin-calendar__cell[data-cal-day]:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; }
+.admin-calendar__count { display: inline-grid; place-items: center; min-width: 18px; height: 18px;
+  padding: 0 4px; border-radius: 9px; background: var(--c-accent); color: #fff; font-size: 0.7rem; font-weight: 700; }
+.admin-day-panel { margin-top: 1.25rem; background: var(--c-white); border: 1px solid #ecdff0;
+  border-radius: var(--r-card); padding: 1rem 1.25rem; box-shadow: var(--shadow-card); }
+.admin-day-panel[hidden] { display: none; }
+.admin-day-panel__title { margin: 0 0 0.75rem; font-size: 1rem; }
+.admin-day-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.admin-day-list__item a { display: block; padding: 0.5rem 0.75rem; border: 1px solid #eee;
+  border-radius: 8px; text-decoration: none; color: var(--c-text); }
+.admin-day-list__item a:hover { background: #faf5fc; border-color: var(--c-accent); }
+.admin-day-list__item--cancelled a { text-decoration: line-through; color: var(--c-text-soft); }
+.admin-day-list__status { float: right; font-size: 0.75rem; color: var(--c-text-soft); text-transform: uppercase; }
+
+/* E-mail texts (subject + intro editor + live preview) */
+.admin-mail-tokens { font-size: 0.85rem; }
+.admin-mail-tokens code { background: var(--bg-pink-soft); border: 1px solid #eee;
+  border-radius: 4px; padding: 0.05rem 0.35rem; font-size: 0.8rem; }
+.admin-mail .admin-field { margin-top: 0.75rem; }
+.admin-mail-preview { margin-top: 1rem; border: 1px solid #e6dfea; border-radius: 10px;
+  background: #fff; padding: 0.85rem 1rem; }
+.admin-mail-preview__label { display: block; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-text-soft);
+  margin-bottom: 0.45rem; }
+.admin-mail-preview__subject { font-weight: 700; color: var(--c-text);
+  padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #f0eaf3; }
+.admin-mail-preview__body { color: var(--c-text); line-height: 1.55; }
+.admin-mail-preview__body p { margin: 0 0 0.6rem; }
+.admin-mail-preview__body p:last-child { margin-bottom: 0; }

@@ -34,6 +34,8 @@ $isSettingsGroup = (
     || str_starts_with($path, '/admin/contact/')
     || $path === '/admin/maintenance'
     || str_starts_with($path, '/admin/maintenance/')
+    || $path === '/admin/emails'
+    || str_starts_with($path, '/admin/emails/')
     || $path === '/admin/log'
     || str_starts_with($path, '/admin/log/')
     || $path === '/admin/gdpr'
@@ -103,6 +105,7 @@ $aria = static function (bool $on): string {
   <nav class="admin-tabs" aria-label="Nastavenia">
     <a href="/admin/contact" class="admin-tab<?= $aria($active('/admin/contact')) ?>">Kontakt</a>
     <a href="/admin/maintenance" class="admin-tab<?= $aria($active('/admin/maintenance')) ?>">Maintenance</a>
+    <a href="/admin/emails" class="admin-tab<?= $aria($active('/admin/emails')) ?>">E-maily</a>
     <a href="/admin/log" class="admin-tab<?= $aria($active('/admin/log')) ?>">Logy</a>
     <a href="/admin/gdpr" class="admin-tab<?= $aria($active('/admin/gdpr')) ?>">GDPR</a>
   </nav>

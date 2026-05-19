@@ -44,17 +44,23 @@ final class Seo
 
     /**
      * Resolve SEO meta with DB override and hardcoded fallback.
-     * @return array{title:string,description:string,robots:string}
+     * @return array{title:string,description:string,robots:string,image:string}
      */
     public static function resolve(?string $pageType, string $titleFallback, string $descFallback, bool $globalIndexing, ?bool $pageIndexing): array
     {
         $pt = $pageType ?? 'default';
         $title = self::pick("seo.$pt.title", $titleFallback);
         $desc  = self::pick("seo.$pt.description", $descFallback);
+        $image = (string) (self::settingValue("seo.$pt.image") ?? '');
         $idxVal = self::settingValue('seo.public_indexing');
         $global = $idxVal !== null ? ($idxVal === '1') : $globalIndexing;
         $index = $pageIndexing ?? $global;
-        return ['title' => $title, 'description' => $desc, 'robots' => $index ? 'index, follow' : 'noindex, nofollow'];
+        return [
+            'title' => $title,
+            'description' => $desc,
+            'robots' => $index ? 'index, follow' : 'noindex, nofollow',
+            'image' => $image,
+        ];
     }
 
     private static function pick(string $key, string $fallback): string
