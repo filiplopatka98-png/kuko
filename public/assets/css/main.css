@@ -392,7 +392,8 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* Soft reservation CTA panel on the standalone FAQ / Fotogaléria pages. */
 .cta-panel {
-  background: var(--bg-pink-soft); border-radius: var(--r-card); padding: var(--s-4);
+  background: var(--c-white); border: 2px solid var(--c-purple);
+  box-shadow: var(--shadow-card); border-radius: var(--r-card); padding: var(--s-4);
   margin-top: var(--s-4); text-align: center; max-width: 680px; margin-inline: auto;
 }
 .cta-panel__title { margin: 0 0 var(--s-1); }
@@ -480,6 +481,8 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 /* ===== Footer ===== */
 .footer { background: var(--c-white); padding-top: var(--s-6); margin-top: var(--s-8); }
+/* Galéria + FAQ end in a full-bg section — no gap before the footer. */
+.page-gallery .footer, .page-faq .footer { margin-top: 0; }
 .footer__inner { display: grid; place-items: center; padding-bottom: var(--s-3); }
 .footer__logo img { width: auto; height: 180px; max-width: 100%; }
 .footer__nav-bg { background: var(--bg-pink-soft); padding-block: var(--s-2); }

@@ -4,7 +4,7 @@
 <head>
 <?php require __DIR__ . '/head.php'; ?>
 </head>
-<body>
+<body class="page-<?= e($pageType ?? 'home') ?>">
 <a class="skip-link" href="#main">Preskočiť na obsah</a>
 <?php require __DIR__ . '/nav.php'; ?>
 <main id="main" tabindex="-1"><?= $content ?></main>
