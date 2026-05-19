@@ -708,7 +708,6 @@ $router->get('/admin/emails', function () use ($renderer, $settings, $db, $admin
     }
     echo $renderer->render('emails', [
         'types'   => $types,
-        'sample'  => \Kuko\MailContent::tokens($sampleRec),
         'user'    => $adminUser,
         'flashes' => $flashes,
     ]);

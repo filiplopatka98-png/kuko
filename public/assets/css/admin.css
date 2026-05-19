@@ -285,21 +285,14 @@ a { color: var(--c-accent); }
 .admin-day-list__item--cancelled a { text-decoration: line-through; color: var(--c-text-soft); }
 .admin-day-list__status { float: right; font-size: 0.75rem; color: var(--c-text-soft); text-transform: uppercase; }
 
-/* E-mail texts (subject + intro editor + live preview) */
+/* E-mail texts (subject + intro editor + full e-mail preview) */
 .admin-mail-tokens { font-size: 0.85rem; }
 .admin-mail-tokens code { background: var(--bg-pink-soft); border: 1px solid #eee;
   border-radius: 4px; padding: 0.05rem 0.35rem; font-size: 0.8rem; }
 .admin-mail .admin-field { margin-top: 0.75rem; }
-.admin-mail-preview { margin-top: 1rem; border: 1px solid #e6dfea; border-radius: 10px;
-  background: #fff; padding: 0.85rem 1rem; }
 .admin-mail-preview__label { display: block; font-size: 0.7rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-text-soft);
   margin-bottom: 0.45rem; }
-.admin-mail-preview__subject { font-weight: 700; color: var(--c-text);
-  padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #f0eaf3; }
-.admin-mail-preview__body { color: var(--c-text); line-height: 1.55; }
-.admin-mail-preview__body p { margin: 0 0 0.6rem; }
-.admin-mail-preview__body p:last-child { margin-bottom: 0; }
 .admin-mail-full { margin-top: 1rem; }
 .admin-mail-frame { display: block; width: 100%; height: 540px; margin-top: 0.45rem;
   border: 1px solid #e6dfea; border-radius: 10px; background: #fff; }
