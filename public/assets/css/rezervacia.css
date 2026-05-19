@@ -291,6 +291,14 @@ input, select, textarea { font: inherit; }
   margin-bottom: 1rem; text-align: center;
 }
 
+/* Hide Google's floating reCAPTCHA badge. Google's terms require the
+   attribution text instead — rendered as .recaptcha-tos in the form. */
+.grecaptcha-badge { visibility: hidden; }
+.recaptcha-tos {
+  margin: 0.75rem 0 0; font-size: 0.78rem; color: var(--c-text-soft); text-align: center;
+}
+.recaptcha-tos a { color: var(--c-text-soft); text-decoration: underline; }
+
 
 /* ===== Cookie banner (compact, since we import the standard one) ===== */
 .cookie-banner {

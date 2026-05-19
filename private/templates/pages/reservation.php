@@ -180,6 +180,9 @@ ob_start();
           <button type="button" class="btn btn--ghost" data-go-step="3">Späť</button>
           <button type="submit" class="btn" id="submit-btn">Odoslať rezerváciu</button>
         </div>
+        <?php if ($siteKey): ?>
+        <p class="recaptcha-tos">Táto stránka je chránená službou reCAPTCHA — platia <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Pravidlá ochrany súkromia</a> a <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Zmluvné podmienky</a> spoločnosti Google.</p>
+        <?php endif; ?>
       </div>
     </section>
 
