@@ -35,8 +35,8 @@ ob_start();
     <p class="admin-lead">Táto stránka nemá editovateľný textový obsah — upravte len SEO.</p>
   <?php else: ?>
     <?php foreach ($groups as $gkey => $blocks): ?>
-      <fieldset class="admin-fieldset">
-        <legend><?= e(ucfirst((string) $gkey)) ?></legend>
+      <details class="admin-fieldset admin-acc" open>
+        <summary><?= e(ucfirst((string) $gkey)) ?></summary>
         <?php foreach ($blocks as $block): ?>
           <?php
             $bkey   = (string) $block['block_key'];
@@ -45,12 +45,17 @@ ob_start();
             $blabel = (string) $block['label'];
           ?>
           <div class="admin-field">
-            <span><?= e($blabel) ?> <small><?= e($bkey) ?></small></span>
+            <span><?= e($blabel) ?>
+              <button type="button" class="admin-help" tabindex="0" aria-label="Pomôcka" data-help="Kľúč obsahu: <?= e($bkey) ?>">?</button>
+            </span>
             <input type="hidden" name="blocks[<?= e($bkey) ?>][key]" value="<?= e($bkey) ?>">
             <?php if ($btype === 'html'): ?>
               <input type="hidden" name="blocks[<?= e($bkey) ?>][type]" value="html">
-              <div class="quill-editor" data-quill-for="<?= e($bkey) ?>"></div>
-              <textarea name="blocks[<?= e($bkey) ?>][value]" hidden><?= e($bval) ?></textarea>
+              <div class="quill-wrap" data-quill-wrap>
+                <div class="quill-editor" data-quill-for="<?= e($bkey) ?>"></div>
+                <textarea class="quill-html" name="blocks[<?= e($bkey) ?>][value]" rows="6" hidden><?= e($bval) ?></textarea>
+                <button type="button" class="admin-btn-link quill-toggle" data-quill-toggle aria-pressed="false">&lt;/&gt; Zobraziť HTML</button>
+              </div>
             <?php elseif (strlen($bval) > 60 || str_ends_with($bkey, '.lead')): ?>
               <input type="hidden" name="blocks[<?= e($bkey) ?>][type]" value="text">
               <textarea name="blocks[<?= e($bkey) ?>][value]" rows="3"><?= e($bval) ?></textarea>
@@ -60,14 +65,23 @@ ob_start();
             <?php endif; ?>
           </div>
         <?php endforeach; ?>
-      </fieldset>
+      </details>
     <?php endforeach; ?>
   <?php endif; ?>
 
   <?php if ($isFaq): ?>
-    <fieldset class="admin-fieldset" id="faq-repeater">
-      <legend>Otázky a odpovede</legend>
-      <p class="admin-lead">Každá položka má otázku (čistý text) a odpoveď (povolené je <code>&lt;strong&gt;</code> a odkazy <code>&lt;a href&gt;</code>). Poradie meníte šípkami ↑ / ↓.</p>
+    <?php
+      $faqActions = <<<'HTML'
+            <div class="faq-row__actions">
+              <button type="button" class="admin-iconbtn" data-faq-up aria-label="Posunúť otázku vyššie" data-help="Posunúť vyššie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 14 12 8 18 14"/></svg></button>
+              <button type="button" class="admin-iconbtn" data-faq-down aria-label="Posunúť otázku nižšie" data-help="Posunúť nižšie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 10 12 16 18 10"/></svg></button>
+              <button type="button" class="admin-iconbtn admin-iconbtn--danger" data-faq-remove aria-label="Odstrániť otázku" data-help="Odstrániť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V3h6v3"/></svg></button>
+            </div>
+HTML;
+    ?>
+    <details class="admin-fieldset admin-acc" id="faq-repeater" open>
+      <summary>Otázky a odpovede</summary>
+      <p class="admin-lead">Každá položka má otázku (čistý text) a odpoveď (povolené je <code>&lt;strong&gt;</code> a odkazy <code>&lt;a href&gt;</code>). Poradie meníte šípkami.</p>
       <div data-faq-list>
         <?php foreach ($faqItems as $i => $it): ?>
           <div class="admin-field faq-row" data-faq-row>
@@ -79,11 +93,7 @@ ob_start();
               <span>Odpoveď</span>
               <textarea name="faq_items[<?= (int) $i ?>][a]" rows="3" data-faq-a><?= e((string) $it['a']) ?></textarea>
             </label>
-            <div class="faq-row__actions">
-              <button type="button" class="admin-pill admin-pill--ghost" data-faq-up aria-label="Posunúť otázku vyššie">↑</button>
-              <button type="button" class="admin-pill admin-pill--ghost" data-faq-down aria-label="Posunúť otázku nižšie">↓</button>
-              <button type="button" class="admin-pill admin-pill--ghost" data-faq-remove aria-label="Odstrániť otázku">Odstrániť</button>
-            </div>
+<?= $faqActions ?>
           </div>
         <?php endforeach; ?>
       </div>
@@ -98,14 +108,10 @@ ob_start();
             <span>Odpoveď</span>
             <textarea name="faq_items[__IDX__][a]" rows="3" data-faq-a></textarea>
           </label>
-          <div class="faq-row__actions">
-            <button type="button" class="admin-pill admin-pill--ghost" data-faq-up aria-label="Posunúť otázku vyššie">↑</button>
-            <button type="button" class="admin-pill admin-pill--ghost" data-faq-down aria-label="Posunúť otázku nižšie">↓</button>
-            <button type="button" class="admin-pill admin-pill--ghost" data-faq-remove aria-label="Odstrániť otázku">Odstrániť</button>
-          </div>
+<?= $faqActions ?>
         </div>
       </template>
-    </fieldset>
+    </details>
   <?php endif; ?>
   </section>
 
@@ -161,14 +167,47 @@ ob_start();
     });
   });
 })();
-// Quill init — one editor per .quill-editor, synced to its sibling hidden textarea on submit
+// Quill init + Editor/HTML toggle. The <textarea.quill-html> is the actual
+// form field (name=blocks[..][value]); we keep it in sync with Quill and let
+// the user switch to raw-HTML editing.
 document.querySelectorAll('.quill-editor').forEach(function (el) {
-  var wrap = el.closest('.admin-field');
-  var hidden = wrap.querySelector('textarea[hidden]');
+  var wrap   = el.closest('[data-quill-wrap]');
+  var ta     = wrap.querySelector('textarea.quill-html');
+  var toggle = wrap.querySelector('[data-quill-toggle]');
   var q = new Quill(el, { theme: 'snow', modules: { toolbar: ['bold', 'italic', { list: 'ordered' }, { list: 'bullet' }, 'link'] } });
-  q.root.innerHTML = hidden.value;
-  el.closest('form').addEventListener('submit', function () { hidden.value = q.root.innerHTML; });
+  q.root.innerHTML = ta.value;
+  var htmlMode = false;
+  function syncFromEditor() { ta.value = q.root.innerHTML; }
+  // keep textarea current while editing visually
+  q.on('text-change', syncFromEditor);
+  syncFromEditor();
+  toggle.addEventListener('click', function () {
+    htmlMode = !htmlMode;
+    if (htmlMode) {
+      syncFromEditor();                 // editor → textarea
+      el.previousElementSibling && (el.previousElementSibling.hidden = true); // toolbar
+      el.hidden = true; ta.hidden = false;
+      toggle.textContent = 'Späť na editor';
+      toggle.setAttribute('aria-pressed', 'true');
+    } else {
+      q.root.innerHTML = ta.value;      // textarea → editor
+      el.previousElementSibling && (el.previousElementSibling.hidden = false);
+      el.hidden = false; ta.hidden = true;
+      toggle.textContent = '</> Zobraziť HTML';
+      toggle.setAttribute('aria-pressed', 'false');
+    }
+  });
+  el.closest('form').addEventListener('submit', function () {
+    // textarea is authoritative in HTML mode; otherwise pull from the editor.
+    if (!htmlMode) syncFromEditor();
+  });
 });
+// Tooltip helper bubbles ("?" / data-help)
+(function () {
+  document.querySelectorAll('[data-help]').forEach(function (el) {
+    if (!el.getAttribute('title')) el.setAttribute('title', el.getAttribute('data-help'));
+  });
+})();
 // FAQ repeater — add / remove / move ↑ ↓. The server (Faq::save) iterates
 // $_POST['faq_items'] values in received (= DOM) order and re-indexes, so
 // JS only needs to physically reorder/append the row nodes; indices just

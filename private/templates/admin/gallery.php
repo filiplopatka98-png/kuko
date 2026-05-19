@@ -53,35 +53,38 @@ ob_start();
         <?php if ($webp): ?><source srcset="/assets/img/gallery/<?= e((string) $webp) ?>" type="image/webp"><?php endif; ?>
         <img src="/assets/img/gallery/<?= e($fname) ?>" width="200" loading="lazy" alt="<?= e($alt) ?>">
       </picture>
-      <form method="post" action="/admin/gallery/<?= $pid ?>/alt" class="gal-alt">
-        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-        <input type="text" name="alt" value="<?= e($alt) ?>" maxlength="255" placeholder="ALT text">
-        <button type="submit" class="admin-btn-link">Uložiť ALT</button>
-      </form>
-      <form method="post" action="/admin/gallery/<?= $pid ?>/homepage" class="gal-hp">
-        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-        <input type="hidden" name="on" value="<?= $onHome ? '0' : '1' ?>">
-        <label class="gal-hp__label">
-          <input type="checkbox" class="gal-hp__box" <?= $onHome ? 'checked' : '' ?>
-                 onchange="this.form.submit()">
-          <span>Na homepage</span>
-        </label>
-      </form>
-      <div class="gal-card__actions">
-        <form method="post" action="/admin/gallery/<?= $pid ?>/visibility" style="display:inline">
+      <div class="gal-card__body">
+        <form method="post" action="/admin/gallery/<?= $pid ?>/alt" class="gal-alt">
           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-          <?php if ($visible): ?>
-            <input type="hidden" name="visible" value="0">
-            <button type="submit" class="admin-btn-link">Skryť</button>
-          <?php else: ?>
-            <input type="hidden" name="visible" value="1">
-            <button type="submit" class="admin-btn-link">Zobraziť</button>
-          <?php endif; ?>
+          <input type="text" name="alt" value="<?= e($alt) ?>" maxlength="255" placeholder="ALT text (popis fotky)" aria-label="ALT text">
+          <button type="submit" class="gal-btn gal-btn--save">Uložiť</button>
         </form>
-        <form method="post" action="/admin/gallery/<?= $pid ?>/delete" style="display:inline" onsubmit="return confirm('Naozaj zmazať fotku?');">
-          <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-          <button type="submit" class="admin-btn-link">Zmazať</button>
-        </form>
+        <div class="gal-card__foot">
+          <form method="post" action="/admin/gallery/<?= $pid ?>/homepage" class="gal-hp">
+            <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+            <input type="hidden" name="on" value="<?= $onHome ? '0' : '1' ?>">
+            <label class="gal-hp__label">
+              <input type="checkbox" class="gal-hp__box" <?= $onHome ? 'checked' : '' ?> onchange="this.form.submit()">
+              <span>Na homepage</span>
+            </label>
+          </form>
+          <div class="gal-card__actions">
+            <form method="post" action="/admin/gallery/<?= $pid ?>/visibility">
+              <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+              <?php if ($visible): ?>
+                <input type="hidden" name="visible" value="0">
+                <button type="submit" class="gal-btn">Skryť</button>
+              <?php else: ?>
+                <input type="hidden" name="visible" value="1">
+                <button type="submit" class="gal-btn">Zobraziť</button>
+              <?php endif; ?>
+            </form>
+            <form method="post" action="/admin/gallery/<?= $pid ?>/delete" onsubmit="return confirm('Naozaj zmazať fotku?');">
+              <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+              <button type="submit" class="gal-btn gal-btn--danger" aria-label="Zmazať fotku">Zmazať</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   <?php endforeach; ?>
@@ -90,20 +93,30 @@ ob_start();
 
 <style>
 .gal-hint { font-style: italic; }
-.gal-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
-.gal-card { width: 220px; border: 1px solid #ddd; border-radius: 8px; padding: .6rem; background: #fff; cursor: grab; }
+.gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.gal-card { border: 1px solid #e3d9e6; border-radius: 10px; padding: .6rem; background: #fff; cursor: grab; display: flex; flex-direction: column; }
 .gal-card.gal-card--dragging { opacity: .4; }
-.gal-card--hidden { opacity: .45; background: #f3f3f3; }
-.gal-card__handle { font-size: .85rem; color: #888; user-select: none; margin-bottom: .3rem; }
-.gal-card img { display: block; width: 200px; height: auto; border-radius: 4px; }
-.gal-alt { display: flex; gap: .3rem; align-items: center; margin: .5rem 0; }
+.gal-card--hidden { opacity: .5; background: #f6f4f7; }
+.gal-card__handle { font-size: .8rem; color: #999; user-select: none; margin-bottom: .4rem; }
+.gal-card img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.gal-card__body { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; }
+.gal-alt { display: flex; gap: .35rem; align-items: center; }
 .gal-alt input { flex: 1; min-width: 0; }
-.gal-card__actions { display: flex; gap: .8rem; }
-.gal-hp { margin: .4rem 0; }
-.gal-hp__label { display: flex; align-items: center; gap: .35rem; font-size: .9rem; cursor: pointer; }
+.gal-card__foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding-top: .5rem; border-top: 1px solid #efe7f1; flex-wrap: wrap; }
+.gal-card__actions { display: flex; gap: .4rem; }
+.gal-card__actions form { display: inline; margin: 0; }
+.gal-hp { margin: 0; }
+.gal-hp__label { display: flex; align-items: center; gap: .35rem; font-size: .85rem; cursor: pointer; white-space: nowrap; }
 .gal-hp__box:disabled + span { color: #aaa; }
 .gal-hp-counter { margin-top: .4rem; }
 .gal-hp-note { font-size: .8rem; color: #888; font-style: italic; }
+/* compact, consistent gallery buttons (no more scattered red links) */
+.gal-btn { padding: .3rem .7rem; font-size: .8rem; font-weight: 600; border: 1px solid #d9c7df;
+  background: #fff; color: var(--c-text); border-radius: 6px; cursor: pointer; line-height: 1.4; }
+.gal-btn:hover { background: #faf5fc; border-color: var(--c-accent); }
+.gal-btn--save { border-color: var(--c-accent); color: var(--c-accent); }
+.gal-btn--danger { border-color: #e3b4ad; color: #c0392b; }
+.gal-btn--danger:hover { background: #fdecea; border-color: #c0392b; }
 </style>
 <script>
 (function () {

@@ -175,6 +175,42 @@ a { color: var(--c-accent); }
 .admin-btn-link { background: none; border: 0; color: #c0392b; cursor: pointer; font: inherit; text-decoration: underline; padding: 0; }
 .admin-btn-link:hover { color: #8a1e0f; }
 
+/* Blokácie inline form — inputs at 50% (was auto-fit ~25%). */
+.admin-form--inline .admin-form__row { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 640px) { .admin-form--inline .admin-form__row { grid-template-columns: 1fr; } }
+
+/* Content groups as accordions (replaces plain fieldsets). */
+.admin-acc { background: var(--c-white); border: 1px solid #ecdff0; border-radius: var(--r-card);
+  padding: 0 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow-card); }
+.admin-acc > summary { cursor: pointer; font-weight: 700; color: var(--c-accent);
+  padding: 0.9rem 0; list-style: none; }
+.admin-acc > summary::-webkit-details-marker { display: none; }
+.admin-acc > summary::before { content: '▸'; display: inline-block; margin-right: 0.5rem; transition: transform 0.15s; }
+.admin-acc[open] > summary::before { transform: rotate(90deg); }
+.admin-acc[open] > summary { border-bottom: 1px solid #f0e7f2; margin-bottom: 1rem; }
+.admin-acc > :last-child { margin-bottom: 1.25rem; }
+
+/* Inline help bubble (replaces the small grey key text). */
+.admin-help { display: inline-grid; place-items: center; width: 18px; height: 18px;
+  border-radius: 50%; border: 0; background: #ecdff0; color: var(--c-accent);
+  font-size: 0.72rem; font-weight: 700; cursor: help; padding: 0; vertical-align: middle; }
+.admin-help:hover, .admin-help:focus-visible { background: var(--c-accent); color: #fff; outline: none; }
+
+/* Icon buttons for the FAQ repeater (was text pills ↑ ↓ Odstrániť). */
+.faq-row__actions { display: flex; gap: 0.4rem; align-items: center; }
+.admin-iconbtn { display: inline-grid; place-items: center; width: 34px; height: 34px;
+  border: 1px solid #d9c7df; background: #fff; color: var(--c-text); border-radius: 8px; cursor: pointer; padding: 0; }
+.admin-iconbtn svg { width: 16px; height: 16px; display: block; }
+.admin-iconbtn:hover { background: #faf5fc; border-color: var(--c-accent); }
+.admin-iconbtn--danger { border-color: #e3b4ad; color: #c0392b; }
+.admin-iconbtn--danger:hover { background: #fdecea; border-color: #c0392b; }
+
+/* WYSIWYG ↔ raw HTML toggle. */
+.quill-wrap { display: flex; flex-direction: column; }
+.quill-html { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; }
+.quill-toggle { align-self: flex-start; margin-top: 0.4rem; color: var(--c-accent); text-decoration: none; font-size: 0.8rem; }
+.quill-toggle:hover { text-decoration: underline; }
+
 .admin-package-form { padding: 1rem 1.5rem; }
 .admin-actions-grid { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin-top: 1rem; }
 .admin-actions-grid > form { background: var(--c-white); border-radius: var(--r-card); padding: 1rem; box-shadow: var(--shadow-card); }
