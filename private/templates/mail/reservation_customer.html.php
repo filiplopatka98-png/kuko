@@ -5,8 +5,8 @@
 <h2 style="color:#D88BBE">Ďakujeme za vašu rezerváciu! 🎉</h2>
 <p>Dobrý deň <?= e($r['name']) ?>,</p>
 <?= \Kuko\MailContent::introHtml('reservation_customer', $r) ?>
-<p>Status rezervácie môžete sledovať tu: <a href="<?= e($statusLink) ?>"><?= e($statusLink) ?></a></p>
-<hr style="border:0;border-top:1px solid #eee;margin:1.5rem 0">
-<p style="font-size:0.9rem;color:#777"><strong>Zmena alebo zrušenie termínu:</strong> volajte prosím <a href="tel:+421915319934">+421 915 319 934</a> alebo napíšte na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Cez web rezerváciu meniť nedá.</p>
-<p>Tešíme sa na vás!<br><strong>Tím KUKO detský svet</strong></p>
+<?php include __DIR__ . '/_details.html.php'; ?>
+<p>Status rezervácie môžete sledovať tu: <a href="<?= e($statusLink) ?>" style="color:#D88BBE"><?= e($statusLink) ?></a></p>
+<p style="font-size:0.9rem;color:#777">Zmena alebo zrušenie termínu je možné len telefonicky alebo e-mailom (kontakt nižšie), nie cez web.</p>
+<?php include __DIR__ . '/_footer.html.php'; ?>
 </body></html>

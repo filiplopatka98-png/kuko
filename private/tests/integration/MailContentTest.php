@@ -105,4 +105,25 @@ final class MailContentTest extends TestCase
             $this->assertStringContainsString("MailContent::introText('reservation_$k'", $t);
         }
     }
+
+    public function testEveryMailHasFullDataAndBrandedFooter(): void
+    {
+        \Kuko\Content::setDb(null);
+        \Kuko\Social::setSettings(null);
+        $r = \Kuko\MailContent::sampleRecord();
+        $ren = new \Kuko\Renderer(\dirname(__DIR__, 2) . '/templates/mail');
+        foreach (['admin', 'customer', 'confirmed', 'cancelled'] as $k) {
+            $h = $ren->render("reservation_$k.html", ['r' => $r, 'statusLink' => 'https://kuko-detskysvet.sk/x']);
+            $t = $ren->render("reservation_$k.text", ['r' => $r, 'statusLink' => 'https://kuko-detskysvet.sk/x']);
+            foreach ([$h, $t] as $body) {
+                $this->assertStringContainsString($r['name'], $body, "$k: name");
+                $this->assertStringContainsString($r['phone'], $body, "$k: phone");
+                $this->assertStringContainsString($r['email'], $body, "$k: email");
+                $this->assertStringContainsString((string) $r['kids_count'], $body, "$k: kids");
+                $this->assertStringContainsString('Bratislavská 141, 921 01 Piešťany', $body, "$k: footer address");
+                $this->assertStringContainsString('KUKO detský svet', $body, "$k: footer name");
+            }
+            $this->assertStringContainsString('/assets/img/logo.png', $h, "$k: footer logo");
+        }
+    }
 }

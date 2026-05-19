@@ -4,10 +4,10 @@ Dobrý deň <?= $r['name'] ?>,
 
 <?= \Kuko\MailContent::introText('reservation_confirmed', $r) ?>
 
+<?php include __DIR__ . '/_details.text.php'; ?>
+
 Status rezervácie: <?= $statusLink ?>
 
 
-Zmena alebo zrušenie termínu cez telefón: +421 915 319 934 alebo info@kuko-detskysvet.sk.
-
-KUKO detský svet
-Bratislavská 141, 921 01 Piešťany
+Zmena alebo zrušenie termínu je možné len telefonicky alebo e-mailom (kontakt nižšie), nie cez web.
+<?php include __DIR__ . '/_footer.text.php'; ?>

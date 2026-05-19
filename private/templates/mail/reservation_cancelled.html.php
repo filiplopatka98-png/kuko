@@ -5,9 +5,7 @@
 <h2 style="color:#D88BBE">Rezervácia bola zrušená</h2>
 <p>Dobrý deň <?= e($r['name']) ?>,</p>
 <?= \Kuko\MailContent::introHtml('reservation_cancelled', $r) ?>
-<?php if (!empty($r['cancelled_reason'])): ?>
-<p>Dôvod: <em><?= e($r['cancelled_reason']) ?></em></p>
-<?php endif; ?>
-<p>Ak chcete dohodnúť iný termín, zavolajte na <a href="tel:+421915319934">+421 915 319 934</a> alebo nám napíšte na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Radi Vám pomôžeme.</p>
-<p>Ďakujeme za pochopenie.<br><strong>Tím KUKO detský svet</strong></p>
+<?php include __DIR__ . '/_details.html.php'; ?>
+<p>Ak chcete dohodnúť iný termín, ozvite sa nám — radi vám pomôžeme. Kontakt nájdete nižšie.</p>
+<?php include __DIR__ . '/_footer.html.php'; ?>
 </body></html>

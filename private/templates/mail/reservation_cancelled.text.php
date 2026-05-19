@@ -3,12 +3,8 @@ Dobrý deň <?= $r['name'] ?>,
 
 
 <?= \Kuko\MailContent::introText('reservation_cancelled', $r) ?>
-<?php if (!empty($r['cancelled_reason'])): ?>
 
-Dôvod: <?= $r['cancelled_reason'] ?>
-<?php endif; ?>
+<?php include __DIR__ . '/_details.text.php'; ?>
 
-Ak chcete dohodnúť iný termín, zavolajte na +421 915 319 934 alebo napíšte na info@kuko-detskysvet.sk.
-
-Ďakujeme za pochopenie,
-Tím KUKO detský svet
+Ak chcete dohodnúť iný termín, ozvite sa nám — radi vám pomôžeme. Kontakt nájdete nižšie.
+<?php include __DIR__ . '/_footer.text.php'; ?>
