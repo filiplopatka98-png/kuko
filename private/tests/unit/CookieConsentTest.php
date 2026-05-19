@@ -52,6 +52,14 @@ final class CookieConsentTest extends TestCase
         }
         // a disabled, pre-checked "necessary" toggle
         $this->assertMatchesRegularExpression('/<input type="checkbox" checked disabled>/', $banner);
+        // Settings live in a SEPARATE modal dialog, not crammed in the banner.
+        $this->assertStringContainsString('id="cookie-modal"', $banner);
+        $this->assertStringContainsString('aria-modal="true"', $banner);
+        $this->assertStringContainsString('data-cookie-action="close"', $banner);
+        $this->assertStringNotContainsString('id="cookie-settings"', $banner, 'old inline panel removed');
+        $this->assertStringContainsString('function openModal', $js);
+        $this->assertStringContainsString('function closeModal', $js);
+        $this->assertStringContainsString("'Escape'", $js);
         // build pipeline minifies it
         $build = file_get_contents($this->root . '/private/scripts/build-assets.php');
         $this->assertStringContainsString('/assets/js/cookie-consent.js', $build);
