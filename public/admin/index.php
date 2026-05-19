@@ -674,21 +674,41 @@ $router->post('/admin/maintenance', function () use ($settings, $audit, $flash) 
 });
 
 // ===== E-mail texts (subject + intro per mail type) =====
-$router->get('/admin/emails', function () use ($renderer, $settings, $adminUser, $flashes) {
+$router->get('/admin/emails', function () use ($renderer, $settings, $db, $adminUser, $flashes) {
     \Kuko\MailContent::setSettings($settings);
+    \Kuko\Content::setDb($db);
+    \Kuko\Social::setSettings($settings);
+    $mailRenderer = new \Kuko\Renderer(APP_ROOT . '/private/templates/mail');
+    $sampleRec = \Kuko\MailContent::sampleRecord();
+    $appUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+    $sampleLink = $appUrl . '/rezervacia/' . (string) $sampleRec['view_token'];
     $types = [];
     foreach (\Kuko\MailContent::TYPES as $key => $label) {
         $r = \Kuko\MailContent::resolve($key);
+        $rec = $sampleRec;
+        // The cancellation-reason row only belongs in the cancelled mail.
+        if ($key !== 'reservation_cancelled') unset($rec['cancelled_reason']);
+        try {
+            $fullHtml = $mailRenderer->render("$key.html", ['r' => $rec, 'statusLink' => $sampleLink]);
+            // Preview-only: make the logo root-relative so it loads in the
+            // admin host. Real e-mails keep the absolute URL (rendered fresh
+            // elsewhere) — mail clients need absolute image sources.
+            $fullHtml = str_replace($appUrl . '/assets/img/logo.png', '/assets/img/logo.png', $fullHtml);
+        } catch (\Throwable $e) {
+            error_log('[admin/emails] preview render failed: ' . $e->getMessage());
+            $fullHtml = '<p>Náhľad sa nepodarilo vykresliť.</p>';
+        }
         $types[$key] = [
             'label'    => $label,
             'subject'  => $r['subject'],
             'intro'    => $r['intro'],
             'defaults' => \Kuko\MailContent::defaults()[$key],
+            'fullHtml' => $fullHtml,
         ];
     }
     echo $renderer->render('emails', [
         'types'   => $types,
-        'sample'  => \Kuko\MailContent::tokens(\Kuko\MailContent::sampleRecord()),
+        'sample'  => \Kuko\MailContent::tokens($sampleRec),
         'user'    => $adminUser,
         'flashes' => $flashes,
     ]);

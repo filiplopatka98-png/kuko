@@ -33,9 +33,15 @@ ob_start();
     </label>
 
     <div class="admin-mail-preview" aria-live="polite">
-      <span class="admin-mail-preview__label">Ukážka</span>
+      <span class="admin-mail-preview__label">Živý náhľad textu (pred uložením)</span>
       <div class="admin-mail-preview__subject" data-mail-pv-subject></div>
       <div class="admin-mail-preview__body" data-mail-pv-body></div>
+    </div>
+
+    <div class="admin-mail-full">
+      <span class="admin-mail-preview__label">Celý e-mail s ukážkovými dátami (uložený stav — aktualizuje sa po Uložiť)</span>
+      <iframe class="admin-mail-frame" title="Náhľad e-mailu" sandbox
+              srcdoc="<?= e($t['fullHtml']) ?>"></iframe>
     </div>
   </details>
   <?php endforeach; ?>

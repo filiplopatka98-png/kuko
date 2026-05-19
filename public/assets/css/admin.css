@@ -300,3 +300,6 @@ a { color: var(--c-accent); }
 .admin-mail-preview__body { color: var(--c-text); line-height: 1.55; }
 .admin-mail-preview__body p { margin: 0 0 0.6rem; }
 .admin-mail-preview__body p:last-child { margin-bottom: 0; }
+.admin-mail-full { margin-top: 1rem; }
+.admin-mail-frame { display: block; width: 100%; height: 540px; margin-top: 0.45rem;
+  border: 1px solid #e6dfea; border-radius: 10px; background: #fff; }
