@@ -214,8 +214,6 @@ a { color: var(--c-accent); }
 .admin-seo-preview__img { display: block; width: 100%; max-width: 100%; aspect-ratio: 1200/630;
   object-fit: cover; border-radius: 8px; background: #f1eef3; }
 .admin-seo-preview__img.is-fallback { opacity: 0.65; }
-.admin-seo-preview__imgnote { font-size: 0.72rem; color: var(--c-text-soft);
-  margin: 0.4rem 0 0; }
 @media (max-width: 560px) {
   .admin-seo-preview { flex-direction: column; }
   .admin-seo-preview__media { flex-basis: auto; max-width: 100%; }

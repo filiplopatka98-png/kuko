@@ -124,14 +124,14 @@ HTML;
         <span>Titulok</span>
         <input type="text" name="seo_title" maxlength="65" value="<?= e($seoTitle) ?>"
                data-seo-title oninput="kukoSeo(this)">
-        <small class="admin-counter"><span data-seo-title-count>0</span>/60 znakov</small>
+        <small class="admin-counter"><span data-seo-title-count>0</span>/60 znakov <button type="button" class="admin-help" tabindex="0" data-help="Toto je text modrého nadpisu vo výsledkoch Google. Nad ~60 znakov ho Google oreže (…), preto sa odporúča zmestiť sa do 60.">?</button></small>
       </label>
 
       <label class="admin-field">
         <span>Popis (meta description)</span>
         <textarea name="seo_description" maxlength="170" rows="2"
                   data-seo-desc oninput="kukoSeo(this)"><?= e($seoDesc) ?></textarea>
-        <small class="admin-counter"><span data-seo-desc-count>0</span>/155 znakov</small>
+        <small class="admin-counter"><span data-seo-desc-count>0</span>/155 znakov <button type="button" class="admin-help" tabindex="0" data-help="Krátky popis pod nadpisom vo výsledkoch Google. Dlhší ako ~155 znakov sa oreže (…), preto sa odporúča zmestiť sa do 155.">?</button></small>
       </label>
 
       <?php $seoImage = $seoImage ?? ''; ?>
@@ -148,7 +148,6 @@ HTML;
         <?php $seoPrevImg = $seoImage !== '' ? $seoImage : '/assets/img/og-cover.jpg'; ?>
         <div class="admin-seo-preview__media">
           <img class="admin-seo-preview__img<?= $seoImage === '' ? ' is-fallback' : '' ?>" src="<?= e($seoPrevImg) ?>" alt="">
-          <?php if ($seoImage === ''): ?><div class="admin-seo-preview__imgnote">Predvolený obrázok webu (nenahraný vlastný)</div><?php endif; ?>
         </div>
         <div class="admin-seo-preview__text">
           <div class="admin-seo-preview__url"><?= e($baseUrl . $url) ?></div>
