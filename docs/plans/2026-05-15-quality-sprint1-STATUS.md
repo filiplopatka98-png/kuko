@@ -305,3 +305,24 @@ Push `c9d638b..617fc78`, lftp 9 súborov (nav.php/reservation.php/kontakt.php �
 - **f17ece9** mobil header: topbar (mail/tel/social) presunutý do hamburger panelu (`#primary-nav .nav__contact`), logo vľavo+menšie, ružový okrúhly hamburger → X; opravený 1px skip-link prúžok (top -44→-60px) a uppercase v kontakt linkoch.
 - **617fc78** mobil batch 2: otvorené menu `position:absolute` (prekrýva obsah, neposúva), social ikony okrúhle 38px, logo 52→57px; Cenník foto nalepené na box (gap 0), balíčky single-col gap `--s-10`, Fotogaléria 2 stĺpce na mobile, Kontakt „Sledujte nás:" 1 riadok + menšie ikony, footer menu tesnejšie medzery.
 - 6 statických assetov prod==repo byte-identicky; invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **363 testov** zelená (+MobileHeaderTest/MobileSectionsTest/AddToCalendarTest aktualizované/pridané). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11).
+
+---
+
+## ✅ Veľký admin/UX batch — NASADENÉ (2026-05-19, commits 40675a8…b51034c)
+
+Push `617fc78..b51034c` (15 commitov), lftp **47 súborov** (40 web/ + 7 private/ → vrátane novej `private/lib/{MailContent,CalendarLink}.php`, mail partialov a `_setup.php` na seed). Poradie kód → migrate (6× skip, žiadna nová) → seed.
+
+**Seed (idempotentný, len pridal):** `+ block cookies.body`, `+ setting seo.cookies.title`, `+ setting seo.cookies.description`; všetko ostatné `= skip` (existujúce hodnoty zachované — vrátane `privacy.body`).
+
+Obsah batchu:
+- **Cookies:** /zasady-cookies stránka + granulárny consent banner + nastavenia v samostatnom modali; reCAPTCHA badge skrytý + povinná Google atribúcia; privacy §5 skrátené + cross-link.
+- **Rezervácia (frontend):** homepage badge ikony na balíčkoch, auto-scroll na časy po kliku na deň, „Počet detí" presunutý pod meno/tel/e-mail.
+- **Admin Stránky:** akordeóny pre obsah, helper texty → tooltipy, FAQ ↑/↓/delete SVG ikon-tlačidlá, WYSIWYG ⇄ HTML prepínač, galéria upratané, Blokácie inputy 50 %.
+- **SEO:** per-page OG obrázok upload + Google-style náhľad (miniatúra vľavo, text vpravo); fallback = predvolený OG cover; nový `og-cover.jpg` z aktuálneho loga; tooltipy k počítadlám znakov.
+- **Admin kalendár:** klik na deň → zoznam rezervácií pod kalendárom.
+- **E-maily:** predmet + hlavný text editovateľné per typ (`/admin/emails`) so serverovým náhľadom celého e-mailu; každý e-mail vždy obsahuje kompletné dáta rezervácie + brandovanú pätičku (logo, kontakty) cez zdieľané `_details`/`_footer` partialy.
+- **Admin menu:** iCal export odstránený (link + route); nové tlačidlo „Pridať do Google kalendára" na každej rezervácii; „Web ↗" prvá položka v dizajne menu; „Odhlásiť" v dizajne nav-itemu, zarovnaná dole.
+
+7 kľúčových statických assetov prod==repo byte-identicky (vrátane `og-cover.jpg`, `cookie-consent.min.js`). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. `_setup.php` po seede zmazaný (delete → 200, následný request 503). Prod config NEPREPÍSANÝ (len čítaný do /tmp, shred). SFTP heslo shred. Suite **391 testov** zelená. Dočasný lokálny admin `kukodev` odstránený z `config/.htpasswd` (restore z /tmp/htpasswd.bak — gitignored, nikdy nešiel na prod). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11).
+
+**Pozn.:** `privacy.body` v prod DB ostáva v pôvodnom znení (seed je insert-only, neprepisuje existujúce bloky — chráni admin úpravy). Nové skrátené §5 s cross-linkom na /zasady-cookies sa prejaví až keď owner blok upraví cez /admin/pages (privacy), alebo na vyžiadanie.
