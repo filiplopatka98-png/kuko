@@ -17,20 +17,8 @@ if (navToggle && navMenu) {
   }));
 }
 
-// ===== Sticky nav: collapse the logo row once the topbar scrolls out =====
-// Driven by an IntersectionObserver on the topbar (a stable element ABOVE the
-// sticky nav, so its visibility does NOT change when the nav's own height
-// changes) — this avoids the scroll-position feedback loop that makes a
-// scrollY-threshold approach oscillate/jank.
-const navStick = $('.nav');
-const topbarStick = $('.topbar');
-if (navStick && topbarStick && 'IntersectionObserver' in window) {
-  const io = new IntersectionObserver(
-    ([entry]) => navStick.classList.toggle('is-stuck', !entry.isIntersecting),
-    { threshold: 0 }
-  );
-  io.observe(topbarStick);
-}
+// Sticky header is now pure CSS (only the .nav__band pins on desktop; the
+// whole .nav pins on mobile). No JS class toggling → no layout-shift jank.
 
 // ===== Scroll reveal =====
 const revealEls = $$('[data-reveal]');

@@ -36,40 +36,22 @@ final class HeaderStickyCacheBustG1Test extends TestCase
         }
     }
 
-    public function testStickyCollapseUsesIntersectionObserverNotScrollThreshold(): void
+    public function testStickyHeaderIsPureCssNoJsCollapse(): void
     {
         $css = $this->css();
-        // Whole header stays sticky page-wide (parent is body) — no height
-        // feedback loop.
+        // The whole header is one pure-CSS sticky block with CONSTANT height
+        // (nothing hidden/resized on scroll) so the page content never jumps.
         $this->assertMatchesRegularExpression(
-            '/\.nav\s*\{[^}]*position:\s*sticky/',
+            '/\.nav\s*\{[^}]*position:\s*sticky[^}]*top:\s*0/',
             $css,
-            '.nav must be position:sticky'
+            '.nav must be position:sticky; top:0'
         );
-        // Desktop: collapse the logo row to just the menu band when stuck.
-        $this->assertMatchesRegularExpression(
-            '/@media\s*\(min-width:\s*769px\)\s*\{\s*\.nav\.is-stuck\s+\.nav__brand-row\s*\{[^}]*display:\s*none/',
-            $css,
-            'desktop: .nav.is-stuck must hide .nav__brand-row'
-        );
+        // The old JS-driven collapse must be gone entirely (it was the jank
+        // source: display:none on a pinned element shifts the layout).
+        $this->assertStringNotContainsString('is-stuck', $css, 'no .is-stuck collapse rule in CSS');
         $js = $this->mainJs();
-        // The collapse must be driven by an IntersectionObserver on the topbar,
-        // NOT a window.scrollY threshold (which oscillates because the nav's
-        // height change feeds back into the scroll position).
-        $this->assertStringContainsString('IntersectionObserver', $js, 'collapse must use IntersectionObserver');
-        $this->assertMatchesRegularExpression(
-            '/\.observe\(\s*topbarStick\s*\)/',
-            $js,
-            'the IntersectionObserver must observe the topbar'
-        );
-        // The collapse must NOT be gated on a scrollY threshold (the source of
-        // the oscillation/jank). smooth-scroll may still use window.scrollY.
-        $this->assertDoesNotMatchRegularExpression(
-            "/is-stuck['\"]\s*,\s*window\.scrollY/",
-            $js,
-            'is-stuck must not be toggled from a window.scrollY threshold'
-        );
-        $this->assertStringNotContainsString("addEventListener('scroll', syncStuck", $js);
+        $this->assertStringNotContainsString('is-stuck', $js, 'no is-stuck toggling in JS');
+        $this->assertStringNotContainsString('topbarStick', $js, 'topbar collapse observer removed');
     }
 
     public function testGalleryImportIsCacheBusted(): void

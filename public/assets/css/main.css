@@ -155,22 +155,14 @@ img, svg { max-width: 100%; height: auto; display: block; }
   .topbar__inner { justify-content: center; row-gap: 0.4rem; }
 }
 
-/* Row 2: centered logo brand */
+/* Row 2: centered logo brand.
+   The whole header is a single pure-CSS sticky block (parent = <body>, so it
+   pins page-wide). It has a CONSTANT height while pinned — nothing is
+   hidden/resized on scroll — so the page content never jumps. No JS. */
 .nav { background: var(--c-white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
 .nav__brand-row { position: relative; display: flex; align-items: center; justify-content: center; padding-block: var(--s-2); }
-/* Lift ONLY the transparent logo so it overlaps the white topbar visually.
-   .nav itself stays in normal flow (no opaque block over the topbar);
-   the negative bottom margin keeps the pink band snug under the logo. */
+/* Lift ONLY the transparent logo so it overlaps the white topbar visually. */
 .nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -56px; margin-bottom: -16px; }
-/* Once the topbar has scrolled out of view the header collapses to just the
-   pink menu band. The collapse is driven by an IntersectionObserver on the
-   topbar (a stable element above the sticky nav, unaffected by the nav's own
-   height change) — so there is no scroll-position feedback loop / oscillation.
-   Desktop only: on mobile the hamburger lives in this row and must stay
-   reachable while scrolled. */
-@media (min-width: 769px) {
-  .nav.is-stuck .nav__brand-row { display: none; }
-}
 .nav__brand img { width: auto; height: 160px; display: block; }
 /* Tablet (769–1024px): the big desktop logo with its negative top margin
    would poke up into the topbar. Shrink it and drop the overlap so it sits
@@ -180,7 +172,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
   .nav__brand img { height: 96px; }
 }
 
-/* Row 3: full-bleed pink nav band, centered horizontal menu */
+/* Row 3: full-bleed pink nav band, centered horizontal menu. */
 .nav__band { background: var(--bg-pink-soft); }
 .nav__menu { display: flex; gap: var(--s-4); flex-wrap: wrap; justify-content: center; padding-block: var(--s-2); }
 .nav__menu a { color: var(--c-text); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
