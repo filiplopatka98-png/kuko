@@ -326,3 +326,88 @@ Obsah batchu:
 7 kľúčových statických assetov prod==repo byte-identicky (vrátane `og-cover.jpg`, `cookie-consent.min.js`). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. `_setup.php` po seede zmazaný (delete → 200, následný request 503). Prod config NEPREPÍSANÝ (len čítaný do /tmp, shred). SFTP heslo shred. Suite **391 testov** zelená. Dočasný lokálny admin `kukodev` odstránený z `config/.htpasswd` (restore z /tmp/htpasswd.bak — gitignored, nikdy nešiel na prod). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11).
 
 **Pozn.:** `privacy.body` v prod DB ostáva v pôvodnom znení (seed je insert-only, neprepisuje existujúce bloky — chráni admin úpravy). Nové skrátené §5 s cross-linkom na /zasady-cookies sa prejaví až keď owner blok upraví cez /admin/pages (privacy), alebo na vyžiadanie.
+
+---
+
+## 🔜 Zmena domény: kuko-detskysvet.sk → kukodetskysvet.sk (PRED launchom)
+
+**Časovanie:** sprav PRED go-live. Web je za maintenance + `noindex`, žiadne
+indexované URL ani backlinky → žiadna SEO strata, žiadna 301 migrácia. Po
+launchi by tá istá zmena znamenala redirect mapu + re-indexáciu.
+
+**Architektúra:** URL sa odvodzujú z `Config::get('app.url')` (canonical,
+hreflang, OG/Twitter, schema, sitemap.xml, robots.txt, odkazy v e-mailoch,
+admin odkaz). Hlavná zmena = 1 hodnota v prod `config/config.php` (nie v gite).
+
+### Kódový batch (Claude — pripraviť pred launchom)
+- Zladiť hardcoded **fallbacky** `'https://kuko-detskysvet.sk'` na novú doménu
+  (len fallback; funkčne nie kritické): `head.php`, `mail/_footer.{html,text}`,
+  `mail/reservation_admin.{html,text}`, `admin/page-edit.php`, `admin/seo.php`.
+- Zameniť hardcoded e-mail `info@kuko-detskysvet.sk` → `info@kukodetskysvet.sk`
+  (ak sa mení aj mailbox): `head.php` (schema), `sections/kontakt.php`,
+  `nav.php`, `pages/{privacy,cookies,reservation-status,maintenance}.php`,
+  `mail/_footer.*`, `lib/Faq.php`, `scripts/seed-cms.php`, `config.example.php`,
+  + aktualizovať príslušné testy (HtmlSanitizerExtended/Faq/Header/MobileHeader).
+- Doménové zmienky v právnych textoch (seed-cms.php: privacy.body, cookies.body,
+  footer.copyright) prepísať na novú doménu.
+- Suite zelená + build-assets + commit; deploy v rámci bežnej mechaniky.
+
+### DB obsah (owner — seed NEPREPÍŠE existujúce bloky)
+Po deployi upraviť v admine (alebo cielený DB update):
+- `/admin/contact` → e-mail (a skontrolovať telefón/adresu/hodiny).
+- `/admin/pages` → *Ochrana údajov* a *Zásady cookies*: prepísať doménu/e-mail
+  v texte; *footer copyright* ak obsahuje doménu.
+
+### Owner / infra (WebSupport + DNS — mimo kódu)
+1. Registrácia `kukodetskysvet.sk`; DNS na WebSupport; pridať doménu/alias.
+2. **SSL** certifikát pre novú doménu (Let's Encrypt v paneli).
+3. Nový **mailbox** `info@kukodetskysvet.sk` + SMTP údaje → prod `config.php`
+   (`mail.user/pass/from_email/admin_to`).
+4. **reCAPTCHA**: pridať novú doménu k existujúcemu kľúču (alebo nový kľúč) →
+   `recaptcha.site_key/secret_key` v configu.
+5. Prod `config/config.php` → `app.url = https://kukodetskysvet.sk`.
+6. Rozhodnúť: stará doména **301 → nová** (zachovať nasmerovanú), alebo opustiť.
+
+---
+
+## ✅ GO-LIVE — presný owner checklist (poradie)
+
+Predpoklad: kódový stav je nasadený (HEAD na prod), suite zelená, web za 503.
+
+**A. Doména (ak sa mení — sprav pred zvyškom)**
+1. Owner: registrácia domény + DNS + alias + SSL na WebSupporte.
+2. Owner: nový mailbox + SMTP heslo.
+3. Claude: kódový batch (fallbacky + e-mail/legal literály) → deploy.
+4. Owner: prod `config/config.php` → `app.url` + `mail.*` + `recaptcha.*` nové.
+5. Owner: v `/admin` upraviť DB obsah (kontakt e-mail, privacy/cookies texty).
+
+**B. Funkčné predpoklady**
+6. Owner: mailbox `info@…` vytvorený; `mail.*` v prod configu vyplnené
+   (`smtp.websupport.sk`, port 465, ssl, user, pass).
+7. Owner: reCAPTCHA kľúče pre (novú) doménu v configu; `recaptcha.min_score=0.5`.
+8. Owner (WebSupport → Cron) zaregistrovať (cesta:
+   `/data/6/b/6b8003ed-75ba-4200-a84c-84c39b8a754e/kuko-detskysvet.sk`):
+   - denne `…/private/cron/expire-pending.php`
+   - mesačne `…/private/cron/retention.php`
+   - týždenne `…/private/cron/db-backup.php`
+
+**C. Overenie pred otvorením (web stále za 503)**
+9. Test rezervácie end-to-end na prod: odoslať rezerváciu → prísť admin aj
+   zákaznícky e-mail (over SMTP aj reCAPTCHA skóre); v `/admin` zmeniť status
+   → prísť potvrdzovací/zrušovací e-mail. Skontrolovať pätičku/údaje v e-maile.
+10. `/admin/emails` — finálne texty; `/admin/contact` — kontakty; SEO tituly/
+    popisy/OG obrázky per stránka v `/admin/pages`.
+11. Lighthouse (mobil) na kľúčových stránkach; opraviť prípadné regresie.
+
+**D. Spustenie (ireverzibilné — verejnosť + Google)**
+12. `/admin/maintenance` → vypnúť údržbu (web prestane vracať 503).
+13. `/admin/seo` (alebo Stránky) → zapnúť indexáciu (`robots` → `index,follow`,
+    `robots.txt` → `Allow`, sitemap aktívna).
+14. Overiť: `/` = 200, `robots.txt` = `Allow`, `sitemap.xml` = 200, náhodná
+    stránka má správny canonical na (novú) doménu, OG obrázok sa načíta.
+
+**E. Po spustení**
+15. Google Search Console: pridať (novú) doménu, odoslať `sitemap.xml`.
+16. Google Business Profile: web URL + NAP konzistentné s webom.
+17. (Voliteľné) HSTS hlavička po overení, že HTTPS všade funguje.
+18. Sledovať `private/logs/` (mail/rate/error) prvých pár dní.
