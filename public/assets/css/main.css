@@ -172,6 +172,13 @@ img, svg { max-width: 100%; height: auto; display: block; }
   .nav.is-stuck .nav__brand-row { display: none; }
 }
 .nav__brand img { width: auto; height: 160px; display: block; }
+/* Tablet (769–1024px): the big desktop logo with its negative top margin
+   would poke up into the topbar. Shrink it and drop the overlap so it sits
+   cleanly inside its own row, below the topbar. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav__brand { margin-top: 0; margin-bottom: 0; }
+  .nav__brand img { height: 96px; }
+}
 
 /* Row 3: full-bleed pink nav band, centered horizontal menu */
 .nav__band { background: var(--bg-pink-soft); }
