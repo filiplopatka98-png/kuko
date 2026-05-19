@@ -163,8 +163,10 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -56px; margin-bottom: -16px; }
 .nav__brand img { width: auto; height: 160px; display: block; }
 /* The compact logo lives in the sticky bar (mobile only); desktop shows the
-   big one in the header row above instead. */
-.nav__brand--bar { display: none; }
+   big one in the header row above instead. Reset the big logo's negative
+   margins/overlap — inside the bar it must sit on the baseline, not be
+   lifted off-screen above the sticky bar. */
+.nav__brand--bar { display: none; margin: 0; align-self: center; }
 /* Tablet (769–1024px): the big desktop logo with its negative top margin
    would poke up into the topbar. Shrink it and drop the overlap so it sits
    cleanly inside its own row, below the topbar. */
@@ -223,7 +225,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
     width: 100%; padding: var(--s-2) 0 0;
   }
   .nav__contact .nav__contact-link {
-    display: inline-flex; align-items: center; gap: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     color: var(--c-text); font-size: 0.9rem;
     text-transform: none; letter-spacing: normal; font-weight: 600;
   }
