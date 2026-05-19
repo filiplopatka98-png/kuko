@@ -1,5 +1,6 @@
 <?php
 /** @var array $r */
+/** @var string $gcal */
 /** @var string $user */
 $title = 'Rezervácia #' . (int) $r['id'] . ' — KUKO admin';
 $csrf = \Kuko\Csrf::token();
@@ -21,6 +22,12 @@ ob_start();
   <tr><th>reCAPTCHA</th><td><?= e($r['recaptcha_score'] ?? '—') ?></td></tr>
   <tr><th>Status</th><td><strong><?= e($r['status']) ?></strong></td></tr>
 </table>
+
+<?php if (!empty($gcal)): ?>
+<p style="margin:1rem 0">
+  <a class="admin-pill" href="<?= e($gcal) ?>" target="_blank" rel="noopener">Pridať do Google kalendára</a>
+</p>
+<?php endif; ?>
 
 <div class="admin-actions-grid">
   <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/status" class="admin-status-form">

@@ -76,16 +76,15 @@ $aria = static function (bool $on): string {
     <span>KUKO admin</span>
   </div>
   <nav class="admin-sidebar__nav" aria-label="Admin">
+    <a href="/" target="_blank" rel="noopener" class="admin-nav-item admin-nav-item--top">Web ↗</a>
     <a href="/admin" class="admin-nav-item admin-nav-item--top<?= $aria($isResvGroup) ?>">Rezervácie</a>
     <a href="/admin/pages" class="admin-nav-item admin-nav-item--top<?= $aria($isPagesGroup) ?>">Stránky</a>
     <a href="/admin/gallery" class="admin-nav-item admin-nav-item--top<?= $aria($active('/admin/gallery')) ?>">Galéria</a>
     <a href="/admin/contact" class="admin-nav-item admin-nav-item--top<?= $aria($isSettingsGroup) ?>">Nastavenia</a>
   </nav>
   <div class="admin-sidebar__footer">
-    <a href="/admin/calendar.ics" title="iCal export pre Google/Apple Calendar">iCal export</a>
-    <a href="/" target="_blank" rel="noopener">Web ↗</a>
     <span class="admin-user">@<?= e($user ?? '') ?></span>
-    <a href="/admin/logout" class="admin-logout">Odhlásiť</a>
+    <a href="/admin/logout" class="admin-nav-item admin-nav-item--top admin-logout">Odhlásiť</a>
   </div>
 </aside>
 <div class="admin-content">

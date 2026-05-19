@@ -153,14 +153,20 @@ $router->get('/admin', function () use ($renderer, $repo, $adminUser, $flashes) 
     echo $renderer->render('list', ['rows' => $rows, 'filter' => $filter, 'user' => $adminUser, 'flashes' => $flashes]);
 });
 
-$router->get('/admin/reservation/{id}', function (array $p) use ($renderer, $repo, $adminUser, $flashes) {
+$router->get('/admin/reservation/{id}', function (array $p) use ($renderer, $repo, $packages, $adminUser, $flashes) {
     $row = $repo->find((int) $p['id']);
     if ($row === null) {
         http_response_code(404);
         echo $renderer->render('not-found', ['user' => $adminUser, 'flashes' => $flashes]);
         return;
     }
-    echo $renderer->render('detail', ['r' => $row, 'user' => $adminUser, 'flashes' => $flashes]);
+    $pkg = $packages->find((string) $row['package']);
+    $gcal = \Kuko\CalendarLink::google(
+        $row,
+        (int) ($pkg['duration_min'] ?? 120),
+        (string) \Kuko\Config::get('app.tz', 'Europe/Bratislava')
+    );
+    echo $renderer->render('detail', ['r' => $row, 'gcal' => $gcal, 'user' => $adminUser, 'flashes' => $flashes]);
 });
 
 $router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, $audit, $flash) {
@@ -577,59 +583,6 @@ $router->get('/admin/calendar', function () use ($renderer, $db, $blocked, $hour
         'user'      => $adminUser,
         'flashes'   => $flashes,
     ]);
-});
-
-// iCal feed (subscribe in Google/Apple Calendar)
-$router->get('/admin/calendar.ics', function () use ($db, $packages) {
-    header('Content-Type: text/calendar; charset=utf-8');
-    header('Content-Disposition: attachment; filename="kuko-rezervacie.ics"');
-    $rows = $db->all(
-        "SELECT * FROM reservations WHERE status IN ('pending','confirmed') ORDER BY wished_date, wished_time"
-    );
-    $tz = (string) \Kuko\Config::get('app.tz', 'Europe/Bratislava');
-    $lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//KUKO detský svet//Rezervácie//SK',
-        'CALSCALE:GREGORIAN',
-        'X-WR-CALNAME:KUKO rezervácie',
-        'X-WR-TIMEZONE:' . $tz,
-    ];
-    foreach ($rows as $r) {
-        $pkg = $packages->find((string) $r['package']);
-        $duration = (int) ($pkg['duration_min'] ?? 120);
-        $startStr = (string) $r['wished_date'] . ' ' . (string) $r['wished_time'];
-        try {
-            $start = new \DateTimeImmutable($startStr, new \DateTimeZone($tz));
-        } catch (\Throwable) { continue; }
-        $end = $start->modify("+{$duration} minutes");
-        $statusLabel = match ((string) $r['status']) {
-            'pending'   => 'PENDING',
-            'confirmed' => 'CONFIRMED',
-            default     => 'TENTATIVE',
-        };
-        $summary = sprintf('%s — %s (%dx, %s)', strtoupper((string) $r['package']), $r['name'], (int) $r['kids_count'], $statusLabel);
-        $desc = sprintf("Balíček: %s\\nKlient: %s\\nTelefón: %s\\nE-mail: %s\\nDetí: %d\\nPoznámka: %s",
-            strtoupper((string) $r['package']),
-            (string) $r['name'],
-            (string) $r['phone'],
-            (string) $r['email'],
-            (int) $r['kids_count'],
-            str_replace(["\r", "\n"], ['', ' / '], (string) ($r['note'] ?? '—'))
-        );
-        $lines[] = 'BEGIN:VEVENT';
-        $lines[] = 'UID:kuko-' . (int) $r['id'] . '@kuko-detskysvet.sk';
-        $lines[] = 'DTSTAMP:' . (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Ymd\THis\Z');
-        $lines[] = 'DTSTART:' . $start->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
-        $lines[] = 'DTEND:'   . $end->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
-        $lines[] = 'SUMMARY:' . str_replace([',', ';'], ['\\,', '\\;'], $summary);
-        $lines[] = 'DESCRIPTION:' . str_replace([',', ';'], ['\\,', '\\;'], $desc);
-        $lines[] = 'STATUS:' . ($r['status'] === 'confirmed' ? 'CONFIRMED' : 'TENTATIVE');
-        $lines[] = 'LOCATION:Bratislavská 141\\, 921 01 Piešťany';
-        $lines[] = 'END:VEVENT';
-    }
-    $lines[] = 'END:VCALENDAR';
-    echo implode("\r\n", $lines) . "\r\n";
 });
 
 // ===== SEO (per-page meta + global indexing) =====

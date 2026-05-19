@@ -98,11 +98,34 @@ final class AdminWpLayoutTest extends TestCase
         $this->assertStringContainsString('id="main"', $this->l);
         $this->assertSame(1, substr_count($this->l, '<main'), 'exactly one <main>');
     }
-    public function testFooterDestinationsPresent(): void
+    public function testIcalExportRemoved(): void
     {
-        foreach (['/admin/calendar.ics','/admin/logout'] as $h)
-            $this->assertStringContainsString('href="' . $h . '"', $this->l);
-        // Web ↗ link to public site root.
-        $this->assertStringContainsString('href="/" target="_blank"', $this->l);
+        $this->assertStringNotContainsString('/admin/calendar.ics', $this->l, 'iCal export link must be gone');
+        $this->assertStringNotContainsString('iCal export', $this->l);
+    }
+    public function testWebIsFirstStyledNavItem(): void
+    {
+        // "Web ↗" is the first sidebar item, styled like the other nav items,
+        // opening the public site in a new tab.
+        $this->assertMatchesRegularExpression(
+            '#<nav class="admin-sidebar__nav"[^>]*>\s*<a href="/" target="_blank" rel="noopener" class="admin-nav-item admin-nav-item--top">Web#u',
+            $this->l,
+            'Web ↗ must be the first .admin-nav-item--top in the sidebar nav'
+        );
+    }
+    public function testLogoutStyledNavItemPinnedBottom(): void
+    {
+        // Odhlásiť uses the nav-item design but lives in the footer block,
+        // which the flex:1 nav pushes to the very bottom.
+        $this->assertMatchesRegularExpression(
+            '/href="\/admin\/logout"\s+class="admin-nav-item admin-nav-item--top admin-logout">Odhl\x{00E1}si\x{0165}/u',
+            $this->l,
+            'logout must be a nav-item-styled link'
+        );
+        $this->assertMatchesRegularExpression(
+            '/admin-sidebar__footer[^>]*>\s*<span class="admin-user"/u',
+            $this->l,
+            'logout must sit in the bottom footer block'
+        );
     }
 }
