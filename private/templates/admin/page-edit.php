@@ -146,11 +146,15 @@ HTML;
 
       <div class="admin-seo-preview" aria-hidden="true">
         <?php $seoPrevImg = $seoImage !== '' ? $seoImage : '/assets/img/og-cover.jpg'; ?>
-        <img class="admin-seo-preview__img<?= $seoImage === '' ? ' is-fallback' : '' ?>" src="<?= e($seoPrevImg) ?>" alt="">
-        <?php if ($seoImage === ''): ?><div class="admin-seo-preview__imgnote">Predvolený obrázok webu (nenahraný vlastný)</div><?php endif; ?>
-        <div class="admin-seo-preview__url"><?= e($baseUrl . $url) ?></div>
-        <div class="admin-seo-preview__title" data-seo-prev-title></div>
-        <div class="admin-seo-preview__desc" data-seo-prev-desc></div>
+        <div class="admin-seo-preview__media">
+          <img class="admin-seo-preview__img<?= $seoImage === '' ? ' is-fallback' : '' ?>" src="<?= e($seoPrevImg) ?>" alt="">
+          <?php if ($seoImage === ''): ?><div class="admin-seo-preview__imgnote">Predvolený obrázok webu (nenahraný vlastný)</div><?php endif; ?>
+        </div>
+        <div class="admin-seo-preview__text">
+          <div class="admin-seo-preview__url"><?= e($baseUrl . $url) ?></div>
+          <div class="admin-seo-preview__title" data-seo-prev-title></div>
+          <div class="admin-seo-preview__desc" data-seo-prev-desc></div>
+        </div>
       </div>
     </fieldset>
   </section>
