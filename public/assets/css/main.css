@@ -445,7 +445,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .contact-card--social {
   border: 2px solid var(--c-purple); background: var(--bg-pink-soft);
   flex-direction: row; align-items: center; flex-wrap: nowrap;
-  justify-content: center; gap: var(--s-2);
+  justify-content: flex-start; gap: var(--s-2);
 }
 .contact-card--social .contact-card__title { font-size: 0.95rem; margin: 0; white-space: nowrap; }
 .contact-card__icon { flex-shrink: 0; display: grid; place-items: center; color: var(--c-blue); }
