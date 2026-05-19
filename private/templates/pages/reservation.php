@@ -34,10 +34,15 @@ ob_start();
       <div class="step__inner">
         <h1>Vyberte si balíček</h1>
         <p class="step__lead">Začnite výberom typu oslavy. Detaily vyplníte v ďalšom kroku.</p>
+        <?php
+        // Same circular badge icons as the homepage "oslavy" section.
+        $pkgIcons = ['mini' => 'badge-balloon.svg', 'maxi' => 'badge-balloons.svg', 'closed' => 'badge-crown.svg'];
+        ?>
         <div class="package-picker">
-          <?php foreach ($packages as $pkg): ?>
+          <?php foreach ($packages as $pkg):
+            $pkgIcon = $pkgIcons[(string) $pkg['code']] ?? 'badge-balloon.svg'; ?>
             <button type="button" class="package-card package-card--<?= e($pkg['code']) ?>" data-pick-package="<?= e($pkg['code']) ?>" data-duration="<?= (int) $pkg['duration_min'] ?>">
-              <span class="package-card__icon" aria-hidden="true">🎩</span>
+              <span class="package-card__icon" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url('/assets/icons/' . $pkgIcon)) ?>" alt="" width="44" height="44"></span>
               <h2><?= e($pkg['name']) ?></h2>
               <p class="package-card__meta"><?= (int) $pkg['duration_min'] ?> minút<?= (int) $pkg['blocks_full_day'] === 1 ? ' · celý deň' : '' ?></p>
               <p class="package-card__cta">Vybrať →</p>
@@ -104,11 +109,6 @@ ob_start();
 
         <p class="form-legend"><span class="req" aria-hidden="true">*</span> povinné pole</p>
         <div class="field">
-          <label for="f-kids">Počet detí <span class="req" aria-hidden="true">*</span></label>
-          <input type="number" name="kids_count" id="f-kids" required aria-required="true" min="1" max="50" value="10" aria-describedby="err-f-kids">
-          <p class="field__error" id="err-f-kids" role="alert"></p>
-        </div>
-        <div class="field">
           <label for="f-name">Meno a priezvisko <span class="req" aria-hidden="true">*</span></label>
           <input type="text" name="name" id="f-name" required aria-required="true" minlength="2" maxlength="120" autocomplete="name" aria-describedby="err-f-name">
           <p class="field__error" id="err-f-name" role="alert"></p>
@@ -127,6 +127,11 @@ ob_start();
             </datalist>
             <p class="field__error" id="err-f-email" role="alert"></p>
           </div>
+        </div>
+        <div class="field">
+          <label for="f-kids">Počet detí <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" name="kids_count" id="f-kids" required aria-required="true" min="1" max="50" value="10" aria-describedby="err-f-kids">
+          <p class="field__error" id="err-f-kids" role="alert"></p>
         </div>
         <div class="field">
           <label for="f-note">Poznámka (voliteľné)</label>

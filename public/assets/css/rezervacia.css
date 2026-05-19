@@ -173,7 +173,15 @@ input, select, textarea { font: inherit; }
 .package-card--mini   { border-color: var(--c-blue); }
 .package-card--maxi   { border-color: var(--c-purple); }
 .package-card--closed { border-color: var(--c-yellow); }
-.package-card__icon { font-size: 2.5rem; }
+/* Circular coloured badge (white SVG inside) — matches the homepage. */
+.package-card__icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: inline-grid; place-items: center; margin: 0 auto;
+}
+.package-card__icon img { width: 40px; height: 40px; display: block; }
+.package-card--mini   .package-card__icon { background: var(--c-blue); }
+.package-card--maxi   .package-card__icon { background: var(--c-purple); }
+.package-card--closed .package-card__icon { background: var(--c-yellow); }
 .package-card h2 { margin: 0; }
 .package-card__meta { color: var(--c-text-soft); font-size: 0.9rem; margin: 0; }
 .package-card__cta { color: var(--c-accent); font-weight: 700; margin-top: auto; margin-bottom: 0; }

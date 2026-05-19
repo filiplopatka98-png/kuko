@@ -423,6 +423,8 @@ if (root) {
     to3Btn.disabled = true;
     slotSection.hidden = false;
     slotGrid.innerHTML = '<p style="color:#7A7A7A">Načítavam časy…</p>';
+    // Picking a day should bring the time slots into view automatically.
+    slotSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     try {
       const res = await fetch(`/api/availability?date=${iso}&package=${pkgInput.value}`);
