@@ -9,6 +9,16 @@ osláv + WordPress-style admin.
 > `robots.txt` má `Disallow: /`. Go-live = vypnúť maintenance + zapnúť indexáciu
 > (owner kroky, viď `docs/`).
 
+## Admin
+
+Session-based admin (`/admin`, `config/.htpasswd`). Editovateľný obsah a SEO
+per stránka (vrátane OG obrázku + Google-style náhľad), galéria, otváracie
+hodiny, balíčky, blokácie, kalendár (klik na deň → rezervácie dňa), GDPR a
+maintenance. **E-maily** (`/admin/emails`): predmet + hlavný text per typ
+(`MailContent`) s náhľadom celého e-mailu; každý e-mail nesie kompletné dáta
+rezervácie + brandovanú pätičku. Pri rezervácii tlačidlo *Pridať do Google
+kalendára* (`CalendarLink`).
+
 ## Tech stack
 
 - **PHP 8.1**, bez frameworku — vlastný router + jedna trieda na súbor v `Kuko\` namespace
@@ -25,7 +35,8 @@ public/            # DocumentRoot (na serveri → web/)
   admin/ api/        admin app, JSON API endpointy
   assets/            css js img icons fonts (+ committed *.min.*)
 private/             mimo DocumentRoot
-  lib/               PHP triedy (Db, Availability, Reservation, Content, …)
+  lib/               PHP triedy (Db, Availability, Reservation, Content,
+                     MailContent, CalendarLink, Seo, Social, …)
   templates/         PHP šablóny (pages/, sections/, layout*.php, admin/)
   migrations/        SQL migrácie (idempotentné)
   scripts/           seed-cms.php, build-assets.php, dev-db-init.php

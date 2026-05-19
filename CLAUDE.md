@@ -23,6 +23,15 @@ Inštrukcie pre AI asistenta. Čítaj `README.md` pre prehľad projektu.
 - Obsah cez `\Kuko\Content::get('key', 'fallback')` — **fallback v šablóne
   MUSÍ byť byte-identický so seed hodnotou** v `private/scripts/seed-cms.php`
   (dual source of truth; edituj obe miesta naraz).
+- E-maily: predmet + hlavný text editovateľné per typ cez `\Kuko\MailContent`
+  (admin `/admin/emails`, settings `mail.<typ>.subject|intro`). Fallback je
+  `MailContent::defaults()` (NIE seed — `mail.*` sú admin-only settings); pri
+  zmene predvoleného textu edituj `defaults()`. Mail šablóny musia volať
+  `MailContent::subject|introHtml|introText` a zdieľané partialy
+  `private/templates/mail/_details.*` + `_footer.*` (každý e-mail = kompletné
+  dáta rezervácie + brandovaná pätička; pätička berie kontakty cez
+  `Content`/`Social` s fallbackom). Per-rezervácia Google-kalendár odkaz cez
+  `\Kuko\CalendarLink::google()` (iCal export route bola odstránená).
 - Migrácie aj seedy **idempotentné**. Nové content bloky pridaj do seed-cms.php
   aj do príslušnej admin `$adminPages` prefix skupiny (`public/admin/index.php`).
 - Po zmene CSS/JS zdroja spusti `php private/scripts/build-assets.php` a
@@ -46,8 +55,16 @@ Inštrukcie pre AI asistenta. Čítaj `README.md` pre prehľad projektu.
   Nepoužívaj `mirror --only-newer` (git checkout resetuje mtimes → nahrá celý
   strom).
 - DB zmeny: token-gated `https://kuko-detskysvet.sk/_setup.php?action=migrate|seed&token=<auth.secret>`
-  (token z prod `config/config.php` stiahnutého cez lftp do `/tmp`, po použití
+  (token z prod configu — na serveri je `kuko-detskysvet.sk/config/config.php`,
+  súbor mimo `web/` aj `private/`; stiahni cez lftp do `/tmp`, po použití
   `shred`), potom `action=delete`. Poradie: kód → migrate → seed.
+  - `action=delete` `_setup.php` z prod **zmaže**, takže pred ďalším seedom ho
+    treba znova nahrať (`public/_setup.php` → `web/_setup.php`); bez súboru
+    request padne do maintenance 503 (nie je routnutý cez index.php).
+  - Seed je **insert-only** (`if get()===null`) — neprepisuje existujúce
+    content bloky/settings (chráni admin úpravy). Zmena fallbacku v
+    `seed-cms.php` sa na prod neprejaví ak blok už existuje → uprav cez
+    `/admin` alebo cielene.
 - **Nikdy neprepíš prod `config/config.php`** z gitu.
 - Po deployi over: `public/`=**503**, `robots.txt`=`Disallow: /`,
   `/admin/login`=200, sitemap=200; statické assety byte-identické s repom
