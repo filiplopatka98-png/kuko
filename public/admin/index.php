@@ -251,6 +251,7 @@ $adminPages = [
     'gallery'    => ['label' => 'Fotogaléria',    'url' => '/galeria',        'prefixes' => ['cta'],                               'seo' => 'gallery'],
     'faq'        => ['label' => 'Časté otázky',   'url' => '/faq',            'prefixes' => ['faq', 'cta'],                        'seo' => 'faq'],
     'privacy'    => ['label' => 'Ochrana údajov', 'url' => '/ochrana-udajov', 'prefixes' => ['privacy'],                           'seo' => 'privacy'],
+    'cookies'    => ['label' => 'Zásady cookies', 'url' => '/zasady-cookies', 'prefixes' => ['cookies'],                           'seo' => 'cookies'],
 ];
 
 $router->get('/admin/pages', function () use ($renderer, $adminPages, $adminUser, $flashes) {

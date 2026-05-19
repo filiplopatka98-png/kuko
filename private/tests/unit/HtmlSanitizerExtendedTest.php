@@ -157,13 +157,34 @@ final class HtmlSanitizerExtendedTest extends TestCase
         $this->assertStringContainsString('<h2 class="legal-h2">1. Prevádzkovateľ</h2>', $out);
         $this->assertStringContainsString('<h2 class="legal-h2">6. Vaše práva</h2>', $out);
         $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $out);
-        $this->assertStringContainsString('href="https://policies.google.com/privacy"', $out);
+        // The detailed cookie list + Google link moved to /zasady-cookies;
+        // privacy now cross-links to it.
+        $this->assertStringContainsString('href="/zasady-cookies"', $out);
         $this->assertStringContainsString('href="/"', $out);
-        $this->assertStringContainsString('<ul>', $out);
-        $this->assertStringContainsString('<li>', $out);
         $this->assertSame(6, substr_count($out, '<h2 class="legal-h2">'));
         // inline style must be gone after the class migration + sanitize
         $this->assertStringNotContainsString('style=', $out);
+    }
+
+    /**
+     * The new cookie-policy body must also round-trip losslessly through the
+     * sanitizer (whitelisted tags only — no <table>, which would be stripped).
+     */
+    public function testCookiesBodyRoundTripLossless(): void
+    {
+        $body = $this->extractFallback($this->root . '/private/templates/pages/cookies.php', 'cookies.body');
+        $out  = HtmlSanitizer::clean($body);
+        $this->assertStringContainsString('<h2 class="legal-h2">1. Čo sú cookies</h2>', $out);
+        $this->assertStringContainsString('<h2 class="legal-h2">6. Kontakt</h2>', $out);
+        $this->assertStringContainsString('<ul class="cookie-list">', $out);
+        $this->assertStringContainsString('<strong>_GRECAPTCHA</strong>', $out);
+        $this->assertStringContainsString('href="https://policies.google.com/privacy"', $out);
+        $this->assertStringContainsString('href="/ochrana-udajov"', $out);
+        $this->assertStringNotContainsString('<table', $out, 'no table tags (not whitelisted)');
+        $this->assertStringNotContainsString('style=', $out);
+        $this->assertSame(6, substr_count($out, '<h2 class="legal-h2">'));
+        // already-clean content sanitises idempotently
+        $this->assertSame(HtmlSanitizer::clean($out), $out);
     }
 
     public function testPrivacyTemplateHasNoInlineStyleInBlock(): void

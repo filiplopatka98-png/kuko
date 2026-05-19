@@ -66,38 +66,9 @@ document.addEventListener('click', e => {
   history.replaceState(null, '', '#' + id);
 });
 
-// ===== Cookie consent =====
-const CONSENT_KEY = 'kuko_cookie_consent';
-const banner = document.getElementById('cookie-banner');
-const reopenBtn = document.getElementById('cookie-reopen');
-
-export function getConsent() { return localStorage.getItem(CONSENT_KEY); }
-function setConsent(value) {
-  localStorage.setItem(CONSENT_KEY, value);
-  document.dispatchEvent(new CustomEvent('kuko:consent', { detail: { value } }));
-}
-function showBanner() { if (banner) banner.hidden = false; }
-function hideBanner() { if (banner) banner.hidden = true; }
-
-if (banner) {
-  if (!getConsent()) showBanner();
-  banner.querySelectorAll('[data-cookie-action]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      setConsent(btn.dataset.cookieAction === 'accept' ? 'accepted' : 'denied');
-      hideBanner();
-    });
-  });
-}
-reopenBtn?.addEventListener('click', () => showBanner());
-
-// Also bind accept buttons in the modal cookie-gate
-document.addEventListener('click', e => {
-  const btn = e.target.closest('[data-cookie-action]');
-  if (!btn) return;
-  if (!banner || btn.closest('#cookie-banner')) return;
-  setConsent(btn.dataset.cookieAction === 'accept' ? 'accepted' : 'denied');
-  hideBanner();
-});
+// Cookie consent is handled by the standalone /assets/js/cookie-consent.js
+// module (loaded by cookie-banner.php) — single source of truth across the
+// full site and the reservation page's minimal layout.
 
 // ===== Lazy-load feature modules =====
 // Versioned URLs injected by the layout (Asset::url adds ?v=<mtime>) so a

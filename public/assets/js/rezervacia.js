@@ -547,8 +547,15 @@ if (root) {
   }
 
   // ---------- Cookie consent + reCAPTCHA ----------
+  // Consent itself (banner, settings, storage) is owned by cookie-consent.js.
+  // Here we only READ whether reCAPTCHA is allowed. Storage format: JSON
+  // { recaptcha,analytics,marketing }; legacy 'accepted'/'denied' supported.
   function consentAccepted() {
-    return localStorage.getItem('kuko_cookie_consent') === 'accepted';
+    let raw = null;
+    try { raw = localStorage.getItem('kuko_cookie_consent'); } catch (e) { return false; }
+    if (raw === 'accepted') return true;
+    if (!raw || raw === 'denied') return false;
+    try { return !!JSON.parse(raw).recaptcha; } catch (e) { return false; }
   }
 
   function loadRecaptcha() {
@@ -576,23 +583,10 @@ if (root) {
       loadRecaptcha().catch(() => {});
     }
   }
+  // cookie-consent.js dispatches `kuko:consent` on every change; we just
+  // re-evaluate the reCAPTCHA gate. (Banner show/buttons are owned there.)
   document.addEventListener('kuko:consent', updateCookieGate);
   updateCookieGate();
-
-  // Cookie banner accept buttons (inline + banner)
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('[data-cookie-action]');
-    if (!btn) return;
-    const decision = btn.dataset.cookieAction === 'accept' ? 'accepted' : 'denied';
-    localStorage.setItem('kuko_cookie_consent', decision);
-    document.dispatchEvent(new CustomEvent('kuko:consent', { detail: { value: decision } }));
-    const banner = document.getElementById('cookie-banner');
-    if (banner) banner.hidden = true;
-  });
-
-  // Banner appears on first visit
-  const banner = document.getElementById('cookie-banner');
-  if (banner && !localStorage.getItem('kuko_cookie_consent')) banner.hidden = false;
 
   // ---------- Draft persistence (QoL) ----------
   // Persist only the personal text fields to sessionStorage so an accidental

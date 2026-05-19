@@ -73,6 +73,7 @@ $router->get('/sitemap.xml', function () use ($publicIndexing) {
             ['/galeria',          '0.6', 'monthly'],
             ['/faq',              '0.5', 'monthly'],
             ['/ochrana-udajov',   '0.3', 'yearly'],
+            ['/zasady-cookies',   '0.3', 'yearly'],
         ] as [$url, $priority, $freq]) {
             echo "  <url>\n    <loc>{$base}{$url}</loc>\n    <lastmod>{$today}</lastmod>\n    <changefreq>{$freq}</changefreq>\n    <priority>{$priority}</priority>\n  </url>\n";
         }
@@ -82,6 +83,10 @@ $router->get('/sitemap.xml', function () use ($publicIndexing) {
 
 $router->get('/ochrana-udajov', function () use ($renderer) {
     echo $renderer->render('pages/privacy');
+});
+
+$router->get('/zasady-cookies', function () use ($renderer) {
+    echo $renderer->render('pages/cookies');
 });
 
 $router->get('/faq', function () use ($renderer) {

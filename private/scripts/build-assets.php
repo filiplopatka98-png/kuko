@@ -31,6 +31,7 @@ $cssInputs = [
 $jsInputs = [
     ['/assets/js/main.js', true],
     ['/assets/js/rezervacia.js', true],
+    ['/assets/js/cookie-consent.js', true],
 ];
 
 function minPathOf(string $in): string

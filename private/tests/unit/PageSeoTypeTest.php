@@ -31,6 +31,7 @@ final class PageSeoTypeTest extends TestCase
             ['gallery.php', 'gallery'],
             ['faq.php', 'faq'],
             ['privacy.php', 'privacy'],
+            ['cookies.php', 'cookies'],
         ];
     }
 }

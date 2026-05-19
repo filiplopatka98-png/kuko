@@ -24,13 +24,8 @@ ob_start();
     <h2 class="legal-h2">4. Doba uchovávania</h2>
     <p>Údaje uchovávame po dobu potrebnú na vybavenie rezervácie a 6 mesiacov po jej skončení, následne sú anonymizované alebo vymazané.</p>
 
-    <h2 class="legal-h2">5. Cookies a Google reCAPTCHA</h2>
-    <p>Web používa nasledujúce cookies:</p>
-    <ul>
-      <li><strong>Technické cookies</strong> (PHPSESSID, cookie_consent) — nevyhnutné pre fungovanie a uloženie vášho rozhodnutia o cookies. Tieto cookies nevyžadujú váš súhlas.</li>
-      <li><strong>Google reCAPTCHA</strong> (_GRECAPTCHA) — slúži na ochranu rezervačného formulára pred spamom. Spoločnosť Google týmto môže získať údaje o vašom správaní na stránke. Cookie sa nahrá iba po vašom súhlase. Viac informácií: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</li>
-    </ul>
-    <p>Súhlas s cookies môžete kedykoľvek odvolať kliknutím na „Cookie nastavenia" v pätičke.</p>
+    <h2 class="legal-h2">5. Cookies</h2>
+    <p>Web používa nevyhnutné cookies a — len s vaším súhlasom — Google reCAPTCHA (ochrana formulára pred spamom), prípadne v budúcnosti analytické či marketingové nástroje. Podrobný prehľad jednotlivých cookies a správu svojho súhlasu nájdete v <a href="/zasady-cookies">Zásadách používania cookies</a>.</p>
 
     <h2 class="legal-h2">6. Vaše práva</h2>
     <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
