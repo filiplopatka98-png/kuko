@@ -155,15 +155,16 @@ img, svg { max-width: 100%; height: auto; display: block; }
   .topbar__inner { justify-content: center; row-gap: 0.4rem; }
 }
 
-/* Row 2: centered logo brand.
-   The whole header is a single pure-CSS sticky block (parent = <body>, so it
-   pins page-wide). It has a CONSTANT height while pinned — nothing is
-   hidden/resized on scroll — so the page content never jumps. No JS. */
-.nav { background: var(--c-white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+/* Row 2: logo header — NORMAL FLOW (not sticky). It scrolls away on scroll
+   so the logo "hides", while only the pink band below stays pinned. */
+.nav { background: var(--c-white); }
 .nav__brand-row { position: relative; display: flex; align-items: center; justify-content: center; padding-block: var(--s-2); }
 /* Lift ONLY the transparent logo so it overlaps the white topbar visually. */
 .nav__brand { display: inline-flex; position: relative; z-index: 210; margin-top: -56px; margin-bottom: -16px; }
 .nav__brand img { width: auto; height: 160px; display: block; }
+/* The compact logo lives in the sticky bar (mobile only); desktop shows the
+   big one in the header row above instead. */
+.nav__brand--bar { display: none; }
 /* Tablet (769–1024px): the big desktop logo with its negative top margin
    would poke up into the topbar. Shrink it and drop the overlap so it sits
    cleanly inside its own row, below the topbar. */
@@ -172,8 +173,11 @@ img, svg { max-width: 100%; height: auto; display: block; }
   .nav__brand img { height: 96px; }
 }
 
-/* Row 3: full-bleed pink nav band, centered horizontal menu. */
-.nav__band { background: var(--bg-pink-soft); }
+/* Row 3: pink nav band. THIS is the only sticky element and it is a direct
+   child of <body>, so it pins page-wide. Its height never changes, so a
+   pinned band can never shift the page → zero jank, zero JS. */
+.nav__band { background: var(--bg-pink-soft); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+.nav__bar { position: relative; display: flex; align-items: center; justify-content: center; }
 .nav__menu { display: flex; gap: var(--s-4); flex-wrap: wrap; justify-content: center; padding-block: var(--s-2); }
 .nav__menu a { color: var(--c-text); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .nav__menu a:hover { color: var(--c-accent); text-decoration: none; }
@@ -185,23 +189,26 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--c-text); transition: transform 0.2s; }
 
 @media (max-width: 768px) {
-  /* Contacts + social move into the hamburger panel — hide the topbar. */
+  /* Contacts + social move into the hamburger panel — hide the topbar AND
+     the big logo header; the sticky pink bar becomes the whole header. */
   .topbar { display: none; }
-  /* Logo left-aligned + smaller; no topbar to overlap so drop the offsets. */
-  .nav__brand-row { justify-content: flex-start; }
-  .nav__brand { margin-top: 0; margin-bottom: 0; }
-  .nav__brand img { height: 57px; }
+  .nav { display: none; }
+  /* Sticky bar = compact logo (left) + round hamburger (right). */
+  .nav__bar { justify-content: space-between; padding-block: var(--s-1); }
+  .nav__brand--bar { display: inline-flex; }
+  .nav__brand--bar img { height: 48px; }
   /* Pink round hamburger with white bars; morphs to an X when open. */
   .nav__toggle {
-    display: flex; background: var(--c-accent); border-radius: 50%;
+    display: flex; position: static; transform: none;
+    background: var(--c-accent); border-radius: 50%;
     width: 44px; height: 44px; padding: 0; gap: 5px;
   }
   .nav__toggle span { background: #fff; width: 22px; transition: transform 0.25s ease, opacity 0.2s ease; }
   .nav__toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav__toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
   .nav__toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  /* Open menu floats OVER the page (absolute) instead of pushing content
-     down. Anchored to the sticky .nav (its positioned ancestor). */
+  /* Open menu floats OVER the page (absolute), anchored to .nav__bar
+     (position:relative) inside the sticky band. */
   .nav__menu {
     position: absolute; top: 100%; left: 0; right: 0; z-index: 199;
     background: var(--bg-pink-soft); box-shadow: 0 14px 24px rgba(0,0,0,0.14);

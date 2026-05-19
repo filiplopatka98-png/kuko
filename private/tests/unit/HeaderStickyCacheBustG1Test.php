@@ -39,12 +39,19 @@ final class HeaderStickyCacheBustG1Test extends TestCase
     public function testStickyHeaderIsPureCssNoJsCollapse(): void
     {
         $css = $this->css();
-        // The whole header is one pure-CSS sticky block with CONSTANT height
-        // (nothing hidden/resized on scroll) so the page content never jumps.
+        // Only the pink band is sticky, and it is a body-level element so it
+        // pins page-wide. Its height never changes (logo/topbar scroll away
+        // in normal flow) → the logo "hides" with zero JS and zero jank.
         $this->assertMatchesRegularExpression(
-            '/\.nav\s*\{[^}]*position:\s*sticky[^}]*top:\s*0/',
+            '/\.nav__band\s*\{[^}]*position:\s*sticky[^}]*top:\s*0/',
             $css,
-            '.nav must be position:sticky; top:0'
+            '.nav__band must be position:sticky; top:0'
+        );
+        // The logo header itself must NOT be sticky (it scrolls away).
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.nav\s*\{[^}]*position:\s*sticky/',
+            $css,
+            '.nav (logo header) must not be sticky'
         );
         // The old JS-driven collapse must be gone entirely (it was the jank
         // source: display:none on a pinned element shifts the layout).

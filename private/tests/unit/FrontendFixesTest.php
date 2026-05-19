@@ -39,7 +39,8 @@ final class FrontendFixesTest extends TestCase
     {
         $css = file_get_contents($this->root . '/public/assets/css/main.css');
         $this->assertMatchesRegularExpression('/\.kontakt__map-wrap\s*\{[^}]*isolation:\s*isolate/s', $css);
-        $this->assertMatchesRegularExpression('/\.nav\s*\{[^}]*z-index:\s*200/s', $css);
+        // The sticky bar (now .nav__band) must outrank the leaflet map.
+        $this->assertMatchesRegularExpression('/\.nav__band\s*\{[^}]*z-index:\s*200/s', $css);
     }
     public function testStraddleHoverKeepsOffset(): void
     {

@@ -48,7 +48,7 @@ document.addEventListener('click', e => {
   const target = document.getElementById(id);
   if (!target) return;
   e.preventDefault();
-  const offset = ($('.nav')?.offsetHeight ?? 0) + 8;
+  const offset = ($('.nav__band')?.offsetHeight ?? 0) + 8;
   const top = target.getBoundingClientRect().top + window.scrollY - offset;
   window.scrollTo({ top, behavior: 'smooth' });
   history.replaceState(null, '', '#' + id);

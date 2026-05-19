@@ -37,15 +37,22 @@ final class MobileHeaderTest extends TestCase
             $this->css,
             'topbar must be hidden on mobile'
         );
+        // Mobile: the big logo header is hidden; the sticky pink bar becomes
+        // the header with a compact logo (left) + hamburger (right).
         $this->assertMatchesRegularExpression(
-            '/\.nav__brand-row \{ justify-content: flex-start/',
+            '/@media \(max-width: 768px\)[\s\S]*\.nav \{ display: none; \}/',
             $this->css,
-            'logo left-aligned on mobile'
+            'big logo header hidden on mobile'
         );
         $this->assertMatchesRegularExpression(
-            '/@media \(max-width: 768px\)[\s\S]*\.nav__brand img \{ height: 57px/',
+            '/\.nav__bar \{ justify-content: space-between/',
             $this->css,
-            'smaller logo on mobile'
+            'sticky bar: compact logo left, hamburger right'
+        );
+        $this->assertMatchesRegularExpression(
+            '/@media \(max-width: 768px\)[\s\S]*\.nav__brand--bar img \{ height: 48px/',
+            $this->css,
+            'compact logo shown in the sticky bar on mobile'
         );
         // Pink round hamburger + white bars + X morph on open.
         $this->assertMatchesRegularExpression(
