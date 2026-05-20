@@ -411,3 +411,15 @@ Predpoklad: kódový stav je nasadený (HEAD na prod), suite zelená, web za 503
 16. Google Business Profile: web URL + NAP konzistentné s webom.
 17. (Voliteľné) HSTS hlavička po overení, že HTTPS všade funguje.
 18. Sledovať `private/logs/` (mail/rate/error) prvých pár dní.
+
+---
+
+## ✅ Header jank fix + transparent logo + mobile menu spacing — NASADENÉ (2026-05-20, commits 5b49b67…2d07fa7)
+
+Push `b51034c..2d07fa7` (header batch + docs), lftp **7 súborov** (nav.php → private/, main.css/.min.css/.js/.min.js + logo.png/.webp → web/). Žiadne DB zmeny.
+
+- **5b49b67/1ecf8fb** header bez janku, pure CSS: `.nav__band` (pink lišta) presunutá ako body-level sibling → `position:sticky; top:0` pinuje na celej stránke. Topbar + logo `.nav` v normálnom toku → odscrolujú (logo „sa skryje"). Žiadny JS observer, žiadny `display:none` na pinned prvku → výška dokumentu konštantná pri scrolle (overené `docHeight` stable na všetkých pozíciách). Mobile: `.nav { display:none }`, kompaktné logo + okrúhly hamburger v lište; menu dropdown pod lištou.
+- **f06bb9d** transparentné logo (flood-fill bieleho pozadia, vnútorné biele plochy zachované) → `logo.png/.webp`; `.nav__brand--bar { margin:0 }` aby kompaktné logo nedostalo `-56px` od veľkého varianta a nevyšlo mimo obrazovku; e-mail/telefón v mobilnom menu vycentrované.
+- **2d07fa7** kontaktné odkazy v mobilnom menu zbavené dedeného `.nav__menu a { padding; border-bottom }` → medzera e-mail/telefón = len `gap` (10 px), žiadny veľký priestor nad telefónom.
+
+6 statických assetov prod==repo byte-identicky (vrátane nového transparentného `logo.png/.webp` a `main.min.css/.min.js`). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **391 testov** zelená (regresné testy prepísané na nový pure-CSS sticky model). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11). Maintenance/indexácia nezmenené (pred-launch).
