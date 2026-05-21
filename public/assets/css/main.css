@@ -280,6 +280,9 @@ img, svg { max-width: 100%; height: auto; display: block; }
   background: var(--c-white);
   border-radius: 20px;
   padding: var(--s-3);
+  /* Extra bottom space so the straddling "Rezervovať oslavu" CTA on the
+     purple card doesn't crowd the text above it. */
+  padding-bottom: 3rem;
   border: 5px solid;
   display: flex;
   flex-direction: column;
@@ -311,6 +314,9 @@ img, svg { max-width: 100%; height: auto; display: block; }
   color: var(--c-text);
   white-space: nowrap;
   z-index: 1;
+  /* Subtle resting shadow so the button lifts off the card edge even
+     before hover; .btn:hover still adds the stronger lift on hover. */
+  box-shadow: 0 3px 10px rgba(216, 139, 190, 0.25);
 }
 /* Keep the straddle offset on hover (plain .btn:hover would override the
    centering translate and make the button jump away). */
