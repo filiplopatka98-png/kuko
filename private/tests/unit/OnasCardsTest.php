@@ -26,4 +26,14 @@ final class OnasCardsTest extends TestCase
         $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/main.css');
         $this->assertMatchesRegularExpression('/translate\(-?50%,\s*50%\)/', $css, 'straddling button rule missing');
     }
+    public function testCardBodyIsDivNotParagraph(): void
+    {
+        // Card content is HTML from the admin editor (Quill), which wraps text
+        // in <p>. A <p class="card__body"> outer wrapper would auto-close on
+        // the inner <p>, leaving an empty .card__body and orphan paragraphs
+        // with unexpected margins (visible as weird spacing in O nás).
+        $this->assertStringNotContainsString('<p class="card__body"', $this->t);
+        $this->assertSame(4, substr_count($this->t, '<div class="card__body">'),
+            'expected 4 card__body div wrappers');
+    }
 }

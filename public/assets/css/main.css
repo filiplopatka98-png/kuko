@@ -294,6 +294,10 @@ img, svg { max-width: 100%; height: auto; display: block; }
 
 .card__icon { width: 64px; height: 64px; margin-top: var(--s-1); }
 .card__body { color: var(--c-text); font-size: 0.95rem; margin: 0; }
+/* Admin WYSIWYG (Quill) wraps text in <p> — flatten the inner paragraph
+   margins so a single-line card doesn't grow extra spacing from defaults. */
+.card__body > p { margin: 0; }
+.card__body > p + p { margin-top: 0.5rem; }
 .card__cta { margin-top: auto; }
 
 /* CTA that straddles the bottom border of the last (purple) card */
