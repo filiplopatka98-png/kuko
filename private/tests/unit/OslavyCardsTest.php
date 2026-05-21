@@ -26,4 +26,25 @@ final class OslavyCardsTest extends TestCase
         $css = file_get_contents(\dirname(__DIR__, 3) . '/public/assets/css/main.css');
         $this->assertMatchesRegularExpression('/translate\(-?50%,\s*-?50%\)/', $css, 'top badge straddle missing');
     }
+    public function testPerFieldFallbackNotAllOrNothingGate(): void
+    {
+        // Every field must be admin-editable independently — an empty DB
+        // value falls back to the per-field default, NOT to a verbatim
+        // hardcoded block that would ignore other admin edits. Guard against
+        // the regression of reintroducing an all-or-nothing $hasExtended
+        // gate.
+        $this->assertStringNotContainsString('$hasExtended', $this->t);
+        $this->assertStringContainsString('$pick(', $this->t, 'per-field pick() fallback must be used');
+        $this->assertStringContainsString("'mini'", $this->t);
+        $this->assertStringContainsString("'maxi'", $this->t);
+        $this->assertStringContainsString("'closed'", $this->t);
+    }
+    public function testPackageDescIsDivNotParagraph(): void
+    {
+        // Description HTML comes from the admin editor (Quill) which wraps
+        // text in <p>. A <p class="package__desc"> outer wrapper would
+        // auto-close on the inner <p> — same regression as O nás cards.
+        $this->assertStringNotContainsString('<p class="package__desc"', $this->t);
+        $this->assertStringContainsString('<div class="package__desc">', $this->t);
+    }
 }

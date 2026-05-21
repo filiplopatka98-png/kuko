@@ -181,4 +181,68 @@ foreach ($seed as $k => $v) {
     if ($s->get($k) === null) { $s->set($k, $v); echo "+ setting $k\n"; }
     else { echo "= skip setting $k\n"; }
 }
+
+// === Packages (mini/maxi/closed) ===
+// Migration 005 added description/price_text/kids_count_text/duration_text/
+// included_json/accent_color but left them NULL on the 3 existing rows. Without
+// this seed, the homepage falls back to verbatim hardcoded text and admin
+// edits do nothing visible. We fill ONLY empty fields per row, so any admin
+// edit already in place is preserved (insert-where-empty semantics).
+$packageDefaults = [
+    'mini' => [
+        'name'            => 'Oslava KUKO MINI',
+        'accent_color'    => 'blue',
+        'description'     => 'Bázový balíček pre menšie oslavy s priateľmi. Zahŕňa prenájom časti herne na 2 hodiny.',
+        'price_text'      => '120 – 150 € / balíček',
+        'kids_count_text' => 'do 10',
+        'duration_text'   => '2 hodiny',
+        'included'        => ['Vyhradený stôl pre rodičov', 'Občerstvenie pre deti', 'Animátorka v cene'],
+    ],
+    'maxi' => [
+        'name'            => 'Oslava KUKO MAXI',
+        'accent_color'    => 'purple',
+        'description'     => 'Pre väčšie deti a väčšie skupiny. Plne vybavená oslava s programom.',
+        'price_text'      => '220 – 260 € / balíček',
+        'kids_count_text' => 'do 20',
+        'duration_text'   => '3 hodiny',
+        'included'        => ['Vyhradený priestor', 'Občerstvenie + nápoje', 'Animátorka + program', 'Tematická výzdoba'],
+    ],
+    'closed' => [
+        'name'            => 'Uzavretá spoločnosť',
+        'accent_color'    => 'yellow',
+        'description'     => 'Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.',
+        'price_text'      => '350 € / balíček',
+        'kids_count_text' => 'neobmedzene',
+        'duration_text'   => '4 hodiny',
+        'included'        => ['Celá herňa len pre vás', 'Personál k dispozícii', 'Pokojná atmosféra bez verejnosti', 'Plný komfort pre rodičov'],
+    ],
+];
+$pkgRepo = new \Kuko\PackagesRepo($db);
+foreach ($packageDefaults as $code => $d) {
+    $row = $pkgRepo->find($code);
+    if ($row === null) { echo "= skip package $code (no row)\n"; continue; }
+    $changed = [];
+    $merged = [
+        'name'            => ((string) ($row['name']            ?? '')) !== '' ? (string) $row['name']            : $d['name'],
+        'duration_min'    => (int)    ($row['duration_min']    ?? 120),
+        'blocks_full_day' => (int)    ($row['blocks_full_day'] ?? 0),
+        'is_active'       => (int)    ($row['is_active']       ?? 1),
+        'sort_order'      => (int)    ($row['sort_order']      ?? 0),
+        'description'     => ((string) ($row['description']     ?? '')) !== '' ? (string) $row['description']     : $d['description'],
+        'price_text'      => ((string) ($row['price_text']      ?? '')) !== '' ? (string) $row['price_text']      : $d['price_text'],
+        'kids_count_text' => ((string) ($row['kids_count_text'] ?? '')) !== '' ? (string) $row['kids_count_text'] : $d['kids_count_text'],
+        'duration_text'   => ((string) ($row['duration_text']   ?? '')) !== '' ? (string) $row['duration_text']   : $d['duration_text'],
+        'included_json'   => ((string) ($row['included_json']   ?? '')) !== '' ? (string) $row['included_json']   : json_encode($d['included'], JSON_UNESCAPED_UNICODE),
+        'accent_color'    => in_array((string) ($row['accent_color'] ?? ''), ['blue','purple','yellow'], true) ? (string) $row['accent_color'] : $d['accent_color'],
+    ];
+    foreach (['description','price_text','kids_count_text','duration_text','included_json','accent_color'] as $f) {
+        if (((string) ($row[$f] ?? '')) === '' || ($f === 'accent_color' && !in_array((string) ($row[$f] ?? ''), ['blue','purple','yellow'], true))) {
+            $changed[] = $f;
+        }
+    }
+    if ($changed === []) { echo "= skip package $code (already filled)\n"; continue; }
+    $pkgRepo->update($code, $merged);
+    echo "+ package $code (filled: " . implode(',', $changed) . ")\n";
+}
+
 echo "seed done\n";

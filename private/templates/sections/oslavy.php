@@ -1,86 +1,52 @@
 <?php
+/** @var array<int,array<string,mixed>>|null $packages */
 $packages = $packages ?? [];
 
-/* Map package code -> circular badge icon (assets). */
+/**
+ * Per-package presentation defaults (used as a per-field fallback when the
+ * matching column in `packages` is empty). The admin (/admin/packages) can
+ * override every one of these fields independently — there is no all-or-
+ * nothing gate. An empty field falls back to the default below; a non-empty
+ * field wins. Keep these in sync with the seed-cms.php packages seed.
+ */
 $packageIcons = [
     'mini'   => '/assets/icons/badge-balloon.svg',
     'maxi'   => '/assets/icons/badge-balloons.svg',
     'closed' => '/assets/icons/badge-crown.svg',
 ];
-$iconFor = static function (string $code) use ($packageIcons): string {
-    return $packageIcons[$code] ?? '/assets/icons/badge-balloon.svg';
-};
-
-/*
- * Per-package hardcoded fallback cards (verbatim original markup).
- * Trusted developer markup — output raw. Keyed by package `code`.
- * Byte-identical to the original static section so that when a
- * package has no extended fields it renders exactly as before.
- */
-$hardcoded = [
-    'mini' => <<<'HTML'
-<article class="package package--blue">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-balloon.svg" alt="" width="36" height="36"></span>
-        <header class="package__head"><h3>Oslava KUKO MINI</h3></header>
-        <p class="package__desc">Bázový balíček pre menšie oslavy s priateľmi. Zahŕňa prenájom časti herne na 2 hodiny.</p>
-        <ul class="package__meta">
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/little-kid.svg" alt="" width="18" height="18"></span> Počet detí: do 10</li>
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/clock.svg" alt="" width="18" height="18"></span> Časový harmonogram: 2 hodiny</li>
-        </ul>
-        <p class="package__price">120 – 150 € / balíček</p>
-        <ul class="package__incl">
-          <li>Vyhradený stôl pre rodičov</li>
-          <li>Občerstvenie pre deti</li>
-          <li>Animátorka v cene</li>
-        </ul>
-        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=mini">Rezervovať balíček</a>
-      </article>
-HTML,
-    'maxi' => <<<'HTML'
-<article class="package package--purple">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-balloons.svg" alt="" width="36" height="36"></span>
-        <header class="package__head"><h3>Oslava KUKO MAXI</h3></header>
-        <p class="package__desc">Pre väčšie deti a väčšie skupiny. Plne vybavená oslava s programom.</p>
-        <ul class="package__meta">
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/little-kid.svg" alt="" width="18" height="18"></span> Počet detí: do 20</li>
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/clock.svg" alt="" width="18" height="18"></span> Časový harmonogram: 3 hodiny</li>
-        </ul>
-        <p class="package__price">220 – 260 € / balíček</p>
-        <ul class="package__incl">
-          <li>Vyhradený priestor</li>
-          <li>Občerstvenie + nápoje</li>
-          <li>Animátorka + program</li>
-          <li>Tematická výzdoba</li>
-        </ul>
-        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=maxi">Rezervovať balíček</a>
-      </article>
-HTML,
-    'closed' => <<<'HTML'
-<article class="package package--yellow">
-        <span class="package__badge" aria-hidden="true"><img src="/assets/icons/badge-crown.svg" alt="" width="36" height="36"></span>
-        <header class="package__head"><h3>Uzavretá spoločnosť</h3></header>
-        <p class="package__desc">Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.</p>
-        <ul class="package__meta">
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/little-kid.svg" alt="" width="18" height="18"></span> Počet detí: neobmedzene</li>
-          <li><span class="ic" aria-hidden="true"><img src="/assets/icons/clock.svg" alt="" width="18" height="18"></span> Časový harmonogram: 4 hodiny</li>
-        </ul>
-        <p class="package__price">350 € / balíček</p>
-        <ul class="package__incl">
-          <li>Celá herňa len pre vás</li>
-          <li>Personál k dispozícii</li>
-          <li>Pokojná atmosféra bez verejnosti</li>
-          <li>Plný komfort pre rodičov</li>
-        </ul>
-        <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=closed">Rezervovať balíček</a>
-      </article>
-HTML,
+$defaults = [
+    'mini' => [
+        'name'            => 'Oslava KUKO MINI',
+        'accent_color'    => 'blue',
+        'description'     => 'Bázový balíček pre menšie oslavy s priateľmi. Zahŕňa prenájom časti herne na 2 hodiny.',
+        'price_text'      => '120 – 150 € / balíček',
+        'kids_count_text' => 'do 10',
+        'duration_text'   => '2 hodiny',
+        'included'        => ['Vyhradený stôl pre rodičov', 'Občerstvenie pre deti', 'Animátorka v cene'],
+    ],
+    'maxi' => [
+        'name'            => 'Oslava KUKO MAXI',
+        'accent_color'    => 'purple',
+        'description'     => 'Pre väčšie deti a väčšie skupiny. Plne vybavená oslava s programom.',
+        'price_text'      => '220 – 260 € / balíček',
+        'kids_count_text' => 'do 20',
+        'duration_text'   => '3 hodiny',
+        'included'        => ['Vyhradený priestor', 'Občerstvenie + nápoje', 'Animátorka + program', 'Tematická výzdoba'],
+    ],
+    'closed' => [
+        'name'            => 'Uzavretá spoločnosť',
+        'accent_color'    => 'yellow',
+        'description'     => 'Doprajte svojmu dieťaťu oslavu, na ktorú bude ešte dlho spomínať. Pri uzavretej spoločnosti máte celé KUKO len pre seba — v pokojnej a príjemnej atmosfére. Deti si môžu naplno užiť všetky herné prvky a spoločné chvíle s kamarátmi, zatiaľ čo rodičia si vychutnajú oslavu bez stresu a zbytočného zhonu. Počas celej oslavy je vám k dispozícii aj náš personál, ktorý sa postará o pohodlie a hladký priebeh.',
+        'price_text'      => '350 € / balíček',
+        'kids_count_text' => 'neobmedzene',
+        'duration_text'   => '4 hodiny',
+        'included'        => ['Celá herňa len pre vás', 'Personál k dispozícii', 'Pokojná atmosféra bez verejnosti', 'Plný komfort pre rodičov'],
+    ],
 ];
+$iconFor = static fn(string $code): string => $packageIcons[$code] ?? '/assets/icons/badge-balloon.svg';
 
-/*
- * Build the ordered render list. Prefer the DB-provided $packages
- * (listActive() order). If no DB rows at all, fall back to the three
- * static codes so the section always renders all 3 offerings.
- */
+/* Build the ordered render list. Prefer DB order (listActive); otherwise
+   fall back to the 3 default codes so the section always renders. */
 if (!empty($packages)) {
     $renderList = [];
     foreach ($packages as $p) {
@@ -94,37 +60,56 @@ if (!empty($packages)) {
     ];
 }
 
+/** Pick a non-empty DB value, else the default, else ''. */
+$pick = static function (?array $row, ?array $def, string $key): string {
+    $v = $row[$key] ?? null;
+    if (is_string($v) && $v !== '') return $v;
+    $d = $def[$key] ?? null;
+    return is_string($d) ? $d : '';
+};
+
 $articles = [];
 foreach ($renderList as $entry) {
     $code = $entry['code'];
-    $p    = $entry['row'];
+    $row  = $entry['row'];
+    $def  = $defaults[$code] ?? null;
+    if ($def === null && $row === null) continue;
 
-    $hasExtended = $p !== null
-        && !empty($p['price_text'])
-        && !empty($p['description'])
-        && !empty($p['included_json'])
-        && !empty($p['accent_color']);
+    $name        = $pick($row, $def, 'name');
+    $description = $pick($row, $def, 'description');
+    $priceText   = $pick($row, $def, 'price_text');
+    $kidsText    = $pick($row, $def, 'kids_count_text');
+    $durText     = $pick($row, $def, 'duration_text');
 
-    if ($hasExtended) {
-        $accent   = in_array($p['accent_color'], ['blue', 'purple', 'yellow'], true) ? $p['accent_color'] : 'blue';
-        $included = json_decode((string) $p['included_json'], true);
-        if (!is_array($included)) { $included = []; }
+    $accent = $pick($row, $def, 'accent_color');
+    if (!in_array($accent, ['blue', 'purple', 'yellow'], true)) {
+        $accent = $def['accent_color'] ?? 'blue';
+    }
 
-        ob_start();
-        ?>
+    $included = null;
+    if (!empty($row['included_json'])) {
+        $j = json_decode((string) $row['included_json'], true);
+        if (is_array($j) && $j !== []) $included = $j;
+    }
+    if ($included === null) $included = $def['included'] ?? [];
+
+    ob_start();
+    ?>
 <article class="package package--<?= e($accent) ?>">
         <span class="package__badge" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url($iconFor($code))) ?>" alt="" width="36" height="36"></span>
-        <header class="package__head"><h3><?= e($p['name'] ?? '') ?></h3></header>
-        <p class="package__desc"><?= $p['description'] ?></p>
+        <header class="package__head"><h3><?= e($name) ?></h3></header>
+        <div class="package__desc"><?= $description ?></div>
         <ul class="package__meta">
-          <?php if (!empty($p['kids_count_text'])): ?>
-          <li><span class="ic" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url('/assets/icons/little-kid.svg')) ?>" alt="" width="18" height="18"></span> Počet detí: <?= e($p['kids_count_text']) ?></li>
+          <?php if ($kidsText !== ''): ?>
+          <li><span class="ic" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url('/assets/icons/little-kid.svg')) ?>" alt="" width="18" height="18"></span> Počet detí: <?= e($kidsText) ?></li>
           <?php endif; ?>
-          <?php if (!empty($p['duration_text'])): ?>
-          <li><span class="ic" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url('/assets/icons/clock.svg')) ?>" alt="" width="18" height="18"></span> Časový harmonogram: <?= e($p['duration_text']) ?></li>
+          <?php if ($durText !== ''): ?>
+          <li><span class="ic" aria-hidden="true"><img src="<?= e(\Kuko\Asset::url('/assets/icons/clock.svg')) ?>" alt="" width="18" height="18"></span> Časový harmonogram: <?= e($durText) ?></li>
           <?php endif; ?>
         </ul>
-        <p class="package__price"><?= e($p['price_text']) ?></p>
+        <?php if ($priceText !== ''): ?>
+        <p class="package__price"><?= e($priceText) ?></p>
+        <?php endif; ?>
         <ul class="package__incl">
           <?php foreach ($included as $item): ?>
           <li><?= e($item) ?></li>
@@ -133,11 +118,7 @@ foreach ($renderList as $entry) {
         <a class="btn btn--straddle package__cta" href="/rezervacia?balicek=<?= e($code) ?>">Rezervovať balíček</a>
       </article>
 <?php
-        $articles[] = trim((string) ob_get_clean());
-    } elseif (isset($hardcoded[$code])) {
-        $articles[] = $hardcoded[$code];
-    }
-    // Unknown code with no extended data is skipped safely.
+    $articles[] = trim((string) ob_get_clean());
 }
 ?>
 <section id="oslavy" class="section section--oslavy" data-reveal>

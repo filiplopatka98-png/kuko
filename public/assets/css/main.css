@@ -389,6 +389,10 @@ img, svg { max-width: 100%; height: auto; display: block; }
 .package__head h3 { margin: 0; }
 .package__hat { font-size: 1.5rem; }
 .package__desc { color: var(--c-text-soft); font-size: 0.9rem; }
+/* Admin WYSIWYG (Quill) wraps text in <p> — flatten the inner paragraph
+   margins so a package description stays compact regardless of editor shape. */
+.package__desc > p { margin: 0; }
+.package__desc > p + p { margin-top: 0.5rem; }
 .package__meta { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; }
 .package__meta li { display: flex; align-items: center; gap: 0.4rem; }
 .package__meta .ic { display: inline-flex; align-items: center; justify-content: center; width: 1.25rem; }
