@@ -626,6 +626,26 @@ $router->post('/admin/maintenance', function () use ($settings, $audit, $flash) 
     header('Location: /admin/maintenance');
 });
 
+// ===== Indexing (seo.public_indexing — robots.txt + <meta robots>) =====
+// Owned settings: this toggle ONLY. Maintenance is a separate switch.
+$router->get('/admin/indexing', function () use ($renderer, $settings, $adminUser, $flashes) {
+    echo $renderer->render('indexing', [
+        'enabled' => $settings->get('seo.public_indexing') === '1',
+        'user'    => $adminUser,
+        'flashes' => $flashes,
+    ]);
+});
+$router->post('/admin/indexing', function () use ($settings, $audit, $flash) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $on = !empty($_POST['enabled']);
+    $settings->set('seo.public_indexing', $on ? '1' : '0');
+    $audit('indexing_toggle', 'settings', 0, ['enabled' => $on]);
+    $flash('Indexácia ' . ($on
+        ? 'ZAPNUTÁ — vyhľadávače môžu web indexovať.'
+        : 'vypnutá — robots.txt = Disallow, stránky noindex.'));
+    header('Location: /admin/indexing');
+});
+
 // ===== E-mail texts (subject + intro per mail type) =====
 $router->get('/admin/emails', function () use ($renderer, $settings, $db, $adminUser, $flashes) {
     \Kuko\MailContent::setSettings($settings);
