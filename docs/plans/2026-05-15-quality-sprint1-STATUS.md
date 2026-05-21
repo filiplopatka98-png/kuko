@@ -436,3 +436,14 @@ Push `2d07fa7..d1fa362`, lftp **5 súborov** (seed-cms.php + o-nas.php + oslavy.
 Seed na prode: `+ package mini/maxi/closed` (všetky 6 extended polí naplnené defaultmi — admin úpravy ak sú už v DB zachované insert-where-empty sémantikou).
 
 Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200, `_setup.php` zmazaný (`?action=path` → 503). 2 statické assety prod==repo byte-identicky. SFTP heslo + tmp config shred. Suite **394 testov** zelená. Maintenance/indexácia nezmenené (pred-launch).
+
+---
+
+## ✅ Indexácia admin záložka + card padding/shadow — NASADENÉ (2026-05-20, commits 09736f2 + 0eeaf83)
+
+Push `d1fa362..0eeaf83`, lftp **5 súborov** (indexing.php + layout.php + admin/index.php → private/, main.css/.min.css → web/). Žiadne DB zmeny.
+
+- **09736f2** *Indexácia* — `seo.public_indexing` mal route + storage, ale prepínač bol osirelý (žiadny GET formulár). Nová samostatná stránka `/admin/indexing` v *Nastaveniach* (vlastný tab vedľa Maintenance), checkbox „Povoliť indexáciu vyhľadávačmi" so stavovým bannerom + confirm pri prepnutí. Maintenance a Indexácia ostávajú **úplne nezávislé prepínače**, owner riadi každý zvlášť.
+- **0eeaf83** *.card padding-bottom = 3rem* (kvôli straddle „Rezervovať oslavu") + jemný pokojový tieň `0 3px 10px rgba(216,139,190,0.25)` na všetkých `.btn--straddle` (Rezervovať oslavu + 3× Rezervovať balíček). Hover tieň z `.btn:hover` zostáva.
+
+Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. 2 statické assety prod==repo byte-identicky. SFTP heslo shred. Suite **394 testov** zelená. Maintenance/indexácia nezmenené (pred-launch).
