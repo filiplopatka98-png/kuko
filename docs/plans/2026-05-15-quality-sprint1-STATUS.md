@@ -423,3 +423,16 @@ Push `b51034c..2d07fa7` (header batch + docs), lftp **7 súborov** (nav.php → 
 - **2d07fa7** kontaktné odkazy v mobilnom menu zbavené dedeného `.nav__menu a { padding; border-bottom }` → medzera e-mail/telefón = len `gap` (10 px), žiadny veľký priestor nad telefónom.
 
 6 statických assetov prod==repo byte-identicky (vrátane nového transparentného `logo.png/.webp` a `main.min.css/.min.js`). Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. SFTP heslo shred. Suite **391 testov** zelená (regresné testy prepísané na nový pure-CSS sticky model). Owner cron `expire-pending.php` stále čaká na registráciu (DEPLOY.md §11). Maintenance/indexácia nezmenené (pred-launch).
+
+---
+
+## ✅ O nás card__body fix + balíčky editovateľné per-field — NASADENÉ (2026-05-20, commits d863898 + d1fa362)
+
+Push `2d07fa7..d1fa362`, lftp **5 súborov** (seed-cms.php + o-nas.php + oslavy.php → private/, main.css/.min.css → web/) + _setup.php pre seed. Po seede _setup.php zmazaný (delete → 200, request → 503).
+
+- **d863898** *O nás karty:* `<p class="card__body">` → `<div class="card__body">` — admin editor (Quill) ukladá obsah ako `<p>...</p>`, vnútorný `<p>` zatváral vonkajší a vznikalo prázdne `.card__body` + osamotený paragraf → divné medzery. Pridané `.card__body > p { margin: 0 }`. Regression test `OnasCardsTest::testCardBodyIsDivNotParagraph`.
+- **d1fa362** *Balíčky editovateľné per-field:* zrušený all-or-nothing `$hasExtended` gate, ktorý padal späť na verbatim hardcoded HTML ak ktorékoľvek zo 4 extended polí bolo prázdne (a v migrácii 002 boli NULL → admin úpravy sa neukazovali). Refaktor: jednotný render path s per-package `$defaults` a `$pick()` per-field fallback; description ako `<div>` (rovnaký editor-`<p>` fix); idempotentný packages seed v `seed-cms.php` (`+ package mini/maxi/closed` na čistom DB, `= skip already filled` na opakovanom behu). Regression testy `OslavyCardsTest::testPerFieldFallbackNotAllOrNothingGate` + `testPackageDescIsDivNotParagraph`.
+
+Seed na prode: `+ package mini/maxi/closed` (všetky 6 extended polí naplnené defaultmi — admin úpravy ak sú už v DB zachované insert-where-empty sémantikou).
+
+Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200, `_setup.php` zmazaný (`?action=path` → 503). 2 statické assety prod==repo byte-identicky. SFTP heslo + tmp config shred. Suite **394 testov** zelená. Maintenance/indexácia nezmenené (pred-launch).
