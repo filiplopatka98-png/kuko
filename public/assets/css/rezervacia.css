@@ -332,3 +332,33 @@ input, select, textarea { font: inherit; }
 /* Required-field marker + legend (a11y) */
 .req { color: #c0392b; margin-left: 0.15rem; }
 .form-legend { font-size: 0.85rem; color: var(--c-text-soft, #725F56); margin: 0.25rem 0 0.75rem; }
+
+/* ===== Microinteractions (reservation page) =====
+   Reservation uses layout-minimal (no main.css), so the polish that
+   belongs to inputs + the submit button lives here. */
+
+/* Tactile button press (works for click + touch). */
+.btn:active { transform: translateY(0) scale(0.98); transition-duration: 0.08s; }
+
+/* Text input focus tint — pairs with the global focus-visible outline. */
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus,
+input[type="number"]:focus, input[type="date"]:focus, input[type="time"]:focus,
+textarea:focus, select:focus {
+  background: var(--bg-pink-soft);
+  transition: background 0.12s ease;
+}
+
+/* Submit-in-flight: keep disabled dimming, add a spinner so the user
+   sees the action is in progress. Toggled by rezervacia.js. */
+.btn.is-loading { position: relative; padding-right: 2.4rem; cursor: progress; }
+.btn.is-loading::after {
+  content: ""; position: absolute; right: 0.85rem; top: 50%;
+  width: 1em; height: 1em; margin-top: -0.5em;
+  border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%;
+  animation: kuko-spin 0.7s linear infinite;
+}
+@keyframes kuko-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .btn.is-loading::after { animation: none; border-right-color: currentColor; opacity: 0.6; }
+}

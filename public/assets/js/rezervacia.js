@@ -645,6 +645,7 @@ if (root) {
     e.preventDefault();
     errorBox.hidden = true;
     submitBtn.disabled = true;
+    submitBtn.classList.add('is-loading');
     submitBtn.textContent = 'Odosielam…';
 
     try {
@@ -707,6 +708,7 @@ if (root) {
       errorBox.hidden = false;
     } finally {
       submitBtn.disabled = false;
+      submitBtn.classList.remove('is-loading');
       submitBtn.textContent = 'Odoslať rezerváciu';
     }
   });
