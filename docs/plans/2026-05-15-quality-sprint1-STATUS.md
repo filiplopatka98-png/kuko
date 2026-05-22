@@ -447,3 +447,27 @@ Push `d1fa362..0eeaf83`, lftp **5 súborov** (indexing.php + layout.php + admin/
 - **0eeaf83** *.card padding-bottom = 3rem* (kvôli straddle „Rezervovať oslavu") + jemný pokojový tieň `0 3px 10px rgba(216,139,190,0.25)` na všetkých `.btn--straddle` (Rezervovať oslavu + 3× Rezervovať balíček). Hover tieň z `.btn:hover` zostáva.
 
 Invarianty: public `/`=503, robots `Disallow:/`, /admin/login=200, sitemap=200. 2 statické assety prod==repo byte-identicky. SFTP heslo shred. Suite **394 testov** zelená. Maintenance/indexácia nezmenené (pred-launch).
+
+---
+
+## ✅ Microinteractions pass — NASADENÉ (2026-05-22, commit 45a3689)
+
+Push `0eeaf83..45a3689`, lftp **6 súborov** (main.css/.min.css + rezervacia.css/.min.css/.js/.min.js → web/). Žiadne DB zmeny, žiadne template zmeny.
+
+Pure-CSS hover/focus/active polish (+2 riadky JS pre rezervačný spinner toggle):
+
+- **Karty O nás + balíčky:** translateY(-4px) + jemný tieň pri hover (gated `@media (hover: hover)`).
+- **Desktop top nav + footer menu:** animovaný „underline-grow" cez `::after` pseudo-element (`@media (min-width: 769px)`).
+- **Galéria:** prepracované — zoom **iba vnútorného `<img>`** (`transform: scale(1.08)`), dlaždica si drží presnú šírku/výšku (overené 188×141 px konštantne); container `overflow: hidden` orezáva zväčšený obrázok → grid sa neposúva.
+- **Tlačidlá:** `.btn:active { transform: scale(.98) }` taktilné stlačenie (vrátane `.btn--straddle` a rezervačného „Odoslať").
+- **Sociálne ikony:** scale(1.10) pop pri hover — topbar, mobilný hamburger panel, kontakt karta „Sledujte nás".
+- **Package badge:** mikro-rotácia (-6deg) + scale(1.06) pri hover karty balíčka.
+- **Text inputy:** focus tint na `--bg-pink-soft` (pridáva sa k existujúcemu focus-visible outline; oba CSS súbory).
+- **Cookie banner:** fade-up animation keď sa zobrazí (`.cookie-banner:not([hidden])` keyframes).
+- **Rezervačný submit:** inline spinner pseudo-element počas `.is-loading` (JS toggle); rešpektuje reduced-motion.
+
+Bezpečnosť: každý hover gated `@media (hover: hover)` (touch sa nezasekne), iba `transform`+`opacity` (GPU-kompozícia), globálne `prefers-reduced-motion: reduce` vypína všetko.
+
+4 statické assety prod==repo byte-identicky (vrátane min variantov; main.min.css po krátkej CDN race overené v 3 retries). SFTP heslo shred. Suite **394 testov** zelená.
+
+**Pozn.:** verejné `/` práve vracia **200** (nie 503) — owner medzičasom manuálne vypol Maintenance cez `/admin/maintenance` pre vlastnú live ukážku. `robots.txt` ostáva `Disallow: /` → Indexácia OFF, web sa nedostane do Google (toto sú samostatné prepínače od commitu 09736f2). `/admin/login`=200, `sitemap.xml`=200.
