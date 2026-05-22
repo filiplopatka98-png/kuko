@@ -471,3 +471,19 @@ Bezpečnosť: každý hover gated `@media (hover: hover)` (touch sa nezasekne), 
 4 statické assety prod==repo byte-identicky (vrátane min variantov; main.min.css po krátkej CDN race overené v 3 retries). SFTP heslo shred. Suite **394 testov** zelená.
 
 **Pozn.:** verejné `/` práve vracia **200** (nie 503) — owner medzičasom manuálne vypol Maintenance cez `/admin/maintenance` pre vlastnú live ukážku. `robots.txt` ostáva `Disallow: /` → Indexácia OFF, web sa nedostane do Google (toto sú samostatné prepínače od commitu 09736f2). `/admin/login`=200, `sitemap.xml`=200.
+
+---
+
+## ✅ Dynamický /llms.txt + docs — NASADENÉ (2026-05-22, commit 1ebfb49)
+
+Push `45a3689..1ebfb49`, lftp **3 súbory** (`LlmsTxt.php` nový + `Maintenance.php` bypass → private/, `index.php` route + robots ad → web/). Žiadne DB zmeny.
+
+- **`/llms.txt`** generovaný cez `\Kuko\LlmsTxt::render($db)` z tých istých zdrojov ako homepage (`Content::get` + `PackagesRepo`). Fallbacky byte-identické so seed-cms.php + oslavy.php $defaults (triple source of truth — popísané v CLAUDE.md). Pri výpadku DB padá na defaulty bez fatálu.
+- Gated by `seo.public_indexing` — OFF → HTTP 404 + `Not Found\n` (overené); ON → plný Markdown s aktuálnymi admin dátami.
+- `Maintenance::shouldBypass()` rozšírený o `/llms.txt` (rovnaký režim ako robots/sitemap — crawler musí vidieť SEO direktívy aj počas údržby).
+- `robots.txt` keď je Indexácia ON pridáva `LLM-Content: <base>/llms.txt` riadok — crawler tak nájde brief.
+- Docs: CLAUDE.md (triple source of truth pre balíčky, LlmsTxt konvencia, Maintenance vs Indexácia separation, „nikdy `<p>` okolo `Content::get` HTML" pravidlo), README.md (nová „SEO + AI crawlers" sekcia, aktualizovaný admin/lib zoznam), DEPLOY.md (smoke-test sekcia pre crawl súbory, vyjasnenie že robots/sitemap/llms sú dynamické routy).
+
+Overené na prode: `/llms.txt` → 404 (Indexácia OFF), `robots.txt` → `Disallow: /`, `/admin/login`=200, `sitemap.xml`=200. SFTP heslo shred. Suite **398 testov** zelená (+4 LlmsTxtTest).
+
+**Po flipnutí Indexácie ON (`/admin/indexing`) sa `/llms.txt` automaticky aktivuje** s aktuálnym Markdown briefom z DB — žiadny build, žiadny re-deploy.
