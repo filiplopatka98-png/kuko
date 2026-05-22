@@ -53,10 +53,31 @@ $router->get('/robots.txt', function () use ($publicIndexing) {
     header('Content-Type: text/plain; charset=utf-8');
     $indexing = $publicIndexing();
     if ($indexing) {
-        echo "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /rezervacia/\n\nSitemap: " . rtrim((string) \Kuko\Config::get('app.url'), '/') . "/sitemap.xml\n";
+        $base = rtrim((string) \Kuko\Config::get('app.url'), '/');
+        echo "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /rezervacia/\n\n"
+           . "Sitemap: $base/sitemap.xml\n"
+           . "# LLM-friendly site brief (llmstxt.org convention)\n"
+           . "LLM-Content: $base/llms.txt\n";
     } else {
         echo "User-agent: *\nDisallow: /\n";
     }
+});
+
+// LLM-friendly Markdown brief. Dynamically generated from the same Content
+// + PackagesRepo sources as the homepage, so edits in /admin propagate here
+// on the next request. Gated by the public-indexing toggle just like robots.
+$router->get('/llms.txt', function () use ($publicIndexing) {
+    header('Content-Type: text/markdown; charset=utf-8');
+    if (!$publicIndexing()) {
+        http_response_code(404);
+        echo "Not Found\n";
+        return;
+    }
+    $db = null;
+    try { $db = \Kuko\Db::fromConfig(); } catch (\Throwable $e) {
+        error_log('[llms.txt] DB unavailable, using defaults: ' . $e->getMessage());
+    }
+    echo \Kuko\LlmsTxt::render($db);
 });
 
 $router->get('/sitemap.xml', function () use ($publicIndexing) {

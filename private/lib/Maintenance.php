@@ -116,7 +116,7 @@ final class Maintenance
         if (str_starts_with($path, '/assets/')) return true;
         if ($path === '/maintenance' || $path === '/maintenance/') return true;
         // SEO crawl files must remain reachable so robots see the indexing directive.
-        if ($path === '/robots.txt' || $path === '/sitemap.xml') return true;
+        if ($path === '/robots.txt' || $path === '/sitemap.xml' || $path === '/llms.txt') return true;
         return false;
     }
 

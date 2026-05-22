@@ -21,8 +21,8 @@ Ideálny rozdeľ medzi `public/` a `private/`:
 ~/web/                   # DocumentRoot
   index.php
   .htaccess
-  robots.txt
-  sitemap.xml
+  # dynamic crawl routes (servované cez index.php, nie fyzické súbory):
+  #   /robots.txt   /sitemap.xml   /llms.txt
   admin/  api/  assets/
 ~/private/               # mimo DocumentRoot, neprístupné z internetu
   lib/  templates/  migrations/  logs/  cron/  scripts/
@@ -106,6 +106,13 @@ brew install webp
 - Cookie banner → klik „Súhlasím" → zmizne.
 - Modal: klik „Rezervovať balíček" → otvorí sa, súhlas s cookies → submit → e-mail dorazí, autoreply tiež.
 - Admin: `https://kuko-detskysvet.sk/admin/` → Basic Auth dialog → po prihlásení vidieť rezerváciu → status change → audit log v `admin_actions`.
+
+**Crawl/SEO súbory** (reagujú na `/admin/indexing` toggle):
+- `https://kuko-detskysvet.sk/robots.txt` → keď Indexácia OFF → `Disallow: /`;
+  keď ON → `Allow: /` + `Sitemap:` + `LLM-Content:` riadok.
+- `https://kuko-detskysvet.sk/sitemap.xml` → keď ON → zoznam verejných URL.
+- `https://kuko-detskysvet.sk/llms.txt` → keď OFF → 404; keď ON → Markdown
+  brief pre AI crawlerov dynamicky generovaný z aktuálnych admin dát.
 
 ## 9. Lokálny dev
 

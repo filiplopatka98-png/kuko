@@ -13,11 +13,23 @@ osláv + WordPress-style admin.
 
 Session-based admin (`/admin`, `config/.htpasswd`). Editovateľný obsah a SEO
 per stránka (vrátane OG obrázku + Google-style náhľad), galéria, otváracie
-hodiny, balíčky, blokácie, kalendár (klik na deň → rezervácie dňa), GDPR a
-maintenance. **E-maily** (`/admin/emails`): predmet + hlavný text per typ
-(`MailContent`) s náhľadom celého e-mailu; každý e-mail nesie kompletné dáta
-rezervácie + brandovanú pätičku. Pri rezervácii tlačidlo *Pridať do Google
-kalendára* (`CalendarLink`).
+hodiny, balíčky (per-field fallback — každé pole nezávisle editovateľné),
+blokácie, kalendár (klik na deň → rezervácie dňa), GDPR a maintenance.
+**E-maily** (`/admin/emails`): predmet + hlavný text per typ (`MailContent`)
+s náhľadom celého e-mailu; každý e-mail nesie kompletné dáta rezervácie +
+brandovanú pätičku. Pri rezervácii tlačidlo *Pridať do Google kalendára*
+(`CalendarLink`). **Maintenance** (`/admin/maintenance`) a **Indexácia**
+(`/admin/indexing`) sú dva nezávislé prepínače.
+
+## SEO + AI crawlers
+
+- `robots.txt`, `sitemap.xml`, `<meta robots>` a OG/Twitter/Schema.org sa
+  dynamicky riadia podľa nastavenia *Indexácia*.
+- **`/llms.txt`** (llmstxt.org konvencia) — Markdown brief pre AI crawlerov
+  (ChatGPT, Perplexity, Gemini AI Overviews) generovaný cez `\Kuko\LlmsTxt`
+  z tých istých `Content` + `PackagesRepo` zdrojov ako homepage, takže
+  admin úpravy sa prejavia automaticky. Inzerovaný v `robots.txt`
+  cez `LLM-Content:` riadok.
 
 ## Tech stack
 
@@ -36,7 +48,7 @@ public/            # DocumentRoot (na serveri → web/)
   assets/            css js img icons fonts (+ committed *.min.*)
 private/             mimo DocumentRoot
   lib/               PHP triedy (Db, Availability, Reservation, Content,
-                     MailContent, CalendarLink, Seo, Social, …)
+                     MailContent, CalendarLink, LlmsTxt, Seo, Social, …)
   templates/         PHP šablóny (pages/, sections/, layout*.php, admin/)
   migrations/        SQL migrácie (idempotentné)
   scripts/           seed-cms.php, build-assets.php, dev-db-init.php

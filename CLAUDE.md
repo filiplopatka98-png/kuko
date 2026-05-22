@@ -32,6 +32,27 @@ Inštrukcie pre AI asistenta. Čítaj `README.md` pre prehľad projektu.
   dáta rezervácie + brandovaná pätička; pätička berie kontakty cez
   `Content`/`Social` s fallbackom). Per-rezervácia Google-kalendár odkaz cez
   `\Kuko\CalendarLink::google()` (iCal export route bola odstránená).
+- Balíčky: render má **per-field fallback**, nie all-or-nothing gate.
+  `sections/oslavy.php` má `$defaults` per code (mini/maxi/closed); `$pick()`
+  vráti DB hodnotu ak je neprázdna, inak default. Tým je každé pole
+  (description, price_text, kids_count_text, duration_text, included, accent)
+  individuálne editovateľné cez `/admin/packages`. Defaults v oslavy.php,
+  llms.txt a `seed-cms.php` packages-seed bloku **musia byť byte-identické**
+  (triple source of truth — edituj všetky tri naraz).
+- LLM brief: dynamický `/llms.txt` cez `\Kuko\LlmsTxt::render($db)` —
+  Markdown brief pre AI crawlerov, generovaný z tých istých zdrojov ako
+  homepage (`Content::get` + `PackagesRepo`). Fallbacky byte-identické so
+  seedom. Gated by `seo.public_indexing` (off → 404). V `Maintenance::shouldBypass()`
+  je `/llms.txt` zaradený vedľa `/robots.txt` + `/sitemap.xml`.
+- Admin **Maintenance** (`maintenance.enabled`) a **Indexácia**
+  (`seo.public_indexing`) sú dva **nezávislé** prepínače v *Nastaveniach*
+  (`/admin/maintenance` a `/admin/indexing`). Žiadne prelínanie — owner každý
+  riadi sám. `robots.txt` + `<meta robots>` + `/llms.txt` reagujú LEN na
+  indexáciu.
+- HTML obsah z admin editora (Quill) je obalený v `<p>` — preto **nikdy
+  neobalovať `Content::get()` výstup s nezaškvaleným HTML do `<p>`** (vnútorný
+  `<p>` zavrie vonkajší, vznikne prázdny wrapper + osamotený paragraf). Použi
+  `<div class="…">` (príklady: `.card__body`, `.package__desc`).
 - Migrácie aj seedy **idempotentné**. Nové content bloky pridaj do seed-cms.php
   aj do príslušnej admin `$adminPages` prefix skupiny (`public/admin/index.php`).
 - Po zmene CSS/JS zdroja spusti `php private/scripts/build-assets.php` a
