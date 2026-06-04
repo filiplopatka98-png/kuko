@@ -30,7 +30,7 @@ $igUrl = \Kuko\Social::url('instagram', '');
             <p class="contact-card__title">Máte otázky? Kontaktujte nás:</p>
             <p class="contact-card__value">
               <a href="tel:+421915319934"><?= e(\Kuko\Content::get('kontakt.phone', '+421 915 319 934')) ?></a> |
-              <a href="mailto:info@kuko-detskysvet.sk"><?= e(\Kuko\Content::get('kontakt.email', 'info@kuko-detskysvet.sk')) ?></a>
+              <a href="mailto:info@kukodetskysvet.sk"><?= e(\Kuko\Content::get('kontakt.email', 'info@kukodetskysvet.sk')) ?></a>
             </p>
           </div>
         </div>

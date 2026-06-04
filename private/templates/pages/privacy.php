@@ -1,6 +1,6 @@
 <?php
 $title = 'Ochrana osobných údajov — KUKO detský svet';
-$description = 'Zásady spracovania osobných údajov a cookies na webe kuko-detskysvet.sk.';
+$description = 'Zásady spracovania osobných údajov a cookies na webe kukodetskysvet.sk.';
 $canonical = '/ochrana-udajov';
 $pageType = 'privacy';
 $pageIndexing = false;
@@ -13,7 +13,7 @@ ob_start();
 
 <?= \Kuko\Content::get('privacy.body', <<<'HTML'
     <h2 class="legal-h2">1. Prevádzkovateľ</h2>
-    <p>Prevádzkovateľom webu kuko-detskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+    <p>Prevádzkovateľom webu kukodetskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
 
     <h2 class="legal-h2">2. Rozsah a účel spracovania</h2>
     <p>Pri rezervácii oslavy spracúvame údaje, ktoré ste nám poskytli prostredníctvom formulára: meno, telefón, e-mail, požadovaný dátum a čas oslavy, počet detí a poznámku. Tieto údaje spracúvame výlučne na účel vybavenia vašej rezervácie a kontaktu vo veci oslavy.</p>
@@ -28,7 +28,7 @@ ob_start();
     <p>Web používa nevyhnutné cookies a — len s vaším súhlasom — Google reCAPTCHA (ochrana formulára pred spamom), prípadne v budúcnosti analytické či marketingové nástroje. Podrobný prehľad jednotlivých cookies a správu svojho súhlasu nájdete v <a href="/zasady-cookies">Zásadách používania cookies</a>.</p>
 
     <h2 class="legal-h2">6. Vaše práva</h2>
-    <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+    <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
 
     <p class="legal-back"><a href="/">&larr; Späť na domov</a></p>
 

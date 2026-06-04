@@ -391,7 +391,7 @@ $router->get('/admin/contact', function () use ($renderer, $db, $settings, $admi
     $contact = [
         'address' => $cb->get('kontakt.address') ?? 'Bratislavská 141, 921 01 Piešťany',
         'phone'   => $cb->get('kontakt.phone')   ?? '+421 915 319 934',
-        'email'   => $cb->get('kontakt.email')   ?? 'info@kuko-detskysvet.sk',
+        'email'   => $cb->get('kontakt.email')   ?? 'info@kukodetskysvet.sk',
         'hours'   => $cb->get('kontakt.hours')   ?? 'Pondelok – Nedeľa: 9:00 – 20:00',
         'facebook'  => $settings->get('social.facebook')  ?? (string) \Kuko\Config::get('social.facebook', ''),
         'instagram' => $settings->get('social.instagram') ?? (string) \Kuko\Config::get('social.instagram', ''),
@@ -653,7 +653,7 @@ $router->get('/admin/emails', function () use ($renderer, $settings, $db, $admin
     \Kuko\Social::setSettings($settings);
     $mailRenderer = new \Kuko\Renderer(APP_ROOT . '/private/templates/mail');
     $sampleRec = \Kuko\MailContent::sampleRecord();
-    $appUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+    $appUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kukodetskysvet.sk'), '/');
     $sampleLink = $appUrl . '/rezervacia/' . (string) $sampleRec['view_token'];
     $types = [];
     foreach (\Kuko\MailContent::TYPES as $key => $label) {

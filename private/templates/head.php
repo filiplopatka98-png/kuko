@@ -10,7 +10,7 @@ $siteName = 'KUKO detský svet';
 $titleFinal = $title ?? 'KUKO detský svet — herňa a kaviareň v Piešťanoch';
 $descriptionFinal = $description ?? 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, káva pre rodičov, oslavy na mieru. Pondelok – Nedeľa 9:00 – 20:00.';
 $siteKey = \Kuko\Config::get('recaptcha.site_key', '');
-$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kukodetskysvet.sk'), '/');
 $canonicalUrl = $baseUrl . ($canonical ?? '/');
 $ogImageUrl = $ogImage ?? ($baseUrl . '/assets/img/og-cover.jpg');
 
@@ -98,7 +98,7 @@ if (!empty($seo['image'])) {
   "logo": "<?= e($baseUrl) ?>/assets/img/logo.png",
   "url": "<?= e($baseUrl) ?>/",
   "telephone": "+421915319934",
-  "email": "info@kuko-detskysvet.sk",
+  "email": "info@kukodetskysvet.sk",
   "priceRange": "<?= e($schemaPriceRange) ?>",
   "currenciesAccepted": "EUR",
   "paymentAccepted": "Cash, Credit Card",

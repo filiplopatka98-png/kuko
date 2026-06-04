@@ -1,7 +1,7 @@
 # KUKO detský svet
 
 Web pre **KUKO detský svet** — interiérové detské ihrisko + kaviareň v Piešťanoch
-(Bratislavská 141, 921 01 Piešťany · +421 915 319 934 · info@kuko-detskysvet.sk ·
+(Bratislavská 141, 921 01 Piešťany · +421 915 319 934 · info@kukodetskysvet.sk ·
 Po–Ne 9:00–20:00). Jednostránkový prezentačný web + viackrokový rezervačný systém
 osláv + WordPress-style admin.
 

@@ -113,8 +113,8 @@ final class MailContentTest extends TestCase
         $r = \Kuko\MailContent::sampleRecord();
         $ren = new \Kuko\Renderer(\dirname(__DIR__, 2) . '/templates/mail');
         foreach (['admin', 'customer', 'confirmed', 'cancelled'] as $k) {
-            $h = $ren->render("reservation_$k.html", ['r' => $r, 'statusLink' => 'https://kuko-detskysvet.sk/x']);
-            $t = $ren->render("reservation_$k.text", ['r' => $r, 'statusLink' => 'https://kuko-detskysvet.sk/x']);
+            $h = $ren->render("reservation_$k.html", ['r' => $r, 'statusLink' => 'https://kukodetskysvet.sk/x']);
+            $t = $ren->render("reservation_$k.text", ['r' => $r, 'statusLink' => 'https://kukodetskysvet.sk/x']);
             foreach ([$h, $t] as $body) {
                 $this->assertStringContainsString($r['name'], $body, "$k: name");
                 $this->assertStringContainsString($r['phone'], $body, "$k: phone");

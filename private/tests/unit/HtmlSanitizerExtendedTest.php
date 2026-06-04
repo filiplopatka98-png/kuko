@@ -139,7 +139,7 @@ final class HtmlSanitizerExtendedTest extends TestCase
         $this->assertStringContainsString('href="/rezervacia"', $joined);
         $this->assertStringContainsString('href="/#kontakt"', $joined);
         $this->assertStringContainsString('href="tel:+421915319934"', $joined);
-        $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $joined);
+        $this->assertStringContainsString('href="mailto:info@kukodetskysvet.sk"', $joined);
         // sanitising an already-clean answer is idempotent (no mangling)
         foreach ($defaults as $it) {
             $this->assertSame($it['a'], HtmlSanitizer::clean($it['a']));
@@ -156,7 +156,7 @@ final class HtmlSanitizerExtendedTest extends TestCase
         $out  = HtmlSanitizer::clean($body);
         $this->assertStringContainsString('<h2 class="legal-h2">1. Prevádzkovateľ</h2>', $out);
         $this->assertStringContainsString('<h2 class="legal-h2">6. Vaše práva</h2>', $out);
-        $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $out);
+        $this->assertStringContainsString('href="mailto:info@kukodetskysvet.sk"', $out);
         // The detailed cookie list + Google link moved to /zasady-cookies;
         // privacy now cross-links to it.
         $this->assertStringContainsString('href="/zasady-cookies"', $out);

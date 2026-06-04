@@ -6,11 +6,11 @@ Cieľová platforma: **WebSupport** (Apache 2 + PHP 8.1+ + MySQL/MariaDB).
 
 | Položka | Akcia |
 |---|---|
-| **Doména** | `kuko-detskysvet.sk` smeruje na WebSupport nameservery |
+| **Doména** | `kukodetskysvet.sk` smeruje na WebSupport nameservery |
 | **SSL** | Aktivovať Let's Encrypt vo WebSupport admine |
 | **Databáza** | Vytvoriť MySQL/MariaDB DB s collation `utf8mb4_unicode_ci`. Poznamenať host, name, user, password |
-| **Mailbox** | Vytvoriť mailbox `info@kuko-detskysvet.sk`, poznamenať SMTP heslo |
-| **reCAPTCHA v3** | Na https://www.google.com/recaptcha/admin/create vytvoriť kľúč pre `kuko-detskysvet.sk`. Poznamenať `site_key` a `secret_key` |
+| **Mailbox** | Vytvoriť mailbox `info@kukodetskysvet.sk`, poznamenať SMTP heslo |
+| **reCAPTCHA v3** | Na https://www.google.com/recaptcha/admin/create vytvoriť kľúč pre `kukodetskysvet.sk`. Poznamenať `site_key` a `secret_key` |
 | **Sociálne siete** | URL Facebook a Instagram (zadávajú sa do `config.php → social.*`) |
 
 ## 2. Adresárová štruktúra na serveri
@@ -39,7 +39,7 @@ Ak WebSupport nepovolí cesty mimo webrootu, ponechaj `private/` a `config/` vn�
 3. Vyplň:
    - `db.host`, `db.name`, `db.user`, `db.pass`
    - `mail.host=smtp.websupport.sk`, `mail.port=465`, `mail.encryption=ssl`, `mail.user`, `mail.pass`
-   - `mail.from_email=info@kuko-detskysvet.sk`, `mail.admin_to=info@kuko-detskysvet.sk`
+   - `mail.from_email=info@kukodetskysvet.sk`, `mail.admin_to=info@kukodetskysvet.sk`
    - `recaptcha.site_key`, `recaptcha.secret_key` (z `config/secrets.local.md` — gitignored)
    - `recaptcha.min_score` = `0.5`
    - `security.ip_hash_secret` = `openssl rand -hex 32`
@@ -76,7 +76,7 @@ V `public/admin/.htaccess` odkomentuj a uprav `AuthUserFile` na absolútnu cestu
 AuthUserFile /full/absolute/path/to/public/admin/.htpasswd
 ```
 
-Skontroluj prístup: `https://kuko-detskysvet.sk/admin/` musí pýtať heslo.
+Skontroluj prístup: `https://kukodetskysvet.sk/admin/` musí pýtať heslo.
 
 ## 6. Force HTTPS
 
@@ -100,18 +100,18 @@ brew install webp
 
 ## 8. Smoke test po deploy-i
 
-- `https://kuko-detskysvet.sk/` → homepage so všetkými sekciami, fonty + obrázky.
-- `https://kuko-detskysvet.sk/ochrana-udajov` → privacy page.
-- `https://kuko-detskysvet.sk/neexistuje` → 404 page.
+- `https://kukodetskysvet.sk/` → homepage so všetkými sekciami, fonty + obrázky.
+- `https://kukodetskysvet.sk/ochrana-udajov` → privacy page.
+- `https://kukodetskysvet.sk/neexistuje` → 404 page.
 - Cookie banner → klik „Súhlasím" → zmizne.
 - Modal: klik „Rezervovať balíček" → otvorí sa, súhlas s cookies → submit → e-mail dorazí, autoreply tiež.
-- Admin: `https://kuko-detskysvet.sk/admin/` → Basic Auth dialog → po prihlásení vidieť rezerváciu → status change → audit log v `admin_actions`.
+- Admin: `https://kukodetskysvet.sk/admin/` → Basic Auth dialog → po prihlásení vidieť rezerváciu → status change → audit log v `admin_actions`.
 
 **Crawl/SEO súbory** (reagujú na `/admin/indexing` toggle):
-- `https://kuko-detskysvet.sk/robots.txt` → keď Indexácia OFF → `Disallow: /`;
+- `https://kukodetskysvet.sk/robots.txt` → keď Indexácia OFF → `Disallow: /`;
   keď ON → `Allow: /` + `Sitemap:` + `LLM-Content:` riadok.
-- `https://kuko-detskysvet.sk/sitemap.xml` → keď ON → zoznam verejných URL.
-- `https://kuko-detskysvet.sk/llms.txt` → keď OFF → 404; keď ON → Markdown
+- `https://kukodetskysvet.sk/sitemap.xml` → keď ON → zoznam verejných URL.
+- `https://kukodetskysvet.sk/llms.txt` → keď OFF → 404; keď ON → Markdown
   brief pre AI crawlerov dynamicky generovaný z aktuálnych admin dát.
 
 ## 9. Lokálny dev
@@ -134,7 +134,7 @@ WebSupport robí denné DB zálohy. Pre extra istotu:
 
 Po nasadení **owner musí zaregistrovať tieto cron úlohy** v paneli WebSupport
 (Hosting → Cron). Bez nich príslušná logika nebeží automaticky. Absolútnu
-cestu k PHP a k projektu zisti cez `https://kuko-detskysvet.sk/_setup.php?action=path&token=<auth.secret>`
+cestu k PHP a k projektu zisti cez `https://kukodetskysvet.sk/_setup.php?action=path&token=<auth.secret>`
 (alebo z panela). Cesta nižšie je vzor — uprav podľa reálneho účtu.
 
 | Skript | Čo robí | Odporúčaná frekvencia |
@@ -146,9 +146,9 @@ cestu k PHP a k projektu zisti cez `https://kuko-detskysvet.sk/_setup.php?action
 Príkaz (vzor — uprav cestu):
 
 ```bash
-/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/expire-pending.php
-/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/retention.php
-/usr/bin/php /data/<účet>/kuko-detskysvet.sk/private/cron/db-backup.php
+/usr/bin/php /data/<účet>/kukodetskysvet.sk/private/cron/expire-pending.php
+/usr/bin/php /data/<účet>/kukodetskysvet.sk/private/cron/retention.php
+/usr/bin/php /data/<účet>/kukodetskysvet.sk/private/cron/db-backup.php
 ```
 
 > **POZOR — `expire-pending.php`:** bez tohto cronu sa nepotvrdené pending

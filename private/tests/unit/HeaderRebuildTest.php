@@ -8,7 +8,7 @@ final class HeaderRebuildTest extends TestCase
     protected function setUp(): void { $this->nav = file_get_contents(\dirname(__DIR__, 3) . '/private/templates/nav.php'); }
     public function testTopbarHasContactIconsAndSocial(): void
     {
-        $this->assertStringContainsString('mailto:info@kuko-detskysvet.sk', $this->nav);
+        $this->assertStringContainsString('mailto:info@kukodetskysvet.sk', $this->nav);
         $this->assertStringContainsString('tel:+421915319934', $this->nav);
         $this->assertMatchesRegularExpression('/Sledujte n\x{00E1}s/u', $this->nav); // "Sledujte nás"
         $this->assertStringContainsString('Social::url', $this->nav);

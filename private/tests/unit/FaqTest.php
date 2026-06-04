@@ -44,7 +44,7 @@ final class FaqTest extends TestCase
         $this->assertStringContainsString('href="/rezervacia"', $joined);
         $this->assertStringContainsString('href="/#kontakt"', $joined);
         $this->assertStringContainsString('href="tel:+421915319934"', $joined);
-        $this->assertStringContainsString('href="mailto:info@kuko-detskysvet.sk"', $joined);
+        $this->assertStringContainsString('href="mailto:info@kukodetskysvet.sk"', $joined);
     }
 
     public function testItemsParsesValidJson(): void

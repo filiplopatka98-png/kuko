@@ -8,7 +8,7 @@ declare(strict_types=1);
  *
  * Writes APP_ROOT/config/.htpasswd (bcrypt, one user per line, mode 0600).
  * The resulting file is gitignored — to take effect on PRODUCTION you must
- * deploy it to kuko-detskysvet.sk/config/.htpasswd (see docs/WORKFLOW.md).
+ * deploy it to kukodetskysvet.sk/config/.htpasswd (see docs/WORKFLOW.md).
  */
 
 require __DIR__ . '/../lib/App.php';

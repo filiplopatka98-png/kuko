@@ -10,7 +10,7 @@ declare(strict_types=1);
  *
  * OWNER ACTION REQUIRED:
  *   1. Register this in the WebSupport cron panel to run WEEKLY, e.g.:
- *        php /data/.../kuko-detskysvet.sk/private/cron/db-backup.php
+ *        php /data/.../kukodetskysvet.sk/private/cron/db-backup.php
  *   2. Periodically DOWNLOAD the newest private/logs/backups/kuko-*.sql.gz
  *      OFFSITE (a backup that only lives on the same server is not a backup).
  *

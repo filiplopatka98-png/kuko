@@ -46,12 +46,12 @@ final class LlmsTxt
      */
     public static function render(?Db $db = null): string
     {
-        $base = rtrim((string) Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+        $base = rtrim((string) Config::get('app.url', 'https://kukodetskysvet.sk'), '/');
 
         // Contact + cennik — live values via Content (seed-identical fallbacks).
         $address = Content::get('kontakt.address', 'Bratislavská 141, 921 01 Piešťany');
         $phone   = Content::get('kontakt.phone',   '+421 915 319 934');
-        $email   = Content::get('kontakt.email',   'info@kuko-detskysvet.sk');
+        $email   = Content::get('kontakt.email',   'info@kukodetskysvet.sk');
         $hours   = Content::get('kontakt.hours',   'Pondelok – Nedeľa: 9:00 – 20:00');
         $tagline = Content::get('hero.tagline',    'Bezpečné a hravé miesto pre vaše deti v Piešťanoch');
 

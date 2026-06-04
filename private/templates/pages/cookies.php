@@ -1,6 +1,6 @@
 <?php
 $title = 'Zásady používania cookies — KUKO detský svet';
-$description = 'Aké cookies používame na webe kuko-detskysvet.sk, na čo slúžia a ako spravovať svoj súhlas.';
+$description = 'Aké cookies používame na webe kukodetskysvet.sk, na čo slúžia a ako spravovať svoj súhlas.';
 $canonical = '/zasady-cookies';
 $pageType = 'cookies';
 $pageIndexing = false;
@@ -33,7 +33,7 @@ ob_start();
     <p>Pri prvej návšteve sa zobrazí cookie lišta, kde môžete súhlas udeliť, odmietnuť alebo si vybrať jednotlivé kategórie cez „Nastavenia". Svoje rozhodnutie môžete kedykoľvek zmeniť kliknutím na <strong>„Cookie nastavenia"</strong> v pätičke webu.</p>
 
     <h2 class="legal-h2">6. Kontakt</h2>
-    <p>V prípade otázok k spracúvaniu cookies nás kontaktujte na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Spracúvanie osobných údajov upravuje <a href="/ochrana-udajov">Ochrana osobných údajov</a>.</p>
+    <p>V prípade otázok k spracúvaniu cookies nás kontaktujte na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>. Spracúvanie osobných údajov upravuje <a href="/ochrana-udajov">Ochrana osobných údajov</a>.</p>
 
     <p class="legal-back"><a href="/">&larr; Späť na domov</a></p>
 

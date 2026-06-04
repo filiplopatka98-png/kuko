@@ -5,12 +5,12 @@ $ig = \Kuko\Social::url('instagram', '');
 <div class="topbar">
   <div class="container topbar__inner">
     <div class="topbar__contact">
-      <a href="mailto:info@kuko-detskysvet.sk" class="topbar__link">
+      <a href="mailto:info@kukodetskysvet.sk" class="topbar__link">
         <svg class="topbar__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
           <path d="M2 4l6 4.5L14 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>info@kuko-detskysvet.sk</span>
+        <span>info@kukodetskysvet.sk</span>
       </a>
       <a href="tel:+421915319934" class="topbar__link">
         <svg class="topbar__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -57,12 +57,12 @@ $ig = \Kuko\Social::url('instagram', '');
       <a href="/galeria">Fotogaléria</a>
       <a href="/#kontakt">Kontakt</a>
       <div class="nav__contact" aria-label="Kontakt a sociálne siete">
-        <a href="mailto:info@kuko-detskysvet.sk" class="nav__contact-link">
+        <a href="mailto:info@kukodetskysvet.sk" class="nav__contact-link">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
             <path d="M2 4l6 4.5L14 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span>info@kuko-detskysvet.sk</span>
+          <span>info@kukodetskysvet.sk</span>
         </a>
         <a href="tel:+421915319934" class="nav__contact-link">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">

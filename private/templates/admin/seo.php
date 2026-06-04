@@ -13,7 +13,7 @@ $pages = [
     'faq'        => ['Časté otázky',          '/faq'],
     'privacy'    => ['Ochrana údajov',        '/ochrana-udajov'],
 ];
-$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kukodetskysvet.sk'), '/');
 ob_start();
 ?>
 <h2>SEO — meta a indexovanie</h2>

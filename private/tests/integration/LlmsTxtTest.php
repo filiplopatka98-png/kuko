@@ -30,7 +30,7 @@ final class LlmsTxtTest extends TestCase
         // Seed-identical contact fallbacks.
         $this->assertStringContainsString('Bratislavská 141, 921 01 Piešťany', $out);
         $this->assertStringContainsString('+421 915 319 934', $out);
-        $this->assertStringContainsString('info@kuko-detskysvet.sk', $out);
+        $this->assertStringContainsString('info@kukodetskysvet.sk', $out);
         $this->assertStringContainsString('Pondelok – Nedeľa: 9:00 – 20:00', $out);
         // Cennik rows.
         $this->assertStringContainsString('Dieťa do 1 roku: ZADARMO', $out);

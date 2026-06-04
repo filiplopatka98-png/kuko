@@ -6,7 +6,7 @@
 <?= \Kuko\MailContent::introHtml('reservation_admin', $r) ?>
 <?php include __DIR__ . '/_details.html.php'; ?>
 <p style="margin-top:1.5rem">
-  <a href="<?= e(rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/')) ?>/admin/" style="background:#D88BBE;color:white;padding:0.75rem 1.5rem;border-radius:999px;text-decoration:none">Otvoriť admin</a>
+  <a href="<?= e(rtrim((string) \Kuko\Config::get('app.url', 'https://kukodetskysvet.sk'), '/')) ?>/admin/" style="background:#D88BBE;color:white;padding:0.75rem 1.5rem;border-radius:999px;text-decoration:none">Otvoriť admin</a>
 </p>
 <?php include __DIR__ . '/_footer.html.php'; ?>
 </body></html>

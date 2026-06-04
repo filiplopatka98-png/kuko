@@ -14,7 +14,7 @@ Tento dokument vysvetľuje, čo sa kde deje pri zmene kódu, od editácie na lok
          │ (cez lftp/Forklift/Cyberduck)
          ▼
 ┌──────────────────────────────────────────────┐
-│ WebSupport — kuko-detskysvet.sk              │
+│ WebSupport — kukodetskysvet.sk              │
 │  /web/           ← DocumentRoot (verejné)    │
 │  /private/       ← lib, templates, migrations│
 │  /config/        ← config.php (secrets)      │
@@ -137,18 +137,18 @@ WebSupport ponúka **SFTP-only účet** (žiadne SSH, žiadne shell príkazy). M
 - `brew install lftp sshpass` (pre non-interactive SFTP)
 - SFTP credentials uložené v password manageri:
   ```
-  host: kuko-detskysvet.sk
+  host: kukodetskysvet.sk
   port: 22
-  user: filip.kuko-detskysvet.sk
+  user: filip.kukodetskysvet.sk
   pass: <heslo>
-  remote_path: kuko-detskysvet.sk/web
+  remote_path: kukodetskysvet.sk/web
   ```
 
 ### Adresárová štruktúra na serveri
 
 ```
 /                                       (SFTP root)
-├── kuko-detskysvet.sk/
+├── kukodetskysvet.sk/
 │   ├── logs/                           ← Apache error_log (read-only)
 │   ├── sub/                            ← subdomény (nepoužívame)
 │   ├── web/                            ← DocumentRoot
@@ -168,7 +168,7 @@ WebSupport ponúka **SFTP-only účet** (žiadne SSH, žiadne shell príkazy). M
 │       └── config.php                  ← secrets — NIKDY nie z gitu
 ```
 
-`web/index.php` načítava `../private/lib/App.php` cez `dirname(__DIR__)`. PHP-FPM má pre tento účet povolený prístup k súborom v `/kuko-detskysvet.sk/`, takže `private/` a `config/` sú síce nedostupné cez HTTP (mimo DocumentRoot), ale PHP ich vie zahrnúť.
+`web/index.php` načítava `../private/lib/App.php` cez `dirname(__DIR__)`. PHP-FPM má pre tento účet povolený prístup k súborom v `/kukodetskysvet.sk/`, takže `private/` a `config/` sú síce nedostupné cez HTTP (mimo DocumentRoot), ale PHP ich vie zahrnúť.
 
 ### Upload (SFTP)
 
@@ -176,9 +176,9 @@ Pre routinnú zmenu (textová úprava, CSS, šablóna):
 
 ```bash
 lftp -e "
-  open -p 22 -u 'filip.kuko-detskysvet.sk,<heslo>' sftp://kuko-detskysvet.sk;
-  put public/index.php -o kuko-detskysvet.sk/web/index.php;
-  put private/templates/sections/hero.php -o kuko-detskysvet.sk/private/templates/sections/hero.php;
+  open -p 22 -u 'filip.kukodetskysvet.sk,<heslo>' sftp://kukodetskysvet.sk;
+  put public/index.php -o kukodetskysvet.sk/web/index.php;
+  put private/templates/sections/hero.php -o kukodetskysvet.sk/private/templates/sections/hero.php;
   bye
 "
 ```
@@ -187,9 +187,9 @@ Pre väčšiu sériu zmien (po commitu):
 
 ```bash
 lftp -e "
-  open -p 22 -u 'filip.kuko-detskysvet.sk,<heslo>' sftp://kuko-detskysvet.sk;
-  mirror -R --no-empty-dirs --only-newer --exclude=router.php public/ kuko-detskysvet.sk/web/;
-  mirror -R --no-empty-dirs --only-newer --exclude=tests/ --exclude=logs/kuko-dev.sqlite --exclude=lib/vendor/ private/ kuko-detskysvet.sk/private/;
+  open -p 22 -u 'filip.kukodetskysvet.sk,<heslo>' sftp://kukodetskysvet.sk;
+  mirror -R --no-empty-dirs --only-newer --exclude=router.php public/ kukodetskysvet.sk/web/;
+  mirror -R --no-empty-dirs --only-newer --exclude=tests/ --exclude=logs/kuko-dev.sqlite --exclude=lib/vendor/ private/ kukodetskysvet.sk/private/;
   bye
 "
 ```
@@ -207,9 +207,9 @@ lftp -e "
 
 Pri zmene config-u na produkcii:
 
-1. Stiahni si aktuálny: `lftp ... get kuko-detskysvet.sk/config/config.php -o /tmp/prod-config.php`
+1. Stiahni si aktuálny: `lftp ... get kukodetskysvet.sk/config/config.php -o /tmp/prod-config.php`
 2. Edit lokálne (v `/tmp/`, nie v repo)
-3. Upload späť: `put /tmp/prod-config.php -o kuko-detskysvet.sk/config/config.php`
+3. Upload späť: `put /tmp/prod-config.php -o kukodetskysvet.sk/config/config.php`
 
 **Nikdy** neuploaduj `config.php` z repo — by si prepísal prod secrets svojou dev SQLite konfiguráciou.
 
@@ -222,18 +222,18 @@ Server je SFTP-only, takže `php private/migrations/run.php` priamo na serveri s
 TOKEN="<auth.secret-z-prod-config>"
 
 # Spusti migrácie:
-curl "https://kuko-detskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
 # → "+ apply 005_xyz.sql\n  done\nall migrations applied"
 
 # Smoke test DB:
-curl "https://kuko-detskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
 # → "Tables:\n  admin_actions\n  packages\n  reservations\n..."
 
 # Vyzistiť absolútne cesty (užitočné pre .htpasswd):
-curl "https://kuko-detskysvet.sk/_setup.php?action=path&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=path&token=$TOKEN"
 
 # Self-destruct po dokončení (odporúčam):
-curl "https://kuko-detskysvet.sk/_setup.php?action=delete&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=delete&token=$TOKEN"
 ```
 
 Token je verifikovaný cez `hash_equals` — bez správneho tokenu vráti 403. Self-destruct vymaže `_setup.php` zo servera.
@@ -254,8 +254,8 @@ verejne prístupný. Pridanie / reset admina (aj recovery ak si zabudol heslo):
 
 ```bash
 lftp -e "
-  open -p 22 -u 'filip.kuko-detskysvet.sk,<heslo>' sftp://kuko-detskysvet.sk;
-  put config/.htpasswd -o kuko-detskysvet.sk/config/.htpasswd;
+  open -p 22 -u 'filip.kukodetskysvet.sk,<heslo>' sftp://kukodetskysvet.sk;
+  put config/.htpasswd -o kukodetskysvet.sk/config/.htpasswd;
   bye
 "
 ```
@@ -266,24 +266,24 @@ lftp -e "
 
 ```bash
 # Public page (po vypnutí maintenance):
-curl -sw "%{http_code}\n" -o /dev/null https://kuko-detskysvet.sk/
+curl -sw "%{http_code}\n" -o /dev/null https://kukodetskysvet.sk/
 
 # Maintenance — bez cookie 503:
-curl -sw "%{http_code}\n" -o /dev/null https://kuko-detskysvet.sk/
+curl -sw "%{http_code}\n" -o /dev/null https://kukodetskysvet.sk/
 
 # Admin login:
-curl -sw "%{http_code}\n" -o /dev/null https://kuko-detskysvet.sk/admin/login
+curl -sw "%{http_code}\n" -o /dev/null https://kukodetskysvet.sk/admin/login
 
 # API:
-curl "https://kuko-detskysvet.sk/api/availability?date=2026-06-15&package=mini"
+curl "https://kukodetskysvet.sk/api/availability?date=2026-06-15&package=mini"
 ```
 
 ### Server logy
 
-Apache `error_log` je v `kuko-detskysvet.sk/logs/`. Stiahnutie:
+Apache `error_log` je v `kukodetskysvet.sk/logs/`. Stiahnutie:
 
 ```bash
-lftp ... get kuko-detskysvet.sk/logs/error_log -o /tmp/kuko-error.log
+lftp ... get kukodetskysvet.sk/logs/error_log -o /tmp/kuko-error.log
 tail -50 /tmp/kuko-error.log
 ```
 
@@ -325,8 +325,8 @@ Cron script pre týždenný dump cez SFTP TODO (zatiaľ ručne mesačne).
 1. **Lokálne**: vytvor nový `private/migrations/NNN_popis.sql`
 2. **Test lokálne** cez SQLite (pre developer convenience). Pozn.: niektoré MySQL features ako `ENUM`, `JSON`, `ON UPDATE CURRENT_TIMESTAMP` SQLite nepodporuje — preto v dev DB seed sa nepoužíva runner, ale `dev-db-init.php` script.
 3. **Commit** súboru.
-4. **Upload** súboru cez SFTP do `kuko-detskysvet.sk/private/migrations/`.
-5. **Spusti** cez `https://kuko-detskysvet.sk/_setup.php?action=migrate&token=...`.
+4. **Upload** súboru cez SFTP do `kukodetskysvet.sk/private/migrations/`.
+5. **Spusti** cez `https://kukodetskysvet.sk/_setup.php?action=migrate&token=...`.
 6. **Overuj** že `migrations` tabuľka má nový riadok.
 
 Migrácie sú idempotentné cez `CREATE TABLE IF NOT EXISTS`, `INSERT IGNORE`, prípadne explicit checks. Spustenie 2× neuškodí — runner sám skipuje aplikované migrácie.
@@ -353,10 +353,10 @@ Pre štandardný release (kód + DB zmena):
    - Upload nový `.sql` cez SFTP
    - `curl https://.../_setup.php?action=migrate&token=...`
 5. **Smoke test prod**
-   - `curl -I https://kuko-detskysvet.sk/`
+   - `curl -I https://kukodetskysvet.sk/`
    - Otvor v prehliadači, prejdi flow
 6. **Sledovať error log**
-   - `lftp ... get kuko-detskysvet.sk/logs/error_log -o /tmp/x.log && tail -30 /tmp/x.log`
+   - `lftp ... get kukodetskysvet.sk/logs/error_log -o /tmp/x.log && tail -30 /tmp/x.log`
 
 Pre release **len lokalizačné zmeny** (text, ALT, malá CSS úprava):
 
@@ -398,7 +398,7 @@ Veci, čo by vylepšili proces ale nie sú kritické:
 
 - **GitHub remote** — pre history backup + možno deploy hooky
 - **CI/CD** (GitHub Actions) — automaticky spustiť testy + lint pri push, voliteľne deploy do staging
-- **Staging subdoména** — `staging.kuko-detskysvet.sk` pre testovanie pred prod
+- **Staging subdoména** — `staging.kukodetskysvet.sk` pre testovanie pred prod
 - **Auto-backup cron** — týždenný dump DB cez SFTP do lokálu
 - **Deploy bash skript** — `./private/scripts/deploy.sh` ktorý spojí lftp + migrate + smoke do jedného príkazu
 - **Verzia v UI** — footer zobrazí `git rev-parse --short HEAD` (zapečené pri deploy) pre debug

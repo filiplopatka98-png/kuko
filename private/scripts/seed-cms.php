@@ -31,10 +31,10 @@ $blocks = [
     ['cennik.item3.price', 'Cenník — cena 3', 'text', '15,00 €'],
     ['kontakt.address', 'Kontakt — adresa', 'text', 'Bratislavská 141, 921 01 Piešťany'],
     ['kontakt.phone', 'Kontakt — telefón', 'text', '+421 915 319 934'],
-    ['kontakt.email', 'Kontakt — e-mail', 'text', 'info@kuko-detskysvet.sk'],
+    ['kontakt.email', 'Kontakt — e-mail', 'text', 'info@kukodetskysvet.sk'],
     ['kontakt.hours', 'Kontakt — otváracie hodiny', 'text', 'Pondelok – Nedeľa: 9:00 – 20:00'],
     ['oslavy.note', 'Oslavy — poznámka pod balíčkami', 'text', '*Konečná cena závisí od možností prispôsobenia - Každý balíček si môžete upraviť podľa vašich predstáv: predĺženie času oslavy, výzdoba na mieru (téma, farby), catering pre deti aj rodičov, torta alebo sweet bar, špeciálne požiadavky…'],
-    ['footer.copyright', 'Footer — copyright', 'text', 'Copyright © {{year}} KUKO-detskysvet.sk | Všetky práva vyhradené.'],
+    ['footer.copyright', 'Footer — copyright', 'text', 'Copyright © {{year}} KUKOdetskysvet.sk | Všetky práva vyhradené.'],
     ['cta.faq.heading', 'CTA (FAQ) — nadpis', 'text', 'Plánujete oslavu pre svoje dieťa?'],
     ['cta.faq.text', 'CTA (FAQ) — text', 'text', 'Rezervujte si termín online za pár minút — vyberte balíček, dátum a čas.'],
     ['cta.reservation.heading', 'CTA (rezervácia) — nadpis', 'text', 'Páči sa vám u nás?'],
@@ -43,7 +43,7 @@ $blocks = [
     // hardcoded fallbacks in pages/privacy.php and pages/faq.php.
     ['privacy.body', 'Ochrana údajov — text', 'html', <<<'HTML'
     <h2 class="legal-h2">1. Prevádzkovateľ</h2>
-    <p>Prevádzkovateľom webu kuko-detskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+    <p>Prevádzkovateľom webu kukodetskysvet.sk je KUKO detský svet, Bratislavská 141, 921 01 Piešťany, e-mail <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
 
     <h2 class="legal-h2">2. Rozsah a účel spracovania</h2>
     <p>Pri rezervácii oslavy spracúvame údaje, ktoré ste nám poskytli prostredníctvom formulára: meno, telefón, e-mail, požadovaný dátum a čas oslavy, počet detí a poznámku. Tieto údaje spracúvame výlučne na účel vybavenia vašej rezervácie a kontaktu vo veci oslavy.</p>
@@ -58,7 +58,7 @@ $blocks = [
     <p>Web používa nevyhnutné cookies a — len s vaším súhlasom — Google reCAPTCHA (ochrana formulára pred spamom), prípadne v budúcnosti analytické či marketingové nástroje. Podrobný prehľad jednotlivých cookies a správu svojho súhlasu nájdete v <a href="/zasady-cookies">Zásadách používania cookies</a>.</p>
 
     <h2 class="legal-h2">6. Vaše práva</h2>
-    <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+    <p>V súlade s GDPR máte právo na prístup k svojim údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, ako aj právo namietať a podať sťažnosť na Úrade na ochranu osobných údajov SR. Ohľadom vašich práv nás môžete kontaktovať na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
 
     <p class="legal-back"><a href="/">&larr; Späť na domov</a></p>
 HTML],
@@ -84,7 +84,7 @@ HTML],
     <p>Pri prvej návšteve sa zobrazí cookie lišta, kde môžete súhlas udeliť, odmietnuť alebo si vybrať jednotlivé kategórie cez „Nastavenia". Svoje rozhodnutie môžete kedykoľvek zmeniť kliknutím na <strong>„Cookie nastavenia"</strong> v pätičke webu.</p>
 
     <h2 class="legal-h2">6. Kontakt</h2>
-    <p>V prípade otázok k spracúvaniu cookies nás kontaktujte na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>. Spracúvanie osobných údajov upravuje <a href="/ochrana-udajov">Ochrana osobných údajov</a>.</p>
+    <p>V prípade otázok k spracúvaniu cookies nás kontaktujte na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>. Spracúvanie osobných údajov upravuje <a href="/ochrana-udajov">Ochrana osobných údajov</a>.</p>
 
     <p class="legal-back"><a href="/">&larr; Späť na domov</a></p>
 
@@ -167,9 +167,9 @@ $seed = [
     'seo.faq.title'         => 'Časté otázky — KUKO detský svet',
     'seo.faq.description'   => 'Odpovede na najčastejšie otázky o detskej herni KUKO v Piešťanoch — ceny, oslavy, otváracie hodiny, vek detí, rezervácie.',
     'seo.privacy.title'     => 'Ochrana osobných údajov — KUKO detský svet',
-    'seo.privacy.description' => 'Zásady spracovania osobných údajov a cookies na webe kuko-detskysvet.sk.',
+    'seo.privacy.description' => 'Zásady spracovania osobných údajov a cookies na webe kukodetskysvet.sk.',
     'seo.cookies.title'     => 'Zásady používania cookies — KUKO detský svet',
-    'seo.cookies.description' => 'Aké cookies používame na webe kuko-detskysvet.sk, na čo slúžia a ako spravovať svoj súhlas.',
+    'seo.cookies.description' => 'Aké cookies používame na webe kukodetskysvet.sk, na čo slúžia a ako spravovať svoj súhlas.',
     'seo.gallery.title'     => 'Fotogaléria — KUKO detský svet',
     'seo.gallery.description' => 'Pozrite si fotografie z detskej herne a osláv v KUKO Piešťany.',
     // FAQ repeater source of truth — migrates the old 6 Q/A into the

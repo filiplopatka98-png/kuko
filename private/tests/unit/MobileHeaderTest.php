@@ -22,7 +22,7 @@ final class MobileHeaderTest extends TestCase
         $contactPos = strpos($this->nav, 'class="nav__contact"');
         $this->assertNotFalse($contactPos, '.nav__contact block must exist');
         $this->assertGreaterThan($navPos, $contactPos, '.nav__contact must be inside #primary-nav');
-        $this->assertStringContainsString('mailto:info@kuko-detskysvet.sk', $this->nav);
+        $this->assertStringContainsString('mailto:info@kukodetskysvet.sk', $this->nav);
         $this->assertStringContainsString('tel:+421915319934', $this->nav);
         $this->assertStringContainsString('class="nav__socials"', $this->nav);
         // Hidden on desktop (topbar covers it there).

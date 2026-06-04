@@ -8,7 +8,7 @@ return [
     'app' => [
         'env'   => 'production',       // production | dev
         'debug' => false,              // set true only for local dev
-        'url'   => 'https://kuko-detskysvet.sk',
+        'url'   => 'https://kukodetskysvet.sk',
         'tz'    => 'Europe/Bratislava',
         // Maintenance mode: when true, public visitors see a branded "we're updating" page
         // until they enter the staff password. Admin remains accessible.
@@ -33,11 +33,11 @@ return [
         'host'       => 'smtp.websupport.sk',
         'port'       => 465,
         'encryption' => 'ssl',          // ssl | tls
-        'user'       => 'info@kuko-detskysvet.sk',
+        'user'       => 'info@kukodetskysvet.sk',
         'pass'       => '',
-        'from_email' => 'info@kuko-detskysvet.sk',
+        'from_email' => 'info@kukodetskysvet.sk',
         'from_name'  => 'KUKO detský svet',
-        'admin_to'   => 'info@kuko-detskysvet.sk',
+        'admin_to'   => 'info@kukodetskysvet.sk',
     ],
 
     'auth' => [

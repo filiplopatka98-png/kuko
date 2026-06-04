@@ -72,11 +72,11 @@ Inštrukcie pre AI asistenta. Čítaj `README.md` pre prehľad projektu.
   (nikdy ho nevypisuj), a po deployi `shred -u ~/.kuko-sftp-pass`.
 - `git push origin main`, potom `lftp` **len reálne zmenené súbory**
   (`git diff --name-only <last_deployed>..HEAD`, vylúč `private/tests/` a
-  `docs/`): `public/X`→`kuko-detskysvet.sk/web/X`, `private/X`→`…/private/X`.
+  `docs/`): `public/X`→`kukodetskysvet.sk/web/X`, `private/X`→`…/private/X`.
   Nepoužívaj `mirror --only-newer` (git checkout resetuje mtimes → nahrá celý
   strom).
-- DB zmeny: token-gated `https://kuko-detskysvet.sk/_setup.php?action=migrate|seed&token=<auth.secret>`
-  (token z prod configu — na serveri je `kuko-detskysvet.sk/config/config.php`,
+- DB zmeny: token-gated `https://kukodetskysvet.sk/_setup.php?action=migrate|seed&token=<auth.secret>`
+  (token z prod configu — na serveri je `kukodetskysvet.sk/config/config.php`,
   súbor mimo `web/` aj `private/`; stiahni cez lftp do `/tmp`, po použití
   `shred`), potom `action=delete`. Poradie: kód → migrate → seed.
   - `action=delete` `_setup.php` z prod **zmaže**, takže pred ďalším seedom ho

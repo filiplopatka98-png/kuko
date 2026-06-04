@@ -18,9 +18,9 @@ and `docs/DEPLOY.md`. This document only covers *restoring* a broken site.
 Quick checks:
 
 ```bash
-curl -sI https://kuko-detskysvet.sk/            # expect 200 (or 503 if maintenance)
-curl -s  https://kuko-detskysvet.sk/robots.txt  # expect a body
-curl -sI https://kuko-detskysvet.sk/admin/login # expect 200
+curl -sI https://kukodetskysvet.sk/            # expect 200 (or 503 if maintenance)
+curl -s  https://kukodetskysvet.sk/robots.txt  # expect a body
+curl -sI https://kukodetskysvet.sk/admin/login # expect 200
 ```
 
 ---
@@ -70,7 +70,7 @@ manager:
 2. Fill every secret from the password manager (db user/pass, `auth.secret`,
    `mail.pass`, reCAPTCHA keys). `auth.secret` MUST match the previous value
    or all remember-me cookies and CSRF tokens are invalidated.
-3. lftp `put config/config.php -o kuko-detskysvet.sk/config/config.php`.
+3. lftp `put config/config.php -o kukodetskysvet.sk/config/config.php`.
 
 ---
 
@@ -81,7 +81,7 @@ Also never in git. Regenerate and upload (see `docs/WORKFLOW.md`
 
 ```bash
 /opt/homebrew/bin/php private/scripts/admin-passwd.php   # writes config/.htpasswd
-lftp -e "put config/.htpasswd -o kuko-detskysvet.sk/config/.htpasswd; bye" ...
+lftp -e "put config/.htpasswd -o kukodetskysvet.sk/config/.htpasswd; bye" ...
 ```
 
 `config/.htpasswd` lives outside the webroot; the change is effective
@@ -92,15 +92,15 @@ immediately (no restart).
 ## 6. Post-recovery smoke test
 
 ```bash
-curl -sI https://kuko-detskysvet.sk/             # 200 (or 503 if maintenance still on)
-curl -s  https://kuko-detskysvet.sk/robots.txt   # body present
-curl -sI https://kuko-detskysvet.sk/admin/login  # 200, then log in with the new htpasswd creds
+curl -sI https://kukodetskysvet.sk/             # 200 (or 503 if maintenance still on)
+curl -s  https://kukodetskysvet.sk/robots.txt   # body present
+curl -sI https://kukodetskysvet.sk/admin/login  # 200, then log in with the new htpasswd creds
 
 # Re-apply DB migrations (server is SFTP-only — use the gated PHP helper):
 TOKEN=<auth.secret from config.php>
-curl "https://kuko-detskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
 # expect: "... all migrations applied"
-curl "https://kuko-detskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
+curl "https://kukodetskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
 ```
 
 Then exercise a real reservation submit and confirm the admin list shows it.

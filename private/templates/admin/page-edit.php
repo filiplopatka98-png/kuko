@@ -12,7 +12,7 @@
 /** @var list<array{q:string,a:string}>|null $faqItems */
 $title = 'Upraviť: ' . $label . ' — KUKO admin';
 $csrf  = \Kuko\Csrf::token();
-$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kuko-detskysvet.sk'), '/');
+$baseUrl = rtrim((string) \Kuko\Config::get('app.url', 'https://kukodetskysvet.sk'), '/');
 $faqItems = $faqItems ?? null;
 $isFaq    = is_array($faqItems);
 $hasContent = !empty($groups) || $isFaq;

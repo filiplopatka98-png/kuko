@@ -53,7 +53,7 @@ imagecopyresampled($og, $logo, (int)(($ogW-$dw)/2), (int)($ogH*0.16), 0, 0, $dw,
 $font = dirname(__DIR__, 2) . '/public/assets/fonts/NunitoSans.ttf';
 if (is_file($font)) {
     $ink = imagecolorallocate($og, 0x3D, 0x3D, 0x3D);
-    $txt = 'kuko-detskysvet.sk';
+    $txt = 'kukodetskysvet.sk';
     $bb = imagettfbbox(34, 0, $font, $txt);
     $tw = $bb[2] - $bb[0];
     imagettftext($og, 34, 0, (int)(($ogW-$tw)/2), (int)($ogH*0.88), $ink, $font, $txt);

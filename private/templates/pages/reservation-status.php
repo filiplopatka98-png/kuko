@@ -32,7 +32,7 @@ ob_start();
 
     <div style="margin-top:2rem; padding:1.25rem; background:var(--bg-pink-soft); border-radius: var(--r-card);">
       <p style="margin:0 0 0.5rem"><strong>Zmena alebo zrušenie?</strong></p>
-      <p style="margin:0; color:var(--c-text-soft);">Cez web rezerváciu meniť nedá. Zavolajte prosím na <a href="tel:+421915319934">+421 915 319 934</a> alebo napíšte na <a href="mailto:info@kuko-detskysvet.sk">info@kuko-detskysvet.sk</a>.</p>
+      <p style="margin:0; color:var(--c-text-soft);">Cez web rezerváciu meniť nedá. Zavolajte prosím na <a href="tel:+421915319934">+421 915 319 934</a> alebo napíšte na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
     </div>
 
     <p style="margin-top:2rem;"><a href="/">&larr; Späť na domov</a></p>

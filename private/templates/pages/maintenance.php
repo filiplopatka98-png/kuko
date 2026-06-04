@@ -58,7 +58,7 @@ ob_start();
   <div class="maint__contact">
     <strong>Potrebujete sa s nami spojiť?</strong><br>
     <a href="tel:+421915319934" style="color:#3D3D3D">📞 +421 915 319 934</a><br>
-    <a href="mailto:info@kuko-detskysvet.sk" style="color:#3D3D3D">✉️ info@kuko-detskysvet.sk</a>
+    <a href="mailto:info@kukodetskysvet.sk" style="color:#3D3D3D">✉️ info@kukodetskysvet.sk</a>
   </div>
 
   <?php if (!empty($error)): ?>
