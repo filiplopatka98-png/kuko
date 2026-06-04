@@ -487,3 +487,27 @@ Push `45a3689..1ebfb49`, lftp **3 súbory** (`LlmsTxt.php` nový + `Maintenance.
 Overené na prode: `/llms.txt` → 404 (Indexácia OFF), `robots.txt` → `Disallow: /`, `/admin/login`=200, `sitemap.xml`=200. SFTP heslo shred. Suite **398 testov** zelená (+4 LlmsTxtTest).
 
 **Po flipnutí Indexácie ON (`/admin/indexing`) sa `/llms.txt` automaticky aktivuje** s aktuálnym Markdown briefom z DB — žiadny build, žiadny re-deploy.
+
+---
+
+## ✅ Domain flip — kukodetskysvet.sk LIVE (2026-06-04, commit 7349612)
+
+Migrácia z `kuko-detskysvet.sk` na `kukodetskysvet.sk` (bez pomlčky).
+
+**Owner urobil:** DNS + SSL na novej doméne, alias na hostingu, mailbox `info@kukodetskysvet.sk`, reCAPTCHA pridanie domény, **nová MySQL DB s premigrovanými dátami zo starej** (content_blocks, packages, settings, gallery_photos, reservations), upravil prod `config/config.php` (app.url + db.* + mail.* na nové).
+
+**Deploy:** novy SFTP host=`kukodetskysvet.sk`, user=`filip.kukodetskysvet.sk`. Na novom účte bol `web/` mirror zo starého (≤ commit 1ebfb49), ale **`private/` chýbal** → app by 500-l. Riešenie: **full mirror `private/`** (`lftp mirror -R --exclude=^tests/ --exclude=^logs/ --exclude-glob=phpunit.phar`, 115 súborov) + **put `public/admin/index.php`** (jediný web/ file zmenený medzi `1ebfb49..7349612`). Plný mirror je bezpečný keď je cieľ prázdny — `mirror --only-newer` warning sa týkal incremental diff deployov, nie inicializácie.
+
+**Overené z novej domény:**
+- `https://kukodetskysvet.sk/` = 200 (maintenance vypnutá v novej DB)
+- `https://kukodetskysvet.sk/robots.txt` = `Disallow: /` (Indexácia OFF, pred-launch)
+- `https://kukodetskysvet.sk/llms.txt` = 404 (Indexácia OFF)
+- `https://kukodetskysvet.sk/admin/login` = 200
+- `https://kukodetskysvet.sk/sitemap.xml` = 200
+- 7 kľúčových assetov prod==repo byte-identicky (main.css/.min.css, admin.min.css, main.min.js, rezervacia.min.js, og-cover.jpg, logo.png)
+
+**Žiadne DB zmeny pri deployi** — dáta sú už v novej DB z migrácie. Seed neutrálne by inserter chýbajúce content_blocks, ale netreba spúšťať (DB úplná).
+
+**Pozn.:** content_blocks z migrovanej DB stále obsahujú starú doménu/e-mail v `kontakt.email`, `privacy.body`, `cookies.body`, `footer.copyright`, prípadne `mail.<typ>.intro` settings — owner doplní cez `/admin/contact`, `/admin/pages`, `/admin/emails` (insert-only seed by ich neprepísal). Toto je obsahový krok, nie kódový.
+
+SFTP heslo shred. Suite **398 testov** zelená pred deployom. Stará doména `kuko-detskysvet.sk` zatiaľ stále beží — owner sa rozhodne (301 redirect na novú, alebo nechať vypršať).
