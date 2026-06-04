@@ -68,6 +68,42 @@ switch ($action) {
         }
         break;
 
+    case 'fix-domain':
+        // One-off cleanup after a domain rename: replace stale literals in
+        // migrated content_blocks + settings (mail.*.subject/intro etc.).
+        // Idempotent — second run reports 0 changes. Accepts query overrides:
+        //   ?old=foo.sk&new=bar.sk  (default: kuko-detskysvet.sk → kukodetskysvet.sk)
+        $old  = (string) ($_GET['old']  ?? 'kuko-detskysvet.sk');
+        $new  = (string) ($_GET['new']  ?? 'kukodetskysvet.sk');
+        $oldT = (string) ($_GET['oldT'] ?? 'KUKO-detskysvet.sk');
+        $newT = (string) ($_GET['newT'] ?? 'KUKOdetskysvet.sk');
+        try {
+            $db = \Kuko\Db::fromConfig();
+            $report = [];
+            foreach ([
+                ['content_blocks', 'block_key', 'value'],
+                ['settings',       'setting_key', 'value'],
+            ] as [$table, $keyCol, $valCol]) {
+                foreach ([[$old, $new], [$oldT, $newT]] as [$from, $to]) {
+                    if ($from === $to) continue;
+                    $rows = $db->all("SELECT $keyCol AS k, $valCol AS v FROM $table WHERE $valCol LIKE ?", ['%' . $from . '%']);
+                    foreach ($rows as $r) {
+                        $newVal = str_replace($from, $to, (string) $r['v']);
+                        if ($newVal === (string) $r['v']) continue;
+                        $db->execStmt("UPDATE $table SET $valCol = ? WHERE $keyCol = ?", [$newVal, (string) $r['k']]);
+                        $report[] = "+ {$table}.{$r['k']}: '{$from}' → '{$to}'";
+                    }
+                }
+            }
+            if ($report === []) echo "= nothing to fix\n";
+            else echo implode("\n", $report) . "\n";
+            echo "fix-domain done\n";
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo "fix-domain failed: " . $e->getMessage() . "\n";
+        }
+        break;
+
     case 'delete':
         if (@unlink(__FILE__)) {
             echo "deleted\n";
@@ -91,5 +127,5 @@ switch ($action) {
         break;
 
     default:
-        echo "actions: path | migrate | seed | smoke | delete\n";
+        echo "actions: path | migrate | seed | smoke | fix-domain | delete\n";
 }

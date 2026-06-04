@@ -511,3 +511,21 @@ Migrácia z `kuko-detskysvet.sk` na `kukodetskysvet.sk` (bez pomlčky).
 **Pozn.:** content_blocks z migrovanej DB stále obsahujú starú doménu/e-mail v `kontakt.email`, `privacy.body`, `cookies.body`, `footer.copyright`, prípadne `mail.<typ>.intro` settings — owner doplní cez `/admin/contact`, `/admin/pages`, `/admin/emails` (insert-only seed by ich neprepísal). Toto je obsahový krok, nie kódový.
 
 SFTP heslo shred. Suite **398 testov** zelená pred deployom. Stará doména `kuko-detskysvet.sk` zatiaľ stále beží — owner sa rozhodne (301 redirect na novú, alebo nechať vypršať).
+
+---
+
+## ✅ Post-domain-flip DB cleanup + helper — NASADENÉ (2026-06-04, commit pending)
+
+Po doménovej migrácii ostávali v premigrovanej DB texty so starou doménou v viacerých blokoch (legal stránky, FAQ, footer, SEO popisy). Riešenie: nový **`?action=fix-domain`** v `public/_setup.php` — token-gated bulk REPLACE pre `content_blocks.value` aj `settings.value`. Idempotentný (druhý beh = `= nothing to fix`). Defaultné mapovanie `kuko-detskysvet.sk → kukodetskysvet.sk` + `KUKO-detskysvet.sk → KUKOdetskysvet.sk`; podporuje `?old=&new=&oldT=&newT=` override pre budúce premenovania.
+
+**Zmeny v DB na prode (8):**
+- `content_blocks.cookies.body`, `faq.items`, `kontakt.email`, `privacy.body`, `footer.copyright`
+- `settings.faq.items`, `seo.cookies.description`, `seo.privacy.description`
+
+Druhý beh: `= nothing to fix` (idempotent). `_setup.php` zmazaný (`?action=delete` → 200; následný request → 404).
+
+**HSTS:** už aktívne v repo `.htaccess` (preložené z roll-outu pred-launch); overené headers na novej doméne: `strict-transport-security: max-age=31536000; includeSubDomains; preload` + CSP + X-Content-Type-Options + X-Frame-Options + Referrer-Policy.
+
+Suite **398 testov** zelená.
+
+**Zostávajúce vlastnícke kroky:** funkčné testy (testovacia rezervácia → e-maily fungujú), cron registrácia na novom hostingu (`expire-pending.php`, `retention.php`, `db-backup.php`), `/admin/indexing` ON pre go-live, Google Search Console + Business Profile, rozhodnutie o starej doméne (301 redirect alebo nechať vypršať).
