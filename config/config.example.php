@@ -53,7 +53,11 @@ return [
     ],
 
     'admin' => [
-        'session_lifetime' => 3600,
+        // Admin session timeouts (seconds). idle = drop after inactivity;
+        // absolute = hard cap regardless of activity. Remember-me cookie is
+        // 30 days and re-establishes a session past these limits.
+        'idle_timeout'     => 8 * 3600,
+        'absolute_timeout' => 24 * 3600,
     ],
 
     'security' => [
@@ -61,6 +65,11 @@ return [
         'ip_hash_secret'      => '',
         'rate_limit_per_hour' => 3,
         'csrf_lifetime'       => 3600,
+        // Only enable if the app sits behind a reverse proxy that rewrites
+        // REMOTE_ADDR to its own IP. When true, the client IP is taken from the
+        // first hop of X-Forwarded-For. Leave false unless you control the proxy
+        // (the header is attacker-spoofable otherwise).
+        'trust_proxy'         => false,
     ],
 
     'social' => [

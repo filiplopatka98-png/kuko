@@ -21,19 +21,19 @@ final class LoginThrottle
     public function permit(string $ip, string $username): bool
     {
         return $this->count($this->ipFile($ip)) < $this->max
-            && $this->count($this->userFile($username)) < $this->max;
+            && $this->count($this->userFile($username, $ip)) < $this->max;
     }
 
     public function recordFailure(string $ip, string $username): void
     {
         $this->bump($this->ipFile($ip));
-        $this->bump($this->userFile($username));
+        $this->bump($this->userFile($username, $ip));
     }
 
     public function recordSuccess(string $ip, string $username): void
     {
         @unlink($this->ipFile($ip));
-        @unlink($this->userFile($username));
+        @unlink($this->userFile($username, $ip));
     }
 
     private function ipFile(string $ip): string
@@ -41,10 +41,16 @@ final class LoginThrottle
         return $this->dir . '/login_ip_' . sha1($ip) . '.json';
     }
 
-    private function userFile(string $username): string
+    /**
+     * Per-(username, IP) failure bucket. Scoping the username counter to the
+     * requesting IP means a stranger cannot lock a real admin out globally by
+     * spamming their username (that was an account-lockout DoS) — while a
+     * single attacker is still stopped by both this and the per-IP counter.
+     */
+    private function userFile(string $username, string $ip): string
     {
         $u = strtolower(trim($username));
-        return $this->dir . '/login_user_' . sha1($u === '' ? '(empty)' : $u) . '.json';
+        return $this->dir . '/login_user_' . sha1(($u === '' ? '(empty)' : $u) . '|' . $ip) . '.json';
     }
 
     private function count(string $file): int

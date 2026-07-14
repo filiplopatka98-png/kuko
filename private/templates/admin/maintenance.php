@@ -37,7 +37,7 @@ ob_start();
   </div>
 </form>
 
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 (function () {
   var form = document.getElementById('maint-form');
   var toggle = document.getElementById('maint-toggle');

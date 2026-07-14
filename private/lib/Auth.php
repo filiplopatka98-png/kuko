@@ -15,27 +15,60 @@ namespace Kuko;
  */
 final class Auth
 {
-    private const SESS_USER    = '_admin_user';
-    private const SESS_AT      = '_admin_at';
-    private const COOKIE_NAME  = 'kuko_admin';
-    private const COOKIE_TTL   = 30 * 86400;
+    private const SESS_USER     = '_admin_user';
+    private const SESS_LOGIN_AT = '_admin_login_at'; // absolute-timeout anchor
+    private const SESS_LAST     = '_admin_last';     // idle-timeout marker
+    private const COOKIE_NAME   = 'kuko_admin';
+    private const COOKIE_TTL    = 30 * 86400;
+
+    /** Seconds of inactivity after which the session is dropped. */
+    private static function idleTtl(): int
+    {
+        return (int) Config::get('admin.idle_timeout', 8 * 3600);
+    }
+
+    /** Hard cap on session age regardless of activity. */
+    private static function absoluteTtl(): int
+    {
+        return (int) Config::get('admin.absolute_timeout', 24 * 3600);
+    }
 
     public static function user(): ?string
     {
         self::ensureSession();
+        $now = time();
+
         if (!empty($_SESSION[self::SESS_USER])) {
-            return (string) $_SESSION[self::SESS_USER];
+            $loginAt = (int) ($_SESSION[self::SESS_LOGIN_AT] ?? 0);
+            $lastAt  = (int) ($_SESSION[self::SESS_LAST] ?? 0);
+            $absoluteExpired = $loginAt > 0 && ($now - $loginAt) > self::absoluteTtl();
+            $idleExpired     = $lastAt  > 0 && ($now - $lastAt)  > self::idleTtl();
+            if ($absoluteExpired || $idleExpired) {
+                // Session too old / idle — drop the admin identity, then fall
+                // through to the remember-me cookie (which may re-establish it).
+                self::clearSessionIdentity();
+            } else {
+                $_SESSION[self::SESS_LAST] = $now; // slide the idle window
+                return (string) $_SESSION[self::SESS_USER];
+            }
         }
-        // Try remember-me cookie
+
+        // Try remember-me cookie: user|iat|sig, HMAC binds the issue time so a
+        // stolen cookie expires server-side (not just via the browser expiry).
         $cookie = (string) ($_COOKIE[self::COOKIE_NAME] ?? '');
         if ($cookie === '') return null;
-        [$user, $sig] = array_pad(explode('|', $cookie, 2), 2, '');
-        if ($user === '' || $sig === '') return null;
-        if (!hash_equals(self::sign($user), $sig)) return null;
+        [$user, $iat, $sig] = array_pad(explode('|', $cookie, 3), 3, '');
+        if ($user === '' || $iat === '' || $sig === '') return null;
+        if (!ctype_digit($iat)) return null;
+        if ($now - (int) $iat > self::COOKIE_TTL) return null; // expired
+        if (!hash_equals(self::sign($user, (int) $iat), $sig)) return null;
         if (!self::userExists($user)) return null;
-        // Re-establish session
-        $_SESSION[self::SESS_USER] = $user;
-        $_SESSION[self::SESS_AT]   = time();
+
+        // Re-establish a fresh session from the trusted cookie.
+        session_regenerate_id(true);
+        $_SESSION[self::SESS_USER]     = $user;
+        $_SESSION[self::SESS_LOGIN_AT] = $now;
+        $_SESSION[self::SESS_LAST]     = $now;
         return $user;
     }
 
@@ -56,11 +89,14 @@ final class Auth
 
         self::ensureSession();
         session_regenerate_id(true);
-        $_SESSION[self::SESS_USER] = $user;
-        $_SESSION[self::SESS_AT]   = time();
+        $now = time();
+        $_SESSION[self::SESS_USER]     = $user;
+        $_SESSION[self::SESS_LOGIN_AT] = $now;
+        $_SESSION[self::SESS_LAST]     = $now;
 
         if ($remember) {
-            setcookie(self::COOKIE_NAME, $user . '|' . self::sign($user), [
+            $iat = $now;
+            setcookie(self::COOKIE_NAME, $user . '|' . $iat . '|' . self::sign($user, $iat), [
                 'expires'  => time() + self::COOKIE_TTL,
                 'path'     => '/',
                 'secure'   => self::isHttps(),
@@ -74,7 +110,7 @@ final class Auth
     public static function logout(): void
     {
         self::ensureSession();
-        unset($_SESSION[self::SESS_USER], $_SESSION[self::SESS_AT]);
+        self::clearSessionIdentity();
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
@@ -113,10 +149,20 @@ final class Auth
         return isset(self::loadHtpasswd()[$user]);
     }
 
-    private static function sign(string $user): string
+    private static function sign(string $user, int $iat): string
     {
         $secret = (string) Config::get('auth.secret', '');
-        return hash_hmac('sha256', 'admin|' . $user, $secret);
+        return hash_hmac('sha256', 'admin|' . $user . '|' . $iat, $secret);
+    }
+
+    /** Drop only the admin-identity keys (keeps CSRF token / flash intact). */
+    private static function clearSessionIdentity(): void
+    {
+        unset(
+            $_SESSION[self::SESS_USER],
+            $_SESSION[self::SESS_LOGIN_AT],
+            $_SESSION[self::SESS_LAST]
+        );
     }
 
     private static function ensureSession(): void

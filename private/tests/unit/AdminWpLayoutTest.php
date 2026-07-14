@@ -14,7 +14,7 @@ final class AdminWpLayoutTest extends TestCase
             '/admin'         => 'Rezerv\x{00E1}cie',
             '/admin/pages'   => 'Str\x{00E1}nky',
             '/admin/gallery' => 'Gal\x{00E9}ria',
-            '/admin/contact' => 'Nastavenia',
+            '/admin/contact' => 'Web &amp; syst\x{00E9}m',
         ];
         foreach ($expected as $href => $label) {
             $this->assertMatchesRegularExpression(
@@ -48,15 +48,15 @@ final class AdminWpLayoutTest extends TestCase
     }
     public function testSettingsTabBar(): void
     {
-        // A Nastavenia tab bar exists with Kontakt/Maintenance/Logy/GDPR.
-        foreach (['/admin/contact','/admin/maintenance','/admin/log','/admin/gdpr'] as $h) {
+        // The "Web a systém" tab bar has Kontakt/Maintenance/Logy/GDPR/Nástroje.
+        foreach (['/admin/contact','/admin/maintenance','/admin/log','/admin/gdpr','/admin/tools'] as $h) {
             $this->assertMatchesRegularExpression(
                 '/href="' . preg_quote($h, '/') . '"[^>]*class="admin-tab/',
                 $this->l,
-                $h . ' must be an .admin-tab in the Nastavenia tab bar'
+                $h . ' must be an .admin-tab in the Web a systém tab bar'
             );
         }
-        $this->assertMatchesRegularExpression('/<nav class="admin-tabs" aria-label="Nastavenia">/u', $this->l);
+        $this->assertMatchesRegularExpression('/<nav class="admin-tabs" aria-label="Web a syst\x{00E9}m">/u', $this->l);
     }
     public function testGroupPredicatesPresent(): void
     {

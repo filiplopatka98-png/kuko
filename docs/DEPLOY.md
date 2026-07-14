@@ -134,8 +134,8 @@ WebSupport robí denné DB zálohy. Pre extra istotu:
 
 Po nasadení **owner musí zaregistrovať tieto cron úlohy** v paneli WebSupport
 (Hosting → Cron). Bez nich príslušná logika nebeží automaticky. Absolútnu
-cestu k PHP a k projektu zisti cez `https://kukodetskysvet.sk/_setup.php?action=path&token=<auth.secret>`
-(alebo z panela). Cesta nižšie je vzor — uprav podľa reálneho účtu.
+cestu k PHP a k projektu zisti z panela WebSupport (Hosting → nastavenia účtu).
+Cesta nižšie je vzor — uprav podľa reálneho účtu.
 
 | Skript | Čo robí | Odporúčaná frekvencia |
 |---|---|---|

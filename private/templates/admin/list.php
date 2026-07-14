@@ -1,6 +1,10 @@
 <?php
 /** @var array $rows */
 /** @var array $filter */
+/** @var int $page */
+/** @var int $pages */
+/** @var int $total */
+/** @var int $perPage */
 /** @var string $user */
 $title = 'Rezervácie — KUKO admin';
 $statusBadge = static fn(string $s): string => match($s) {
@@ -9,9 +13,24 @@ $statusBadge = static fn(string $s): string => match($s) {
     'cancelled' => 'badge badge--no',
     default     => 'badge',
 };
+// Build a query string for pagination links, preserving the active filters.
+$pageUrl = static function (int $p) use ($filter): string {
+    $q = array_filter([
+        'status'  => $filter['status']  ?? '',
+        'package' => $filter['package'] ?? '',
+        'from'    => $filter['from']    ?? '',
+        'to'      => $filter['to']      ?? '',
+        'q'       => $filter['q']       ?? '',
+        'page'    => $p,
+    ], fn($v) => $v !== '' && $v !== null);
+    return '/admin?' . http_build_query($q);
+};
+$from = $total > 0 ? (($page - 1) * $perPage) + 1 : 0;
+$to   = min($page * $perPage, $total);
 ob_start();
 ?>
 <form class="admin-filter" method="get" action="/admin">
+  <input type="search" name="q" value="<?= e($filter['q'] ?? '') ?>" placeholder="Hľadať meno / telefón / e-mail" aria-label="Hľadať">
   <select name="status" aria-label="Status">
     <option value="">Všetky statusy</option>
     <?php foreach (['pending','confirmed','cancelled'] as $s): ?>
@@ -33,6 +52,8 @@ ob_start();
 <?php if (!$rows): ?>
   <p class="admin-empty">Žiadne rezervácie nezodpovedajú filtru.</p>
 <?php else: ?>
+<p class="admin-muted" style="margin:0 0 .75rem">Zobrazené <strong><?= $from ?>–<?= $to ?></strong> z <strong><?= $total ?></strong> rezervácií.</p>
+<div class="admin-table-wrap">
 <table class="admin-table">
   <thead>
     <tr>
@@ -55,6 +76,22 @@ ob_start();
   <?php endforeach; ?>
   </tbody>
 </table>
+</div>
+<?php if ($pages > 1): ?>
+<nav class="admin-pager" aria-label="Stránkovanie">
+  <?php if ($page > 1): ?>
+    <a class="admin-btn" href="<?= e($pageUrl($page - 1)) ?>" rel="prev">← Predchádzajúce</a>
+  <?php else: ?>
+    <span class="admin-btn admin-btn--disabled" aria-disabled="true">← Predchádzajúce</span>
+  <?php endif; ?>
+  <span class="admin-pager__status">Strana <?= $page ?> / <?= $pages ?></span>
+  <?php if ($page < $pages): ?>
+    <a class="admin-btn" href="<?= e($pageUrl($page + 1)) ?>" rel="next">Ďalšie →</a>
+  <?php else: ?>
+    <span class="admin-btn admin-btn--disabled" aria-disabled="true">Ďalšie →</span>
+  <?php endif; ?>
+</nav>
+<?php endif; ?>
 <?php endif; ?>
 <?php
 $content = ob_get_clean();

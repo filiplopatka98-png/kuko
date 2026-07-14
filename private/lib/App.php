@@ -14,7 +14,10 @@ final class App
             Config::load(APP_ROOT . '/config/config.php');
         }
         date_default_timezone_set(Config::get('app.tz', 'Europe/Bratislava'));
-        if (Config::get('app.debug', false)) {
+        // display_errors is NEVER on in production, even if debug was left true
+        // by mistake — a stray fatal must not leak paths/SQL to visitors.
+        $isProd = Config::get('app.env', 'production') === 'production';
+        if (Config::get('app.debug', false) && !$isProd) {
             error_reporting(E_ALL);
             ini_set('display_errors', '1');
         } else {

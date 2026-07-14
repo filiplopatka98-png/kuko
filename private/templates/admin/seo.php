@@ -42,14 +42,14 @@ ob_start();
     <label class="admin-field">
       <span>Titulok</span>
       <input type="text" name="<?= e($pg) ?>_title" maxlength="65" value="<?= e($tVal) ?>"
-             data-seo-title oninput="kukoSeo(this)">
+             data-seo-title>
       <small class="admin-counter"><span data-seo-title-count>0</span>/60 znakov</small>
     </label>
 
     <label class="admin-field">
       <span>Popis (meta description)</span>
       <textarea name="<?= e($pg) ?>_description" maxlength="170" rows="2"
-                data-seo-desc oninput="kukoSeo(this)"><?= e($dVal) ?></textarea>
+                data-seo-desc><?= e($dVal) ?></textarea>
       <small class="admin-counter"><span data-seo-desc-count>0</span>/155 znakov</small>
     </label>
 
@@ -66,7 +66,7 @@ ob_start();
   </div>
 </form>
 
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 (function () {
   function render(fs) {
     var t = fs.querySelector('[data-seo-title]');
@@ -82,11 +82,12 @@ ob_start();
     if (pt) pt.textContent = tv || '(prázdny titulok)';
     if (pd) pd.textContent = dv || '(prázdny popis)';
   }
-  window.kukoSeo = function (el) {
-    var fs = el.closest('fieldset[data-seo-page]');
-    if (fs) render(fs);
-  };
-  document.querySelectorAll('fieldset[data-seo-page]').forEach(render);
+  document.querySelectorAll('fieldset[data-seo-page]').forEach(function (fs) {
+    render(fs);
+    fs.querySelectorAll('[data-seo-title], [data-seo-desc]').forEach(function (el) {
+      el.addEventListener('input', function () { render(fs); });
+    });
+  });
 })();
 </script>
 <?php

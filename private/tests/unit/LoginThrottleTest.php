@@ -41,11 +41,17 @@ final class LoginThrottleTest extends TestCase
         $this->assertTrue($t->permit('9.9.9.9', 'bob'), 'buckets cleared after success');
     }
 
-    public function testPerUsernameBlockSpansIps(): void
+    /**
+     * Regression (account-lockout DoS): a stranger spamming the real admin's
+     * username from THEIR own IP must NOT lock the admin out from a different
+     * IP. The username counter is scoped per-IP, so the legit IP stays open.
+     */
+    public function testStrangerCannotLockOutAdminFromAnotherIp(): void
     {
         $t = new LoginThrottle($this->dir, 5, 3600);
-        for ($i = 0; $i < 5; $i++) { $t->permit('10.0.0.' . $i, 'victim'); $t->recordFailure('10.0.0.' . $i, 'victim'); }
-        $this->assertFalse($t->permit('10.0.0.99', 'victim'), 'username bucket blocks even from a fresh IP');
+        for ($i = 0; $i < 10; $i++) { $t->recordFailure('66.66.66.66', 'victim'); }
+        $this->assertFalse($t->permit('66.66.66.66', 'victim'), 'attacker IP is locked');
+        $this->assertTrue($t->permit('10.0.0.99', 'victim'), 'legit admin on a fresh IP stays permitted');
     }
 
     public function testStaleBucketResetsAfterWindow(): void

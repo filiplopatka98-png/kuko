@@ -62,7 +62,7 @@ ob_start();
 
 <link rel="stylesheet" href="/assets/vendor/quill/quill.snow.css">
 <script src="/assets/vendor/quill/quill.js"></script>
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 document.querySelectorAll('.quill-editor').forEach(function(el){
   var form = el.closest('form');
   var hidden = form.querySelector('textarea[name="value"]');

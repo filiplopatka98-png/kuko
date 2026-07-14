@@ -39,8 +39,12 @@ final class ReservationRepo
         return $this->db->one('SELECT * FROM reservations WHERE id = ?', [$id]);
     }
 
-    /** @param array{status?:string,package?:string,from?:string,to?:string,limit?:int,offset?:int} $filter */
-    public function list(array $filter = []): array
+    /**
+     * Build the shared WHERE clause + params for list()/count().
+     * @param array{status?:string,package?:string,from?:string,to?:string,q?:string} $filter
+     * @return array{0:string,1:array<int,mixed>}
+     */
+    private function buildWhere(array $filter): array
     {
         $where = ['1=1'];
         $params = [];
@@ -60,13 +64,35 @@ final class ReservationRepo
             $where[] = 'wished_date <= ?';
             $params[] = $filter['to'];
         }
+        if (!empty($filter['q'])) {
+            $where[] = '(name LIKE ? OR phone LIKE ? OR email LIKE ?)';
+            $like = '%' . $filter['q'] . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+        }
+        return [implode(' AND ', $where), $params];
+    }
+
+    /** @param array{status?:string,package?:string,from?:string,to?:string,q?:string,limit?:int,offset?:int} $filter */
+    public function list(array $filter = []): array
+    {
+        [$whereSql, $params] = $this->buildWhere($filter);
         $limit  = max(1, min(500, (int) ($filter['limit']  ?? 50)));
         $offset = max(0, (int) ($filter['offset'] ?? 0));
         return $this->db->all(
-            'SELECT * FROM reservations WHERE ' . implode(' AND ', $where)
+            'SELECT * FROM reservations WHERE ' . $whereSql
             . ' ORDER BY created_at DESC LIMIT ' . $limit . ' OFFSET ' . $offset,
             $params
         );
+    }
+
+    /** Total rows matching the same filters (for pagination). */
+    public function count(array $filter = []): int
+    {
+        [$whereSql, $params] = $this->buildWhere($filter);
+        $row = $this->db->one('SELECT COUNT(*) AS c FROM reservations WHERE ' . $whereSql, $params);
+        return (int) ($row['c'] ?? 0);
     }
 
     public function setStatus(int $id, string $status): bool

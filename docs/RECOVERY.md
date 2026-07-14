@@ -95,15 +95,12 @@ immediately (no restart).
 curl -sI https://kukodetskysvet.sk/             # 200 (or 503 if maintenance still on)
 curl -s  https://kukodetskysvet.sk/robots.txt   # body present
 curl -sI https://kukodetskysvet.sk/admin/login  # 200, then log in with the new htpasswd creds
-
-# Re-apply DB migrations (server is SFTP-only — use the gated PHP helper):
-TOKEN=<auth.secret from config.php>
-curl "https://kukodetskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
-# expect: "... all migrations applied"
-curl "https://kukodetskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
 ```
+
+Re-apply DB migrations via the admin UI (server is SFTP-only): log in to
+`/admin`, open **Web & systém → Nástroje**, click *Spustiť migrácie*
+(expect "… all migrations applied"), then *Smoke test* to list tables.
 
 Then exercise a real reservation submit and confirm the admin list shows it.
 If `app.maintenance` was flipped on during recovery, set it back to `false`
-in `config/config.php` and re-upload. Finally, delete `_setup.php` from the
-server (`?action=delete&token=$TOKEN`).
+in `config/config.php` and re-upload.

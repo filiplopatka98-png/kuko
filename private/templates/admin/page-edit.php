@@ -123,14 +123,14 @@ HTML;
       <label class="admin-field">
         <span>Titulok</span>
         <input type="text" name="seo_title" maxlength="65" value="<?= e($seoTitle) ?>"
-               data-seo-title oninput="kukoSeo(this)">
+               data-seo-title>
         <small class="admin-counter"><span data-seo-title-count>0</span>/60 znakov <button type="button" class="admin-help" tabindex="0" data-help="Toto je text modrého nadpisu vo výsledkoch Google. Nad ~60 znakov ho Google oreže (…), preto sa odporúča zmestiť sa do 60.">?</button></small>
       </label>
 
       <label class="admin-field">
         <span>Popis (meta description)</span>
         <textarea name="seo_description" maxlength="170" rows="2"
-                  data-seo-desc oninput="kukoSeo(this)"><?= e($seoDesc) ?></textarea>
+                  data-seo-desc><?= e($seoDesc) ?></textarea>
         <small class="admin-counter"><span data-seo-desc-count>0</span>/155 znakov <button type="button" class="admin-help" tabindex="0" data-help="Krátky popis pod nadpisom vo výsledkoch Google. Dlhší ako ~155 znakov sa oreže (…), preto sa odporúča zmestiť sa do 155.">?</button></small>
       </label>
 
@@ -165,7 +165,7 @@ HTML;
 
 <link rel="stylesheet" href="/assets/vendor/quill/quill.snow.css">
 <script src="/assets/vendor/quill/quill.js"></script>
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 // Sub-tab toggle (Obsah | SEO)
 (function () {
   var tabs = document.querySelectorAll('[data-pagetab]');
@@ -282,11 +282,12 @@ document.querySelectorAll('.quill-editor').forEach(function (el) {
     if (pt) pt.textContent = tv || '(prázdny titulok)';
     if (pd) pd.textContent = dv || '(prázdny popis)';
   }
-  window.kukoSeo = function (el) {
-    var fs = el.closest('fieldset[data-seo-page]');
-    if (fs) render(fs);
-  };
-  document.querySelectorAll('fieldset[data-seo-page]').forEach(render);
+  document.querySelectorAll('fieldset[data-seo-page]').forEach(function (fs) {
+    render(fs);
+    fs.querySelectorAll('[data-seo-title], [data-seo-desc]').forEach(function (el) {
+      el.addEventListener('input', function () { render(fs); });
+    });
+  });
 })();
 </script>
 <?php

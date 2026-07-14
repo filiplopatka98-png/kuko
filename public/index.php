@@ -8,6 +8,8 @@ use Kuko\Router;
 use Kuko\Renderer;
 use Kuko\Maintenance;
 
+\Kuko\Csp::send('public');
+
 $renderer = new Renderer(APP_ROOT . '/private/templates');
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -156,6 +158,16 @@ $router->get('/rezervacia/{token}', function (array $p) use ($renderer) {
 
 // Maintenance bypass form submit
 $router->post('/maintenance', function () use ($renderer) {
+    // Throttle password guessing on the staff bypass (per IP).
+    $secret = (string) \Kuko\Config::get('security.ip_hash_secret', '');
+    $ipHash = hash('sha256', \Kuko\ClientIp::get() . '|' . $secret);
+    $rl = new \Kuko\RateLimit(APP_ROOT . '/private/logs/rate', 10);
+    if (!$rl->allow($ipHash, 'maintenance')) {
+        http_response_code(429);
+        header('Retry-After: 3600');
+        echo $renderer->render('pages/maintenance', ['error' => true]);
+        return;
+    }
     $given = (string) ($_POST['password'] ?? '');
     if (Maintenance::passwordMatches($given)) {
         Maintenance::grantStaffCookie();

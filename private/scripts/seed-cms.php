@@ -156,7 +156,12 @@ $s = new \Kuko\SettingsRepo($db);
 // fallbacks in head.php (and the section templates, Task 9). Edit BOTH places to avoid drift.
 $seed = [
     'maintenance.enabled'  => \Kuko\Config::get('app.maintenance', false) ? '1' : '0',
-    'maintenance.password' => (string) \Kuko\Config::get('app.maintenance_password', ''),
+    // Store the staff bypass password hashed (never plaintext in the DB). Empty
+    // config → empty setting (bypass stays disabled until set in /admin).
+    'maintenance.password' => (function () {
+        $p = (string) \Kuko\Config::get('app.maintenance_password', '');
+        return $p === '' ? '' : password_hash($p, PASSWORD_BCRYPT);
+    })(),
     'seo.public_indexing'  => \Kuko\Config::get('app.public_indexing', false) ? '1' : '0',
     'seo.default.title'       => 'KUKO detský svet — herňa a kaviareň v Piešťanoch',
     'seo.default.description' => 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, kvalitná káva pre rodičov, oslavy na mieru. Otvorené Pon–Ne 9:00 – 20:00.',

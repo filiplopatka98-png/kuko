@@ -136,6 +136,12 @@ a { color: var(--c-accent); }
   display: flex; gap: 0.75rem; align-items: center; max-width: 720px; flex-wrap: wrap;
 }
 /* appearance handled by global .admin-main select rule */
+.admin-detail-gcal { margin: 1rem 0; }
+.admin-detail-gdpr { margin-top: 2rem; }
+.admin-form__h3-flush { margin: 0; }
+.admin-reason-field { display: flex; align-items: center; gap: 0.5rem; }
+.admin-reason-field[hidden] { display: none; }
+.admin-status-note { flex-basis: 100%; margin: 0.25rem 0 0; font-size: 0.82rem; }
 .admin-status-form button { padding: 0.5rem 1.25rem; background: var(--c-accent); color: var(--c-white); border: 0; border-radius: var(--r-btn); cursor: pointer; font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8rem; }
 .admin-status-form button:hover { background: var(--c-accent-dark); }
 .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
@@ -144,9 +150,42 @@ a { color: var(--c-accent); }
 .badge--no       { background: #f8d7da; color: #721c24; }
 
 /* Flash messages */
-.admin-flash { max-width: 1100px; margin: 0.75rem auto 0; padding: 0.6rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; }
+.admin-flash { max-width: 1100px; margin: 0.75rem auto 0; padding: 0.6rem 1rem; border-radius: 0.5rem; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 0.75rem; }
+.admin-flash > span { flex: 1; }
 .admin-flash--ok  { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .admin-flash--err { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.admin-flash__close { background: none; border: 0; color: inherit; font-size: 1.25rem; line-height: 1;
+  cursor: pointer; padding: 0 0.25rem; opacity: 0.6; }
+.admin-flash__close:hover { opacity: 1; }
+
+/* Status banners (Maintenance / Indexácia) — prominent state affordance. */
+.admin-banner { padding: 0.85rem 1.1rem; border-radius: 0.6rem; font-weight: 700; font-size: 0.95rem;
+  margin: 0 0 1.25rem; border: 1px solid transparent; display: flex; align-items: center; gap: 0.5rem; }
+.admin-banner code { font-weight: 600; }
+.admin-banner--ok   { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+.admin-banner--warn { background: #fff3cd; color: #856404; border-color: #ffe69c; }
+
+/* Horizontal-scroll wrapper so wide tables never overflow the viewport. */
+.admin-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Muted helper text + small inline links. */
+.admin-muted { color: var(--c-text-soft); }
+.admin-link { color: var(--c-accent); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+.admin-link:hover { text-decoration: underline; }
+
+/* Character counters go red once past the recommended SEO length. */
+.admin-counter--over { color: #c0392b; font-weight: 700; }
+
+/* Pagination */
+.admin-pager { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap; }
+.admin-pager__status { font-size: 0.85rem; color: var(--c-text-soft); }
+.admin-btn--disabled { opacity: 0.45; pointer-events: none; }
+
+/* Deploy tools output */
+.admin-tools-output { background: #2b2431; color: #f4eef7; padding: 1rem 1.25rem; border-radius: 0.6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; line-height: 1.5;
+  overflow-x: auto; white-space: pre; max-width: 100%; }
 
 /* Forms */
 .admin-lead { color: var(--c-text-soft); margin-bottom: 1.5rem; }
@@ -244,6 +283,12 @@ a.admin-pill:hover { background: var(--c-accent-dark); text-decoration: none; }
 .admin-btn:hover { background: var(--bg-pink-soft); }
 
 .admin-calendar { background: var(--c-white); border-radius: var(--r-card); padding: 0.5rem; box-shadow: var(--shadow-card); }
+/* On phones the 7-column grid is too cramped — let it scroll horizontally
+   with a usable minimum width instead of squashing every day cell. */
+@media (max-width: 640px) {
+  .admin-calendar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-calendar__head, .admin-calendar__row { min-width: 560px; }
+}
 .admin-calendar__head { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; font-size: 0.75rem; color: var(--c-text-soft); font-weight: 600; text-transform: uppercase; padding: 0.5rem 0; }
 .admin-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .admin-calendar__cell { background: var(--bg-cream); border-radius: 0.5rem; padding: 0.4rem; min-height: 96px; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.78rem; position: relative; }

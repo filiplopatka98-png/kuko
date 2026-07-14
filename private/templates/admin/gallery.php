@@ -64,7 +64,7 @@ ob_start();
             <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
             <input type="hidden" name="on" value="<?= $onHome ? '0' : '1' ?>">
             <label class="gal-hp__label">
-              <input type="checkbox" class="gal-hp__box" <?= $onHome ? 'checked' : '' ?> onchange="this.form.submit()">
+              <input type="checkbox" class="gal-hp__box" <?= $onHome ? 'checked' : '' ?> data-submit-on-change>
               <span>Na homepage</span>
             </label>
           </form>
@@ -79,7 +79,7 @@ ob_start();
                 <button type="submit" class="gal-btn">Zobraziť</button>
               <?php endif; ?>
             </form>
-            <form method="post" action="/admin/gallery/<?= $pid ?>/delete" onsubmit="return confirm('Naozaj zmazať fotku?');">
+            <form method="post" action="/admin/gallery/<?= $pid ?>/delete" data-confirm="Naozaj zmazať fotku?">
               <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
               <button type="submit" class="gal-btn gal-btn--danger" aria-label="Zmazať fotku">Zmazať</button>
             </form>
@@ -118,7 +118,7 @@ ob_start();
 .gal-btn--danger { border-color: #e3b4ad; color: #c0392b; }
 .gal-btn--danger:hover { background: #fdecea; border-color: #c0392b; }
 </style>
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 (function () {
   var grid = document.getElementById('galGrid');
   if (!grid) return;

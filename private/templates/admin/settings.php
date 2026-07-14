@@ -6,7 +6,7 @@ $title = 'Nastavenia — KUKO admin';
 $csrf = \Kuko\Csrf::token();
 ob_start();
 ?>
-<h2>Nastavenia rezervácií</h2>
+<h2>Pravidlá rezervácií</h2>
 <form method="post" action="/admin/settings" class="admin-form">
   <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
 

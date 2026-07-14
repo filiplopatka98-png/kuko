@@ -29,11 +29,16 @@ foreach ($blocked as $b) {
 $startGrid = $start->modify('-' . ((((int)$start->format('N')) - 1)) . ' day');
 $today = (new \DateTimeImmutable('today'))->format('Y-m-d');
 
+// Slovak month names (PHP's format('F') is English-only without intl).
+$skMonths = [1 => 'Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún',
+    'Júl', 'August', 'September', 'Október', 'November', 'December'];
+$monthLabel = $skMonths[(int) $start->format('n')] . ' ' . $start->format('Y');
+
 ob_start();
 ?>
 <div class="admin-calendar-bar">
   <a class="admin-btn" href="/admin/calendar?month=<?= e($prev) ?>">← <?= e($prev) ?></a>
-  <h2><?= e($start->format('F Y')) ?> · <?= e($month) ?></h2>
+  <h2><?= e($monthLabel) ?></h2>
   <a class="admin-btn" href="/admin/calendar?month=<?= e($next) ?>"><?= e($next) ?> →</a>
 </div>
 
@@ -92,7 +97,7 @@ ob_start();
   <h3 class="admin-day-panel__title" id="calDayTitle"></h3>
   <div id="calDayList"></div>
 </section>
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 (function () {
   var byDay = <?= json_encode($byDay, JSON_UNESCAPED_UNICODE) ?>;
   var cal = document.querySelector('.admin-calendar');

@@ -15,6 +15,8 @@ use Kuko\OpeningHoursRepo;
 use Kuko\BlockedPeriodsRepo;
 use Kuko\Availability;
 
+\Kuko\Csp::send('admin');
+
 $renderer = new Renderer(APP_ROOT . '/private/templates/admin');
 $router   = new Router();
 
@@ -36,7 +38,7 @@ $logAuth = function (string $action, string $user): void {
                 'auth',
                 0,
                 json_encode(['ua' => $ua]),
-                hash('sha256', ((string) ($_SERVER['REMOTE_ADDR'] ?? '')) . '|' . $secret),
+                hash('sha256', \Kuko\ClientIp::get() . '|' . $secret),
             ]
         );
     } catch (\Throwable $e) {
@@ -66,7 +68,7 @@ $router->post('/admin/login', function () use ($renderer, $logAuth) {
     $next     = (string) ($_POST['next'] ?? '/admin');
     if (!preg_match('#^/admin#', $next)) $next = '/admin';
 
-    $ipRaw = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $ipRaw = \Kuko\ClientIp::get();
     $throttle = new \Kuko\LoginThrottle(APP_ROOT . '/private/logs/ratelimit');
     if (!$throttle->permit($ipRaw, $user)) {
         $logAuth('login_locked', $user);
@@ -111,8 +113,9 @@ if (!$isLoginRoute) {
 try {
     $db = Db::fromConfig();
 } catch (\Throwable $e) {
+    error_log('[admin] DB connect failed: ' . $e->getMessage());
     http_response_code(500);
-    echo '<h1>Database connection failed</h1><p>' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<h1>Chyba pripojenia k databáze</h1><p>Skúste to prosím neskôr.</p>';
     return;
 }
 
@@ -134,7 +137,7 @@ $audit = function (string $action, string $table, int $id, array $payload = []) 
     $secret = (string) \Kuko\Config::get('security.ip_hash_secret', '');
     $db->execStmt(
         'INSERT INTO admin_actions (admin_user, action, target_table, target_id, payload_json, ip_hash) VALUES (?,?,?,?,?,?)',
-        [$adminUser, $action, $table, $id, json_encode($payload), hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . '|' . $secret)]
+        [$adminUser, $action, $table, $id, json_encode($payload), hash('sha256', \Kuko\ClientIp::get() . '|' . $secret)]
     );
 };
 
@@ -148,9 +151,25 @@ $router->get('/admin', function () use ($renderer, $repo, $adminUser, $flashes) 
         'package' => $_GET['package'] ?? null,
         'from'    => $_GET['from']    ?? null,
         'to'      => $_GET['to']      ?? null,
+        'q'       => trim((string) ($_GET['q'] ?? '')) ?: null,
     ];
-    $rows = $repo->list(array_filter($filter, fn($v) => $v !== null && $v !== ''));
-    echo $renderer->render('list', ['rows' => $rows, 'filter' => $filter, 'user' => $adminUser, 'flashes' => $flashes]);
+    $active   = array_filter($filter, fn($v) => $v !== null && $v !== '');
+    $perPage  = 50;
+    $page     = max(1, (int) ($_GET['page'] ?? 1));
+    $total    = $repo->count($active);
+    $pages    = max(1, (int) ceil($total / $perPage));
+    $page     = min($page, $pages);
+    $rows     = $repo->list($active + ['limit' => $perPage, 'offset' => ($page - 1) * $perPage]);
+    echo $renderer->render('list', [
+        'rows'    => $rows,
+        'filter'  => $filter,
+        'page'    => $page,
+        'pages'   => $pages,
+        'total'   => $total,
+        'perPage' => $perPage,
+        'user'    => $adminUser,
+        'flashes' => $flashes,
+    ]);
 });
 
 $router->get('/admin/reservation/{id}', function (array $p) use ($renderer, $repo, $packages, $adminUser, $flashes) {
@@ -233,13 +252,17 @@ $router->get('/admin/settings', function () use ($renderer, $settings, $adminUse
 });
 $router->post('/admin/settings', function () use ($settings, $audit, $flash) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $changed = [];
     foreach (SettingsRepo::KNOWN_KEYS as $k) {
         if (isset($_POST[$k])) {
             $v = (string) (int) $_POST[$k];
             $settings->set($k, $v);
+            $changed[$k] = $v;
         }
     }
-    $audit('update_settings', 'settings', 0, $_POST);
+    // Audit only the known settings keys — never dump the raw $_POST (it also
+    // carries the CSRF token, which does not belong in the audit log).
+    $audit('update_settings', 'settings', 0, $changed);
     $flash('Nastavenia uložené.');
     header('Location: /admin/settings');
 });
@@ -617,7 +640,8 @@ $router->post('/admin/maintenance', function () use ($settings, $audit, $flash) 
     $on = !empty($_POST['enabled']);
     $settings->set('maintenance.enabled', $on ? '1' : '0');
     if (!empty($_POST['password'])) {
-        $settings->set('maintenance.password', (string) $_POST['password']);
+        // Never store the staff password in plaintext.
+        $settings->set('maintenance.password', password_hash((string) $_POST['password'], PASSWORD_BCRYPT));
     }
     $audit('maintenance_toggle', 'settings', 0, ['enabled' => $on]);
     $flash('Maintenance ' . ($on
@@ -717,6 +741,36 @@ $router->get('/admin/gdpr', function () use ($renderer, $db, $adminUser, $flashe
     $email = trim((string) ($_GET['email'] ?? ''));
     $rows  = $email !== '' ? (new \Kuko\Privacy($db))->exportByEmail($email) : [];
     echo $renderer->render('gdpr', ['email' => $email, 'rows' => $rows, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+
+// ===== Deploy tools (migrate / seed / smoke / fix-domain) — admin-only =====
+// Replaces the old public token-gated public/_setup.php. No public endpoint,
+// no secret in a URL — gated by the admin session like every other route here.
+$router->get('/admin/tools', function () use ($renderer, $adminUser, $flashes) {
+    $output = (string) ($_SESSION['tools_output'] ?? '');
+    unset($_SESSION['tools_output']);
+    echo $renderer->render('tools', ['output' => $output, 'user' => $adminUser, 'flashes' => $flashes]);
+});
+$router->post('/admin/tools/run', function () use ($db, $audit, $flash, $adminUser) {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
+    $action = (string) ($_POST['action'] ?? '');
+    try {
+        $output = match ($action) {
+            'migrate' => \Kuko\DeployTools::migrate($db, APP_ROOT . '/private/migrations'),
+            'seed'    => \Kuko\DeployTools::seed(APP_ROOT . '/private/scripts/seed-cms.php'),
+            'smoke'   => \Kuko\DeployTools::smoke($db),
+            'fix-domain' => \Kuko\DeployTools::fixDomain($db, [
+                [trim((string) ($_POST['old'] ?? '')), trim((string) ($_POST['new'] ?? ''))],
+            ]),
+            default   => throw new \InvalidArgumentException('Neznáma akcia.'),
+        };
+        $audit('deploy_tool', 'system', 0, ['action' => $action]);
+    } catch (\Throwable $e) {
+        $output = 'CHYBA: ' . $e->getMessage();
+        $flash('Operácia zlyhala.', 'err');
+    }
+    $_SESSION['tools_output'] = $output;
+    header('Location: /admin/tools');
 });
 
 $match = $router->match($method, $path);

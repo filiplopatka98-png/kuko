@@ -24,7 +24,7 @@ ob_start();
 </table>
 
 <?php if (!empty($gcal)): ?>
-<p style="margin:1rem 0">
+<p class="admin-detail-gcal">
   <a class="admin-pill" href="<?= e($gcal) ?>" target="_blank" rel="noopener">Pridať do Google kalendára</a>
 </p>
 <?php endif; ?>
@@ -33,22 +33,23 @@ ob_start();
   <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/status" class="admin-status-form">
     <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
     <label>Zmeniť status:
-      <select name="status">
+      <select name="status" data-status-select>
         <?php foreach (['pending','confirmed','cancelled'] as $s): ?>
           <option value="<?= $s ?>" <?= $r['status'] === $s ? 'selected' : '' ?>><?= $s ?></option>
         <?php endforeach; ?>
       </select>
     </label>
-    <label style="display:flex;align-items:center;gap:0.5rem">
-      <span>Dôvod (ak ruším)</span>
+    <label class="admin-reason-field" data-reason-field<?= $r['status'] === 'cancelled' ? '' : ' hidden' ?>>
+      <span>Dôvod zrušenia</span>
       <input type="text" name="reason" maxlength="255" placeholder="napr. klient sa neozval">
     </label>
     <button type="submit">Uložiť</button>
+    <p class="admin-muted admin-status-note">Pri zmene na <strong>potvrdené</strong> alebo <strong>zrušené</strong> sa klientovi automaticky odošle e-mail.</p>
   </form>
 
   <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/move" class="admin-status-form">
     <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-    <h3 style="margin:0">Presunúť termín</h3>
+    <h3 class="admin-form__h3-flush">Presunúť termín</h3>
     <label>Nový dátum
       <input type="date" name="wished_date" required value="<?= e($r['wished_date']) ?>">
     </label>
@@ -56,13 +57,13 @@ ob_start();
       <input type="time" name="wished_time" required step="1800" value="<?= e(substr((string)$r['wished_time'], 0, 5)) ?>">
     </label>
     <button type="submit">Presunúť</button>
-    <p style="margin:0;color:#888;font-size:0.85rem">Backend overí dostupnosť rovnako ako pri novej rezervácii.</p>
+    <p class="admin-muted admin-status-note">Backend overí dostupnosť rovnako ako pri novej rezervácii.</p>
   </form>
 </div>
 
-<div style="margin-top:2rem">
+<div class="admin-detail-gdpr">
   <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/anonymize"
-        onsubmit="return confirm('Anonymizovať? PII (meno, telefón, e-mail, poznámka) sa nenávratne vymažú. Štatistika zostane.');">
+        data-confirm="Anonymizovať? PII (meno, telefón, e-mail, poznámka) sa nenávratne vymažú. Štatistika zostane.">
     <input type="hidden" name="csrf" value="<?= e(\Kuko\Csrf::token()) ?>">
     <button type="submit" class="admin-btn-link">Anonymizovať (GDPR)</button>
   </form>

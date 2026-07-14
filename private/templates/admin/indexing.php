@@ -31,7 +31,7 @@ ob_start();
   </div>
 </form>
 
-<script>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 (function () {
   var form = document.getElementById('idx-form');
   var toggle = document.getElementById('idx-toggle');

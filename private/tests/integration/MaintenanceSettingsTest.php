@@ -36,6 +36,21 @@ final class MaintenanceSettingsTest extends TestCase
         $this->assertFalse(Maintenance::passwordMatches('wrong'));
     }
 
+    public function testPasswordStoredAsBcryptHashVerifies(): void
+    {
+        Config::reset();
+        Config::load(__DIR__ . '/../fixtures/config.test.php');
+        $db = Db::fromDsn('sqlite::memory:');
+        $db->exec("CREATE TABLE settings (setting_key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT (datetime('now')))");
+        $hash = password_hash('s3cret', PASSWORD_BCRYPT);
+        $db->execStmt("INSERT INTO settings (setting_key,value) VALUES ('maintenance.password',?)", [$hash]);
+        Maintenance::setSettings(new SettingsRepo($db));
+        $this->assertTrue(Maintenance::looksHashed($hash));
+        $this->assertTrue(Maintenance::passwordMatches('s3cret'), 'must verify against a stored bcrypt hash');
+        $this->assertFalse(Maintenance::passwordMatches('wrong'));
+        $this->assertFalse(Maintenance::passwordMatches(''), 'empty guess never matches');
+    }
+
     public function testFallsBackToConfigWhenNoSettings(): void
     {
         Config::reset();

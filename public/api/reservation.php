@@ -47,7 +47,7 @@ if (!\Kuko\Csrf::verify($csrf)) {
 
 // Rate limit by IP
 $secret = \Kuko\Config::get('security.ip_hash_secret', '');
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$ip = \Kuko\ClientIp::get();
 $ipHash = hash('sha256', $ip . '|' . $secret);
 $rl = new \Kuko\RateLimit(
     APP_ROOT . '/private/logs/rate',

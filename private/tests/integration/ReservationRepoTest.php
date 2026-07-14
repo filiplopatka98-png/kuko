@@ -97,4 +97,34 @@ final class ReservationRepoTest extends TestCase
     {
         $this->assertNull($this->repo->find(9999));
     }
+
+    public function testSearchByNamePhoneEmail(): void
+    {
+        $this->repo->create($this->input(['name' => 'Janko Hraško', 'phone' => '+421915111', 'email' => 'janko@x.sk']));
+        $this->repo->create($this->input(['name' => 'Anna Nová', 'phone' => '+421915222', 'email' => 'anna@y.sk']));
+        $this->assertCount(1, $this->repo->list(['q' => 'Hraško']), 'match by name');
+        $this->assertCount(1, $this->repo->list(['q' => '915222']), 'match by phone fragment');
+        $this->assertCount(1, $this->repo->list(['q' => 'anna@y']), 'match by email fragment');
+        $this->assertCount(0, $this->repo->list(['q' => 'nezhoda']));
+    }
+
+    public function testCountHonoursFilters(): void
+    {
+        $this->repo->create($this->input(['package' => 'mini']));
+        $this->repo->create($this->input(['package' => 'maxi']));
+        $this->repo->create($this->input(['package' => 'maxi']));
+        $this->assertSame(3, $this->repo->count());
+        $this->assertSame(2, $this->repo->count(['package' => 'maxi']));
+        $this->assertSame(0, $this->repo->count(['q' => 'ghost']));
+    }
+
+    public function testListRespectsLimitAndOffset(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->repo->create($this->input(['name' => 'R' . $i]));
+        }
+        $this->assertCount(2, $this->repo->list(['limit' => 2, 'offset' => 0]));
+        $this->assertCount(2, $this->repo->list(['limit' => 2, 'offset' => 2]));
+        $this->assertCount(1, $this->repo->list(['limit' => 2, 'offset' => 4]));
+    }
 }

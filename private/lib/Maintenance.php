@@ -101,8 +101,19 @@ final class Maintenance
     public static function passwordMatches(string $given): bool
     {
         $expected = self::password();
-        if ($expected === '') return false;
+        if ($expected === '' || $given === '') return false;
+        // Stored value may be a bcrypt/argon hash (set via /admin/maintenance)
+        // or legacy plaintext (config fallback / pre-hash rows).
+        if (self::looksHashed($expected)) {
+            return password_verify($given, $expected);
+        }
         return hash_equals($expected, $given);
+    }
+
+    /** True if $value looks like a PHP password_hash() output. */
+    public static function looksHashed(string $value): bool
+    {
+        return (bool) preg_match('/^\$(2[aby]|argon2(id|i|d))\$/', $value);
     }
 
     /** Should this incoming request bypass the maintenance page? */

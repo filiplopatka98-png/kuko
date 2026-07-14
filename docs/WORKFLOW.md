@@ -130,7 +130,7 @@ Vždy pred commitom skontroluj `git status` že tieto súbory nie sú medzi stag
 
 ## 3. Deploy na WebSupport
 
-WebSupport ponúka **SFTP-only účet** (žiadne SSH, žiadne shell príkazy). Migrácie a setup operácie sa preto robia cez webovo dostupný PHP helper `public/_setup.php`.
+WebSupport ponúka **SFTP-only účet** (žiadne SSH, žiadne shell príkazy). Migrácie a setup operácie sa preto robia cez admin stránku **`/admin/tools`** (za prihlásením; predtým verejný `public/_setup.php`, ktorý bol odstránený).
 
 ### Prerekvizity (raz)
 
@@ -215,28 +215,16 @@ Pri zmene config-u na produkcii:
 
 ### Migrácie
 
-Server je SFTP-only, takže `php private/migrations/run.php` priamo na serveri spustiť nedá. Riešenie: **`public/_setup.php`** je gated cez `auth.secret` token a vie:
+Server je SFTP-only, takže `php private/migrations/run.php` priamo na serveri spustiť nedá. Riešenie: **admin stránka `/admin/tools`** (za prihlásením) — `public/_setup.php` bol odstránený (žiadny verejný endpoint ani token v URL). Admin login je súborový (`config/.htpasswd`), takže funguje aj pred migráciou DB.
 
-```bash
-# Auth secret = hodnota z config/config.php → auth.secret na serveri
-TOKEN="<auth.secret-z-prod-config>"
+Kroky (po nahratí zmeneného kódu cez SFTP):
 
-# Spusti migrácie:
-curl "https://kukodetskysvet.sk/_setup.php?action=migrate&token=$TOKEN"
-# → "+ apply 005_xyz.sql\n  done\nall migrations applied"
+1. Prihlás sa do `/admin`, otvor **Web & systém → Nástroje**.
+2. **Spustiť migrácie** — aplikuje nové `*.sql` (idempotentné, výstup `+ apply … / all migrations applied`).
+3. **Spustiť seed** — doplní chýbajúce content bloky/nastavenia (insert-only).
+4. **Smoke test** — overí DB a vypíše tabuľky (bez zmien).
 
-# Smoke test DB:
-curl "https://kukodetskysvet.sk/_setup.php?action=smoke&token=$TOKEN"
-# → "Tables:\n  admin_actions\n  packages\n  reservations\n..."
-
-# Vyzistiť absolútne cesty (užitočné pre .htpasswd):
-curl "https://kukodetskysvet.sk/_setup.php?action=path&token=$TOKEN"
-
-# Self-destruct po dokončení (odporúčam):
-curl "https://kukodetskysvet.sk/_setup.php?action=delete&token=$TOKEN"
-```
-
-Token je verifikovaný cez `hash_equals` — bez správneho tokenu vráti 403. Self-destruct vymaže `_setup.php` zo servera.
+Logika je v `\Kuko\DeployTools` (testovateľná); routy `GET /admin/tools` + `POST /admin/tools/run` (CSRF) v `public/admin/index.php`.
 
 ### Admin používatelia (htpasswd)
 
@@ -326,8 +314,8 @@ Cron script pre týždenný dump cez SFTP TODO (zatiaľ ručne mesačne).
 2. **Test lokálne** cez SQLite (pre developer convenience). Pozn.: niektoré MySQL features ako `ENUM`, `JSON`, `ON UPDATE CURRENT_TIMESTAMP` SQLite nepodporuje — preto v dev DB seed sa nepoužíva runner, ale `dev-db-init.php` script.
 3. **Commit** súboru.
 4. **Upload** súboru cez SFTP do `kukodetskysvet.sk/private/migrations/`.
-5. **Spusti** cez `https://kukodetskysvet.sk/_setup.php?action=migrate&token=...`.
-6. **Overuj** že `migrations` tabuľka má nový riadok.
+5. **Spusti** cez `/admin/tools` → *Spustiť migrácie* (za prihlásením).
+6. **Overuj** že `migrations` tabuľka má nový riadok (*Smoke test*).
 
 Migrácie sú idempotentné cez `CREATE TABLE IF NOT EXISTS`, `INSERT IGNORE`, prípadne explicit checks. Spustenie 2× neuškodí — runner sám skipuje aplikované migrácie.
 
@@ -351,7 +339,7 @@ Pre štandardný release (kód + DB zmena):
    - `lftp ... mirror -R --only-newer private/ ...`
 4. **Migrácie (ak treba)**
    - Upload nový `.sql` cez SFTP
-   - `curl https://.../_setup.php?action=migrate&token=...`
+   - `/admin/tools` → *Spustiť migrácie*
 5. **Smoke test prod**
    - `curl -I https://kukodetskysvet.sk/`
    - Otvor v prehliadači, prejdi flow

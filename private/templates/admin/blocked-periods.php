@@ -43,6 +43,7 @@ ob_start();
 <?php if (!$rows): ?>
   <p class="admin-empty">Žiadne blokované obdobia.</p>
 <?php else: ?>
+<div class="admin-table-wrap">
 <table class="admin-table">
   <thead><tr><th>Od</th><th>Do</th><th>Čas</th><th>Dôvod</th><th></th></tr></thead>
   <tbody>
@@ -53,7 +54,7 @@ ob_start();
       <td><?php if ($r['time_from'] || $r['time_to']): ?><?= e(substr((string)$r['time_from'], 0, 5)) ?>–<?= e(substr((string)$r['time_to'], 0, 5)) ?><?php else: ?><em>celý deň</em><?php endif; ?></td>
       <td><?= e($r['reason'] ?? '—') ?></td>
       <td>
-        <form method="post" action="/admin/blocked-periods/<?= (int)$r['id'] ?>/delete" style="display:inline" onsubmit="return confirm('Naozaj zmazať?');">
+        <form method="post" action="/admin/blocked-periods/<?= (int)$r['id'] ?>/delete" style="display:inline" data-confirm="Naozaj zmazať?">
           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
           <button type="submit" class="admin-btn-link">Zmazať</button>
         </form>
@@ -62,6 +63,7 @@ ob_start();
   <?php endforeach; ?>
   </tbody>
 </table>
+</div>
 <?php endif; ?>
 <?php
 $content = ob_get_clean();

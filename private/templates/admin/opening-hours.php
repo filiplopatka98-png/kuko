@@ -13,6 +13,7 @@ ob_start();
 
 <form method="post" action="/admin/opening-hours" class="admin-form">
   <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+  <div class="admin-table-wrap">
   <table class="admin-table admin-table--hours">
     <thead><tr><th>Deň</th><th>Otvorené</th><th>Od</th><th>Do</th></tr></thead>
     <tbody>
@@ -26,6 +27,7 @@ ob_start();
     <?php endforeach; ?>
     </tbody>
   </table>
+  </div>
   <div class="admin-form__actions">
     <button type="submit">Uložiť</button>
   </div>

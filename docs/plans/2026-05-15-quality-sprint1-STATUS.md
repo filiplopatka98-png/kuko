@@ -529,3 +529,31 @@ Druhý beh: `= nothing to fix` (idempotent). `_setup.php` zmazaný (`?action=del
 Suite **398 testov** zelená.
 
 **Zostávajúce vlastnícke kroky:** funkčné testy (testovacia rezervácia → e-maily fungujú), cron registrácia na novom hostingu (`expire-pending.php`, `retention.php`, `db-backup.php`), `/admin/indexing` ON pre go-live, Google Search Console + Business Profile, rozhodnutie o starej doméne (301 redirect alebo nechať vypršať).
+
+---
+
+## 2026-07-14 — Bezpečnostný + UX audit admin časti (remediation)
+
+Kompletná náprava oboch auditov (bezpečnosť + admin UI/UX). **Nenasadené** — čaká na „go".
+
+**Bezpečnosť:**
+- `_setup.php` odstránený z repo → presunuté za admin login: `/admin/tools` (`\Kuko\DeployTools`, POST+CSRF, žiadny token v URL). Migrácie/Seed/Smoke/Náhrada textu.
+- Remember-me cookie: `iat` v HMAC podpise (`user|iat|sig`) → starý/ukradnutý cookie neplatí server-side; `session_regenerate_id` pri obnove.
+- Admin session timeout: idle 8h / absolút 24h (`Auth`, config `admin.idle_timeout`/`absolute_timeout`).
+- `LoginThrottle`: username lock zúžený na (username+IP) → koniec account-lockout DoS.
+- Maintenance: heslo hashované (`password_hash`/`verify`, aj v seede) + rate-limit na `/maintenance` POST.
+- `\Kuko\ClientIp` (config `security.trust_proxy`) pre IP za proxy; admin DB chyba generická; audit `update_settings` loguje whitelist (nie CSRF token); `display_errors` vždy off v prod.
+- **CSP s nonce** (`\Kuko\Csp`, emitované z PHP; `.htaccess` CSP odstránené): `script-src` bez `unsafe-inline`, inline `<script>` majú nonce, inline `on*` handlery → `admin.js` + `data-*`.
+
+**UX:**
+- Doplnené chýbajúce CSS triedy: `.admin-banner*` (Maintenance/Indexácia status box), `.admin-table-wrap` (mobil scroll, obalené tabuľky), `.admin-counter--over`, `.admin-muted`, `.admin-link`.
+- Zoznam rezervácií: vyhľadávanie (meno/tel/e-mail) + stránkovanie + počítadlo (`ReservationRepo::count()`/`q`).
+- IA: premenované „Nastavenia" → **„Web & systém"** (top-nav) a **„Pravidlá rezervácií"** (tab); pridaný tab „Nástroje".
+- Detail: upozornenie na e-mail pri zmene statusu + podmienené pole „Dôvod zrušenia"; inline štýly → triedy.
+- Kalendár: SK názvy mesiacov + mobilný scroll. Flash správy: × + auto-dismiss.
+
+**Vizuálne overené** na dev serveri (login, zoznam+hľadanie, bannery, Nástroje POST flow, detail toggle, kalendár, verejná homepage) — 0 CSP porušení, CSP hlavička má nonce a bez `unsafe-inline`.
+
+Suite **409 testov** zelená (+11). Pridané: `CspTest`, `ClientIpTest`, rozšírené `LoginThrottleTest`/`MaintenanceSettingsTest`/`ReservationRepoTest`.
+
+**Vlastnícky krok pred deployom:** reCAPTCHA v3 na `/rezervacia` smoke-test s ostrým kľúčom (nedá sa overiť lokálne — dev nemá secret). Ak by nový CSP blokoval reCAPTCHA, fallback = pridať `'unsafe-inline'` len do public `script-src` v `\Kuko\Csp::policy('public')`.

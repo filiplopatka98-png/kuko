@@ -58,7 +58,7 @@ final class AdminPagesTest extends TestCase
         $this->assertStringContainsString('seo_description', $t);
         $this->assertStringContainsString('name="csrf"', $t);
         // reuses seo.php counter + quill markup
-        $this->assertStringContainsString('kukoSeo', $t);
+        $this->assertStringContainsString('data-seo-prev-title', $t);
         $this->assertStringContainsString('quill-editor', $t);
         // two sub-tab sections + save
         $this->assertStringContainsString('Obsah', $t);

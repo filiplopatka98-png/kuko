@@ -42,6 +42,8 @@ $isSettingsGroup = (
     || str_starts_with($path, '/admin/log/')
     || $path === '/admin/gdpr'
     || str_starts_with($path, '/admin/gdpr/')
+    || $path === '/admin/tools'
+    || str_starts_with($path, '/admin/tools/')
 );
 /**
  * Active-state helper.
@@ -82,7 +84,7 @@ $aria = static function (bool $on): string {
     <a href="/admin" class="admin-nav-item admin-nav-item--top<?= $aria($isResvGroup) ?>">Rezervácie</a>
     <a href="/admin/pages" class="admin-nav-item admin-nav-item--top<?= $aria($isPagesGroup) ?>">Stránky</a>
     <a href="/admin/gallery" class="admin-nav-item admin-nav-item--top<?= $aria($active('/admin/gallery')) ?>">Galéria</a>
-    <a href="/admin/contact" class="admin-nav-item admin-nav-item--top<?= $aria($isSettingsGroup) ?>">Nastavenia</a>
+    <a href="/admin/contact" class="admin-nav-item admin-nav-item--top<?= $aria($isSettingsGroup) ?>">Web &amp; systém</a>
   </nav>
   <div class="admin-sidebar__footer">
     <span class="admin-user">@<?= e($user ?? '') ?></span>
@@ -91,7 +93,10 @@ $aria = static function (bool $on): string {
 </aside>
 <div class="admin-content">
 <?php foreach (($flashes ?? []) as $f): ?>
-  <div class="admin-flash admin-flash--<?= e($f['type'] ?? 'ok') ?>"><?= e($f['msg']) ?></div>
+  <div class="admin-flash admin-flash--<?= e($f['type'] ?? 'ok') ?>" data-flash>
+    <span><?= e($f['msg']) ?></span>
+    <button type="button" class="admin-flash__close" data-flash-close aria-label="Zavrieť">&times;</button>
+  </div>
 <?php endforeach; ?>
 <?php if ($isResvGroup): ?>
   <nav class="admin-tabs" aria-label="Rezervácie">
@@ -100,19 +105,21 @@ $aria = static function (bool $on): string {
     <a href="/admin/blocked-periods" class="admin-tab<?= $aria($active('/admin/blocked-periods')) ?>">Blokácie</a>
     <a href="/admin/opening-hours" class="admin-tab<?= $aria($active('/admin/opening-hours')) ?>">Otváracie hodiny</a>
     <a href="/admin/packages" class="admin-tab<?= $aria($active('/admin/packages')) ?>">Balíčky</a>
-    <a href="/admin/settings" class="admin-tab<?= $aria($active('/admin/settings')) ?>">Nastavenia</a>
+    <a href="/admin/settings" class="admin-tab<?= $aria($active('/admin/settings')) ?>">Pravidlá rezervácií</a>
   </nav>
 <?php elseif ($isSettingsGroup): ?>
-  <nav class="admin-tabs" aria-label="Nastavenia">
+  <nav class="admin-tabs" aria-label="Web a systém">
     <a href="/admin/contact" class="admin-tab<?= $aria($active('/admin/contact')) ?>">Kontakt</a>
     <a href="/admin/maintenance" class="admin-tab<?= $aria($active('/admin/maintenance')) ?>">Maintenance</a>
     <a href="/admin/indexing" class="admin-tab<?= $aria($active('/admin/indexing')) ?>">Indexácia</a>
     <a href="/admin/emails" class="admin-tab<?= $aria($active('/admin/emails')) ?>">E-maily</a>
     <a href="/admin/log" class="admin-tab<?= $aria($active('/admin/log')) ?>">Logy</a>
     <a href="/admin/gdpr" class="admin-tab<?= $aria($active('/admin/gdpr')) ?>">GDPR</a>
+    <a href="/admin/tools" class="admin-tab<?= $aria($active('/admin/tools')) ?>">Nástroje</a>
   </nav>
 <?php endif; ?>
 <main class="admin-main" id="main" tabindex="-1"><?= $content ?></main>
 </div>
+<script src="<?= e(\Kuko\Asset::url('/assets/js/admin.js')) ?>" defer></script>
 </body>
 </html>

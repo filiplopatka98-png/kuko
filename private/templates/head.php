@@ -84,7 +84,7 @@ if (!empty($seo['image'])) {
 
 <!-- Schema.org -->
 <?php $schemaPriceRange = '5 € – 350 €'; ?>
-<script type="application/ld+json">
+<script type="application/ld+json" nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 {
   "@context": "https://schema.org",
   "@type": ["ChildCare", "LocalBusiness"],
@@ -139,7 +139,7 @@ try {
     $faqSchemaItems = \Kuko\Faq::defaults();
 }
 ?>
-<script type="application/ld+json">
+<script type="application/ld+json" nonce="<?= e(\Kuko\Csp::nonce()) ?>">
 <?= \Kuko\Faq::schemaJson($faqSchemaItems) ?>
 </script>
 <?php endif; ?>
