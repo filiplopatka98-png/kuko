@@ -611,3 +611,29 @@ try/catch pre admin vs zákaznícky mail v `api/reservation.php`.
 a FAQ veta na existujúcej prod DB sa zmenia cez `/admin/tools` → *Hromadná
 náhrada textu* (napr. `v 3 krokoch` → `v 4 krokoch`). Go-live config potvrdiť:
 `auth.secret` neprázdny, `recaptcha.secret_key`, `security.trust_proxy`.
+
+## ✅ Celkový audit remediácia — NASADENÉ (2026-07-21, commit ed2aaf8)
+
+**Baseline zistený overením servera:** prod bol reálne na `03caf2b` (nie 7349612 —
+predch. `03caf2b` audit UŽ bol nasadený; táto sekcia doc bola v tomto bode
+neaktuálna). Diskriminátory: prod `web/.htaccess` aj `private/lib/Csp.php`
+hash-zhodné s `03caf2b`, `web/_setup.php` už neexistoval.
+
+**Deploy:** `git diff 03caf2b..HEAD` (bez `private/tests/`, `docs/`) = **61 súborov
+upload** (`public/`→`kukodetskysvet.sk/web/`, `private/`→`…/private/`) + **1 rm**
+(`web/assets/fonts/Inter.ttf`). SFTP host `kukodetskysvet.sk`, user
+`filip.kukodetskysvet.sk`, web root `kukodetskysvet.sk/web/`. lftp `put -o` cez
+stdin skript, heslo cez `LFTP_PASSWORD` env (`--env-password`), po deployi shred.
+
+**Overené:** 5 vzoriek byte-identických (index.php, main.min.css, rezervacia.min.js,
+_head-schema.php, Db.php); `Inter.ttf` zmazaný; `/`=503+Retry-After, `robots.txt`=
+`Disallow: /`, `/admin/login`=200, `/sitemap.xml`=200. Maintenance/indexácia
+NEZMENENÉ (pred-launch gate ostáva).
+
+**Owner TODO (post-deploy):**
+- `/admin/tools` → *Hromadná náhrada*: `v 3 krokoch` → `v 4 krokoch` (prod DB má
+  starý `cta.reservation.text` + `seo.rezervacia.description`; seed je insert-only).
+  Príp. FAQ vetu „Cez web rezerváciu meniť nedá." → „Rezerváciu cez web zmeniť nie je možné."
+- Go-live config potvrdiť: `auth.secret` neprázdny, `recaptcha.secret_key`,
+  `security.trust_proxy` (fail-closed + XFF správanie).
+- Voliteľné/odložené: woff2 subset fontov (chýba pyftsubset), slot šípková navigácia.
