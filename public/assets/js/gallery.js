@@ -9,6 +9,9 @@ if (items.length) {
 
   const lb = document.createElement('div');
   lb.className = 'lightbox';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Galéria fotiek');
   lb.hidden = true;
   lb.innerHTML = `
     <button type="button" class="lightbox__btn lightbox__btn--close" aria-label="Zavrieť">${ICON_CLOSE}</button>
@@ -106,5 +109,16 @@ if (items.length) {
     if (e.key === 'Escape') close();
     if (e.key === 'ArrowLeft') show(idx - 1);
     if (e.key === 'ArrowRight') show(idx + 1);
+    if (e.key === 'Tab') {
+      // Trap focus inside the modal (buttons in DOM order, skipping hidden thumbs).
+      const focusables = Array.from(lb.querySelectorAll('button')).filter(el => el.offsetParent !== null);
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (!lb.contains(active)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    }
   });
 }

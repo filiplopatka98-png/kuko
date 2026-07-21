@@ -18,7 +18,7 @@
   --c-pink: #F5C3DE;
   --c-text: #62534C;
   --c-text-soft: #725F56;
-  --c-accent: #D88BBE;
+  --c-accent: #A8478A;
   --c-white: #FFFFFF;
   --c-success: #2ecc71;
   --c-danger: #e74c3c;
@@ -48,6 +48,14 @@ a  { color: var(--c-accent); }
 
 button { font: inherit; cursor: pointer; }
 input, select, textarea { font: inherit; }
+
+/* Global branded focus ring — mirrors main.css. This page uses layout-minimal
+   which does NOT load main.css, so the ring must be defined here too. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
@@ -92,8 +100,11 @@ input, select, textarea { font: inherit; }
 .rezervacia__steps li.is-done span { background: var(--c-accent); color: white; }
 .rezervacia__steps li.is-active { color: var(--c-text); font-weight: 700; }
 @media (max-width: 560px) {
+  /* Collapse inactive steps to just their numbered badge, but keep the ACTIVE
+     step's label visible so the user always knows which step they're on. */
   .rezervacia__steps li { font-size: 0; padding: 0.25rem; }
   .rezervacia__steps li span { font-size: 0.85rem; }
+  .rezervacia__steps li.is-active { font-size: 0.85rem; gap: 0.35rem; }
 }
 
 /* ===== Step containers ===== */
@@ -163,6 +174,19 @@ input, select, textarea { font: inherit; }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem; margin-top: 2rem;
 }
+.package-picker__empty {
+  margin-top: 2rem; padding: 1.5rem; border-radius: var(--r-card);
+  background: var(--bg-pink-soft); text-align: center; line-height: 1.6;
+}
+.calendar__empty {
+  margin: 0.75rem 0 0; padding: 0.75rem 1rem; border-radius: 10px;
+  background: var(--bg-pink-soft); color: var(--c-text); text-align: center; font-weight: 600;
+}
+.rezervacia__help {
+  margin-top: auto; padding: 1.25rem 1.5rem; text-align: center;
+  color: var(--c-text-soft); font-size: 0.9rem; border-top: 1px solid rgba(0,0,0,0.06);
+}
+.rezervacia__help p { margin: 0; }
 .package-card {
   background: white; border: 3px solid; border-radius: var(--r-card);
   padding: 1.75rem 1.25rem; text-align: center;

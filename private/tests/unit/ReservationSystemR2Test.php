@@ -88,12 +88,14 @@ final class ReservationSystemR2Test extends TestCase
         $this->assertStringNotContainsString('font-size: 1.4rem', $this->css);
     }
 
-    public function testAvailabilityNoWholeDayPackageBlock(): void
+    public function testAvailabilityFullDayPackageBlock(): void
     {
-        // The package-level whole-day block is gone; blocked_full_day now only
-        // comes from an admin all-day blocked_period.
-        $this->assertStringNotContainsString("\$pkg['blocks_full_day']", $this->avail);
-        $this->assertStringNotContainsString("\$e['blocks_full_day']", $this->avail);
+        // A blocks_full_day package ("Uzavretá spoločnosť") is exclusive for the
+        // whole day: an existing full-day booking blocks every package, and a
+        // full-day request cannot sit on a partially-booked day.
+        $this->assertStringContainsString("\$pkg['blocks_full_day']", $this->avail);
+        $this->assertStringContainsString("\$e['blocks_full_day']", $this->avail);
+        $this->assertStringContainsString('reserved_full_day', $this->avail);
         // Pending older than one month no longer holds a slot.
         $this->assertStringContainsString("modify('-1 month')", $this->avail);
         $this->assertMatchesRegularExpression(

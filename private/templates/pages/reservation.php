@@ -1,7 +1,7 @@
 <?php
 /** @var array<int,array<string,mixed>> $packages */
 $title = 'Rezervácia oslavy — KUKO detský svet';
-$description = 'Rezervujte si oslavu v KUKO detský svet. Vyberte balíček, dátum a čas v 3 krokoch.';
+$description = 'Rezervujte si oslavu v KUKO detský svet. Vyberte balíček, dátum a čas v 4 krokoch.';
 $canonical = '/rezervacia';
 $pageType = 'rezervacia';
 $csrf = \Kuko\Csrf::token();
@@ -38,6 +38,14 @@ ob_start();
         // Same circular badge icons as the homepage "oslavy" section.
         $pkgIcons = ['mini' => 'badge-balloon.svg', 'maxi' => 'badge-balloons.svg', 'closed' => 'badge-crown.svg'];
         ?>
+        <?php if (empty($packages)): ?>
+        <div class="package-picker__empty" role="status">
+          <p>Online rezervácia je momentálne nedostupná. Zavolajte nám prosím na
+            <a href="tel:+421915319934">+421 915 319 934</a> alebo napíšte na
+            <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a> —
+            radi vám oslavu naplánujeme.</p>
+        </div>
+        <?php else: ?>
         <div class="package-picker">
           <?php foreach ($packages as $pkg):
             $pkgIcon = $pkgIcons[(string) $pkg['code']] ?? 'badge-balloon.svg'; ?>
@@ -49,6 +57,7 @@ ob_start();
             </button>
           <?php endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
     </section>
 
@@ -76,6 +85,7 @@ ob_start();
           <div class="calendar__grid" id="calendar-grid" role="grid">
             <p class="calendar__hint">Načítavam…</p>
           </div>
+          <p class="calendar__empty" id="calendar-empty" role="status" hidden>V tomto mesiaci nie sú voľné termíny — skúste prosím ďalší mesiac →</p>
           <div class="calendar__legend">
             <span><span class="dot dot--available"></span> voľné</span>
             <span><span class="dot dot--full"></span> plné / nedostupné</span>
@@ -197,14 +207,23 @@ ob_start();
         <p class="success__icon" aria-hidden="true">🎉</p>
         <h2 class="step__title">Ďakujeme za rezerváciu!</h2>
         <p class="success__lead">Veľmi nás teší, že ste si na oslavu vybrali práve nás. Vašu rezerváciu sme prijali — ozveme sa vám do 24 hodín s potvrdením a ďalšími detailmi.</p>
+        <p class="success__ref" hidden>Referenčné číslo rezervácie: <strong id="success-ref">—</strong><br>
+          <span class="success__ref-note">Toto číslo nám prosím uveďte pri telefonáte.</span></p>
         <p class="success__sub">Tešíme sa na vás a vaše deti! 💛</p>
         <div class="success-actions">
           <a class="btn btn--ghost" id="cal-gcal" target="_blank" rel="noopener" href="#" hidden>Pridať do Google kalendára</a>
+          <a class="btn btn--ghost" id="success-status" href="#" hidden>Sledovať stav rezervácie</a>
           <a class="btn" href="/">Späť na domov</a>
         </div>
       </div>
     </section>
   </form>
+
+  <footer class="rezervacia__help">
+    <p>Potrebujete pomoc s rezerváciou? Zavolajte
+      <a href="tel:+421915319934">+421 915 319 934</a> alebo napíšte
+      <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>.</p>
+  </footer>
 </div>
 
 <?php require __DIR__ . '/../cookie-banner.php'; ?>

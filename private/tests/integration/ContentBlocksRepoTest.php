@@ -67,6 +67,24 @@ final class ContentBlocksRepoTest extends TestCase
         $this->assertStringContainsString('<p>ok</p>', $stored);
     }
 
+    public function testTextContentStripsTagsOnSet(): void
+    {
+        // Defense-in-depth: a 'text' block must never persist active markup.
+        $this->repo->set('kontakt.address', 'Bratislavská 141<script>alert(1)</script>', 'text', 't');
+        $stored = $this->repo->get('kontakt.address');
+        $this->assertStringNotContainsString('<script', $stored);
+        $this->assertStringContainsString('Bratislavská 141', $stored);
+    }
+
+    public function testTextContentKeepsEntitiesAndPlaceholders(): void
+    {
+        // strip_tags leaves entities / ampersands / the {{year}} placeholder
+        // untouched, so it composes safely with the render-side e() (no
+        // double-escaping) and does not corrupt the footer copyright.
+        $this->repo->set('footer.copyright', 'Copyright © {{year}} A & B', 'text', 't');
+        $this->assertSame('Copyright © {{year}} A & B', $this->repo->get('footer.copyright'));
+    }
+
     public function testUpdatedAtRefreshesOnUpdate(): void
     {
         $this->repo->set('k', 'v1', 'text', 'a');

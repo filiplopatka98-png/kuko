@@ -67,16 +67,28 @@ final class Availability
         // expire-pending cron, so a slot frees even between cron runs).
         $pendingCutoff = $this->now->modify('-1 month')->format('Y-m-d H:i:s');
         $existing = $this->db->all(
-            "SELECT r.wished_time, p.duration_min
+            "SELECT r.wished_time, p.duration_min, p.blocks_full_day
              FROM reservations r JOIN packages p ON p.code = r.package
              WHERE r.wished_date = ?
                AND (r.status = 'confirmed'
                     OR (r.status = 'pending' AND r.created_at >= ?))",
             [$date, $pendingCutoff]
         );
-        // NOTE: every package only blocks its own time window + buffer (below);
-        // that window is then unavailable for ANY package. No package blocks
-        // the whole day — admins can still block a full day via blocked_periods.
+        // Full-day exclusivity (e.g. "Uzavretá spoločnosť" = blocks_full_day):
+        //  - if ANY existing booking that day is a full-day booker, the whole
+        //    day is taken for EVERY package;
+        //  - if the REQUESTED package is a full-day booker, it can only sit on
+        //    an otherwise-empty day, so a partially-booked day rejects it.
+        // Every other (partial) package only blocks its own time window +
+        // buffer (below); admins can still block a full day via blocked_periods.
+        foreach ($existing as $e) {
+            if ((int) $e['blocks_full_day'] === 1) {
+                return new AvailabilityResult([], 'reserved_full_day', $duration);
+            }
+        }
+        if ((int) $pkg['blocks_full_day'] === 1 && $existing !== []) {
+            return new AvailabilityResult([], 'reserved_full_day', $duration);
+        }
 
         // Blocked periods
         $blockedToday = $this->blocked->listForDate($date);

@@ -557,3 +557,57 @@ Kompletná náprava oboch auditov (bezpečnosť + admin UI/UX). **Nenasadené** 
 Suite **409 testov** zelená (+11). Pridané: `CspTest`, `ClientIpTest`, rozšírené `LoginThrottleTest`/`MaintenanceSettingsTest`/`ReservationRepoTest`.
 
 **Vlastnícky krok pred deployom:** reCAPTCHA v3 na `/rezervacia` smoke-test s ostrým kľúčom (nedá sa overiť lokálne — dev nemá secret). Ak by nový CSP blokoval reCAPTCHA, fallback = pridať `'unsafe-inline'` len do public `script-src` v `\Kuko\Csp::policy('public')`.
+
+---
+
+## 2026-07-21 — Celkový audit + remediácia (6 domén)
+
+Audit (security, a11y, SEO/AEO, performance, code/funkcie, UI/UX) + implementácia
+v 6 dávkach. Suite **435 testov** zelená (baseline 409 → +26). Owner rozhodnutia
+viď `memory/full-audit-2026-07-21.md`. Vizuálne overené na dev serveri.
+
+**Batch 1 — correctness:** `blocks_full_day` teraz reálne blokuje celý deň pre
+`closed` balíček (reason `reserved_full_day`); validácia blokovaných období
+(celý deň / rozsah od<do); atomický presun termínu (transakcia+rollback);
+GDPR retencia viazaná na `wished_date` (nie `created_at`).
+
+**Batch 2 — bezpečnosť (defense-in-depth):** remember-me cookie sa invaliduje
+zmenou hesla (fingerprint bcrypt hashu v HMAC); fail-closed pri prázdnom
+`auth.secret`/maintenance kľúči; `ClientIp` berie pravý XFF hop za proxy;
+logout len POST+CSRF; `App::isHttps()` (X-Forwarded-Proto) pre session cookie
+Secure vo všetkých API; LIKE wildcard escape (`ESCAPE '!'`); `strip_tags` na
+`text` content bloky.
+
+**Batch 3 — výkon:** `Db::fromConfig()` per-request singleton (~5 spojení → 1);
+Leaflet CSS/preconnect len na homepage; podmienený import gallery/map;
+schema.org `image[]` → webp. **Obrázky 24 MB → 1,86 MB** (`.jpg` súbory boli
+mislabeled PNG → reálny progresívny JPEG q82); `Inter.ttf` (803 KB) odstránený.
+Odložené (chýba tooling): woff2 subset fontov (návod: pyftsubset latin+latin-ext+SK).
+`img/galeria_N.*` root set je statický fallback (nie duplicita na zmazanie).
+
+**Batch 4 — a11y + kontrast:** brand `--c-accent` `#D88BBE` → `#A8478A`
+(WCAG AA: biely-na-ňom 5,34:1, na-kréme 5,10:1); admin `--c-accent-dark`
+`#8E3A74`; sivé `#7A7A7A`/`#aaa` → `#6A6A6A`; no-js reveal gating (`html.js`
++ nonce script); lightbox `role=dialog`+focus-trap; fokus pri prechode krokov;
+mobilné menu aria-label toggle+Esc; `scope="row"` v tabuľkách; focus-visible
+do `rezervacia.css`. (Slot šípková navigácia odložená — funguje ako tab-stopy.)
+
+**Batch 5 — SEO/AEO:** zdieľané `_head-social.php` + `_head-schema.php` partialy
+(rezervačná stránka má teraz OG/Twitter/ikony/JSON-LD — jeden zdroj pravdy);
+`CafeOrCoffeeShop` typ; `hasOfferCatalog` (DB-driven z price_text); priceRange
+`€€`; sitemap `lastmod` = max(content_blocks.updated_at); `/llms.txt` inline FAQ;
+404 meta description.
+
+**Batch 6 — UX:** rezervačný empty-state (nula balíčkov); hint pri plnom mesiaci;
+mobilný názov aktívneho kroku; „Potrebujete pomoc?" footer vo wizarde;
+add-to-calendar `ctz=Europe/Bratislava` (DST-safe); nav poradie (cenník pred
+oslavy) + „Rezervovať" CTA + „Časté otázky" v menu (aj footer); referencia
+rezervácie + „sledovať stav" na success (API vracia `view_token`); admin status
+`data-confirm` (upozornenie na e-mail); admin galéria ↑/↓ reorder + feedback;
+tools náhrada `{old}→{new}` echo v confirm + `required`. Bonus: oddelený
+try/catch pre admin vs zákaznícky mail v `api/reservation.php`.
+
+**Pozn. pre prod deploy:** seed je insert-only → texty „v 3 krokoch"→„v 4 krokoch"
+a FAQ veta na existujúcej prod DB sa zmenia cez `/admin/tools` → *Hromadná
+náhrada textu* (napr. `v 3 krokoch` → `v 4 krokoch`). Go-live config potvrdiť:
+`auth.secret` neprázdny, `recaptcha.secret_key`, `security.trust_proxy`.

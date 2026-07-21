@@ -36,8 +36,7 @@ final class App
         // force-HTTPS rule keys on). So cookie_secure is only set when https
         // is detected — local plain-http dev keeps working.
         if (PHP_SAPI !== 'cli' && !defined('TESTING') && session_status() === PHP_SESSION_NONE && !headers_sent()) {
-            $https = (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
-                  || (($_SERVER['HTTPS'] ?? '') === 'on');
+            $https = self::isHttps();
             @ini_set('session.use_strict_mode', '1');
             @ini_set('session.cookie_httponly', '1');
             @ini_set('session.cookie_samesite', 'Lax');
@@ -50,5 +49,18 @@ final class App
                 'secure'   => $https,
             ]);
         }
+    }
+
+    /**
+     * Canonical HTTPS detection — single source of truth for session/cookie
+     * "secure" flags across the app. Behind the WebSupport reverse proxy TLS is
+     * terminated at the edge and forwarded as X-Forwarded-Proto: https, so the
+     * bare $_SERVER['HTTPS'] check alone under-reports and would drop the
+     * Secure attribute on production cookies.
+     */
+    public static function isHttps(): bool
+    {
+        return (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+            || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
     }
 }

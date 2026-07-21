@@ -46,7 +46,7 @@ ob_start();
       </div>
       <aside class="cta-panel" aria-label="Rezervácia oslavy">
         <h2 class="cta-panel__title"><?= e(\Kuko\Content::get('cta.reservation.heading', 'Páči sa vám u nás?')) ?></h2>
-        <p class="cta-panel__text"><?= e(\Kuko\Content::get('cta.reservation.text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 3 krokoch.')) ?></p>
+        <p class="cta-panel__text"><?= e(\Kuko\Content::get('cta.reservation.text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 4 krokoch.')) ?></p>
         <a class="btn" href="/rezervacia">Rezervovať oslavu</a>
       </aside>
     </div>

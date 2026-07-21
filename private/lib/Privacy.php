@@ -14,11 +14,16 @@ final class Privacy
         );
     }
 
-    /** Anonymizes reservations whose created_at is older than $months. Returns count affected. */
+    /**
+     * Anonymizes reservations whose event date (wished_date) is more than
+     * $months in the past. Retention is anchored to the booked event, not the
+     * creation time, so a booking made long ago for a future date is kept until
+     * $months after the event actually happened. Returns count affected.
+     */
     public function purgeOlderThan(int $months): int
     {
-        $cutoff = (new \DateTimeImmutable("-{$months} months"))->format('Y-m-d H:i:s');
-        $rows = $this->db->all("SELECT id FROM reservations WHERE created_at < ? AND name <> 'anonymizovaný'", [$cutoff]);
+        $cutoff = (new \DateTimeImmutable("-{$months} months"))->format('Y-m-d');
+        $rows = $this->db->all("SELECT id FROM reservations WHERE wished_date < ? AND name <> 'anonymizovaný'", [$cutoff]);
         foreach ($rows as $r) {
             $this->anonymizeReservation((int) $r['id']);
         }

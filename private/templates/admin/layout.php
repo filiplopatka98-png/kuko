@@ -88,7 +88,10 @@ $aria = static function (bool $on): string {
   </nav>
   <div class="admin-sidebar__footer">
     <span class="admin-user">@<?= e($user ?? '') ?></span>
-    <a href="/admin/logout" class="admin-nav-item admin-nav-item--top admin-logout">Odhlásiť</a>
+    <form method="post" action="/admin/logout" class="admin-logout-form">
+      <input type="hidden" name="csrf" value="<?= e(\Kuko\Csrf::token()) ?>">
+      <button type="submit" class="admin-nav-item admin-nav-item--top admin-logout">Odhlásiť</button>
+    </form>
   </div>
 </aside>
 <div class="admin-content">

@@ -4,7 +4,7 @@
 /** @var string|null $canonical */         // path relative to app.url, e.g. '/rezervacia'
 /** @var string|null $ogImage */
 /** @var bool|null $pageIndexing */         // override; null = global app.public_indexing
-/** @var string|null $pageType */           // 'home' | 'reservation' | 'privacy' | 'status' | 'maintenance'
+/** @var string|null $pageType */           // 'home' | 'rezervacia' | 'gallery' | 'faq' | 'privacy' | 'cookies' | 'status'
 
 $siteName = 'KUKO detský svet';
 $titleFinal = $title ?? 'KUKO detský svet — herňa a kaviareň v Piešťanoch';
@@ -45,33 +45,13 @@ if (!empty($seo['image'])) {
 <meta name="recaptcha-site-key" content="<?= e($siteKey) ?>">
 <?php endif; ?>
 
-<!-- Open Graph -->
-<meta property="og:type" content="<?= e(($pageType ?? '') === 'home' ? 'website' : 'article') ?>">
-<meta property="og:site_name" content="<?= e($siteName) ?>">
-<meta property="og:title" content="<?= e($titleFinal) ?>">
-<meta property="og:description" content="<?= e($descriptionFinal) ?>">
-<meta property="og:image" content="<?= e($ogImageUrl) ?>">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="<?= e($canonicalUrl) ?>">
-<meta property="og:locale" content="sk_SK">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<?= e($titleFinal) ?>">
-<meta name="twitter:description" content="<?= e($descriptionFinal) ?>">
-<meta name="twitter:image" content="<?= e($ogImageUrl) ?>">
-
-<!-- Icons -->
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.webmanifest">
+<?php require __DIR__ . '/_head-social.php'; ?>
 
 <!-- Performance hints -->
+<?php if (($pageType ?? '') === 'home'): // Leaflet map lives only in the homepage kontakt section ?>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<?php endif; ?>
 <link rel="preload" href="/assets/fonts/NunitoSans.woff2" as="font" type="font/woff2" crossorigin>
 <?php if (($pageType ?? '') === 'home'): ?>
 <link rel="preload" as="image" href="<?= e($baseUrl) ?>/assets/img/hero-768.webp" type="image/webp" media="(max-width: 768px)" fetchpriority="high">
@@ -80,51 +60,12 @@ if (!empty($seo['image'])) {
 
 <!-- Stylesheets -->
 <link rel="stylesheet" href="<?= e(\Kuko\Asset::url('/assets/css/main.css')) ?>">
+<?php if (($pageType ?? '') === 'home'): // Leaflet CSS only where the map renders ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<?php endif; ?>
 
 <!-- Schema.org -->
-<?php $schemaPriceRange = '5 € – 350 €'; ?>
-<script type="application/ld+json" nonce="<?= e(\Kuko\Csp::nonce()) ?>">
-{
-  "@context": "https://schema.org",
-  "@type": ["ChildCare", "LocalBusiness"],
-  "@id": "<?= e($baseUrl) ?>/#business",
-  "name": "<?= e($siteName) ?>",
-  "image": [
-    "<?= e($baseUrl) ?>/assets/img/hero.jpg",
-    "<?= e($baseUrl) ?>/assets/img/cennik.jpg",
-    "<?= e($baseUrl) ?>/assets/img/galeria_1.jpg"
-  ],
-  "logo": "<?= e($baseUrl) ?>/assets/img/logo.png",
-  "url": "<?= e($baseUrl) ?>/",
-  "telephone": "+421915319934",
-  "email": "info@kukodetskysvet.sk",
-  "priceRange": "<?= e($schemaPriceRange) ?>",
-  "currenciesAccepted": "EUR",
-  "paymentAccepted": "Cash, Credit Card",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Bratislavská 141",
-    "postalCode": "921 01",
-    "addressLocality": "Piešťany",
-    "addressRegion": "Trnavský kraj",
-    "addressCountry": "SK"
-  },
-  "geo": { "@type": "GeoCoordinates", "latitude": 48.58128, "longitude": 17.81575 },
-  "hasMap": "https://www.google.com/maps/?q=48.58128,17.81575",
-  "openingHoursSpecification": [{
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-    "opens": "09:00", "closes": "20:00"
-  }],
-  "sameAs": [
-    <?php
-    $social = array_filter([\Kuko\Social::url('facebook', ''), \Kuko\Social::url('instagram', '')]);
-    echo implode(",\n    ", array_map(fn($u) => '"' . e($u) . '"', $social));
-    ?>
-  ]
-}
-</script>
+<?php require __DIR__ . '/_head-schema.php'; ?>
 
 <?php if (($pageType ?? '') === 'faq'): ?>
 <?php

@@ -65,13 +65,25 @@ final class ReservationRepo
             $params[] = $filter['to'];
         }
         if (!empty($filter['q'])) {
-            $where[] = '(name LIKE ? OR phone LIKE ? OR email LIKE ?)';
-            $like = '%' . $filter['q'] . '%';
+            // Escape LIKE wildcards so a search for "50%" / "a_b" is treated
+            // literally instead of as a pattern. The '!' escape char is used
+            // (not the conventional backslash) because a literal '\' in the
+            // ESCAPE clause is parsed inconsistently across engines — SQLite
+            // takes "'\'" as a backslash, while default MySQL treats it as an
+            // escaped quote and errors. '!' is neutral in both.
+            $where[] = "(name LIKE ? ESCAPE '!' OR phone LIKE ? ESCAPE '!' OR email LIKE ? ESCAPE '!')";
+            $like = '%' . self::escapeLike((string) $filter['q']) . '%';
             $params[] = $like;
             $params[] = $like;
             $params[] = $like;
         }
         return [implode(' AND ', $where), $params];
+    }
+
+    /** Escape LIKE metacharacters (%, _) and the escape char itself with '!'. */
+    private static function escapeLike(string $s): string
+    {
+        return str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $s);
     }
 
     /** @param array{status?:string,package?:string,from?:string,to?:string,q?:string,limit?:int,offset?:int} $filter */

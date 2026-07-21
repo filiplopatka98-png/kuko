@@ -14,16 +14,16 @@ $cIg      = \Kuko\Social::url('instagram', '');
       <img src="<?= e($mailBase) ?>/assets/img/logo.png" alt="KUKO detský svet" width="72" style="display:block;width:72px;height:auto">
     </td>
     <td style="vertical-align:top;line-height:1.6">
-      <strong style="color:#D88BBE">KUKO detský svet</strong><br>
+      <strong style="color:#A8478A">KUKO detský svet</strong><br>
       <?= e($cAddress) ?><br>
       Tel.: <a href="tel:<?= e(preg_replace('/\s+/', '', $cPhone)) ?>" style="color:#777"><?= e($cPhone) ?></a>
       &nbsp;·&nbsp; <a href="mailto:<?= e($cEmail) ?>" style="color:#777"><?= e($cEmail) ?></a><br>
       <?= e($cHours) ?>
       <?php if ($cFb !== '' || $cIg !== ''): ?>
       <br>
-      <?php if ($cFb !== ''): ?><a href="<?= e($cFb) ?>" style="color:#D88BBE;text-decoration:none">Facebook</a><?php endif; ?>
+      <?php if ($cFb !== ''): ?><a href="<?= e($cFb) ?>" style="color:#A8478A;text-decoration:none">Facebook</a><?php endif; ?>
       <?php if ($cFb !== '' && $cIg !== ''): ?> &nbsp;·&nbsp; <?php endif; ?>
-      <?php if ($cIg !== ''): ?><a href="<?= e($cIg) ?>" style="color:#D88BBE;text-decoration:none">Instagram</a><?php endif; ?>
+      <?php if ($cIg !== ''): ?><a href="<?= e($cIg) ?>" style="color:#A8478A;text-decoration:none">Instagram</a><?php endif; ?>
       <?php endif; ?>
     </td>
   </tr>

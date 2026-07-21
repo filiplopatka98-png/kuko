@@ -45,6 +45,15 @@ final class ContentBlocksRepo
     {
         if ($contentType === 'html') {
             $value = HtmlSanitizer::clean($value);
+        } else {
+            // Defense-in-depth for stored XSS: 'text' blocks (kontakt.*,
+            // hero.*, cennik.*, footer.copyright, …) are plain text and every
+            // render site already escapes them via e(). Strip any markup here
+            // too so no active tag can ever be persisted, even if a future
+            // template forgets to escape. strip_tags leaves entities untouched
+            // (no double-escaping with e()) and keeps the {{year}} placeholder
+            // and ordinary text (incl. "A & B") intact.
+            $value = strip_tags($value);
         }
         $exists = $this->db->one('SELECT block_key FROM content_blocks WHERE block_key = ?', [$key]) !== null;
         if ($exists) {

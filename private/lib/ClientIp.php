@@ -7,9 +7,9 @@ namespace Kuko;
  *
  * By default we trust ONLY REMOTE_ADDR (spoof-proof). Behind a reverse proxy
  * that rewrites REMOTE_ADDR to its own address (e.g. some WebSupport setups),
- * set security.trust_proxy = true so the first hop of X-Forwarded-For is used
- * instead. Never trust the header unless the deployment is actually behind a
- * proxy you control — it is attacker-controlled otherwise.
+ * set security.trust_proxy = true so the RIGHT-MOST hop of X-Forwarded-For is
+ * used instead. Never trust the header unless the deployment is actually
+ * behind a single proxy you control — it is attacker-controlled otherwise.
  */
 final class ClientIp
 {
@@ -23,8 +23,12 @@ final class ClientIp
         if ($header === '') {
             return $remote;
         }
-        // Left-most entry is the original client (proxy appends its own hops).
-        $first = trim(explode(',', $header)[0]);
-        return filter_var($first, FILTER_VALIDATE_IP) !== false ? $first : $remote;
+        // The trusted proxy APPENDS the address it saw the connection from, so
+        // the RIGHT-MOST entry is the real client as seen by our proxy. Any
+        // left-hand entries are client-supplied and therefore spoofable, so we
+        // ignore them entirely.
+        $parts = explode(',', $header);
+        $last = trim((string) end($parts));
+        return filter_var($last, FILTER_VALIDATE_IP) !== false ? $last : $remote;
     }
 }

@@ -73,6 +73,11 @@ final class Maintenance
     {
         $cookie = (string) ($_COOKIE[self::COOKIE_NAME] ?? '');
         if ($cookie === '') return false;
+        // Fail-closed: the staff cookie is a keyed hash over auth.secret. With
+        // an empty secret the value collapses to a hash of public-ish inputs
+        // and becomes forgeable, so never trust the bypass cookie in that case.
+        // Staff can still recover the site via the session-based admin login.
+        if ((string) Config::get('auth.secret', '') === '') return false;
         return hash_equals(self::expectedCookieValue(), $cookie);
     }
 
@@ -141,7 +146,6 @@ final class Maintenance
 
     private static function isHttps(): bool
     {
-        return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
-            || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+        return App::isHttps();
     }
 }

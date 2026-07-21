@@ -8,7 +8,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
-        'secure'   => isset($_SERVER['HTTPS']),
+        // Behind the WebSupport TLS-terminating proxy $_SERVER['HTTPS'] is
+        // unset, so the bare isset() check dropped Secure on real HTTPS. Use
+        // the shared detector that also honours X-Forwarded-Proto.
+        'secure'   => \Kuko\App::isHttps(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -162,10 +165,12 @@ $mailCfg  = \Kuko\Config::get('mail');
 $mailer   = new \Kuko\Mailer($mailCfg);
 $renderer = new \Kuko\Renderer(APP_ROOT . '/private/templates/mail');
 
-try {
-    $appUrl = rtrim((string) \Kuko\Config::get('app.url', ''), '/');
-    $statusLink = $appUrl . '/rezervacia/' . (string) $record['view_token'];
+$appUrl = rtrim((string) \Kuko\Config::get('app.url', ''), '/');
+$statusLink = $appUrl . '/rezervacia/' . (string) $record['view_token'];
 
+// Admin notification and customer confirmation are sent independently — a
+// failure rendering or sending one must NOT suppress the other.
+try {
     $adminHtml = $renderer->render('reservation_admin.html', ['r' => $record]);
     $adminText = $renderer->render('reservation_admin.text', ['r' => $record]);
     $mailer->send(
@@ -175,7 +180,11 @@ try {
         $adminText,
         (string) $record['email']
     );
+} catch (\Throwable $e) {
+    error_log('[api/reservation] admin mail render/send failed: ' . $e->getMessage());
+}
 
+try {
     $custHtml = $renderer->render('reservation_customer.html', ['r' => $record, 'statusLink' => $statusLink]);
     $custText = $renderer->render('reservation_customer.text', ['r' => $record, 'statusLink' => $statusLink]);
     $mailer->send(
@@ -185,7 +194,7 @@ try {
         $custText
     );
 } catch (\Throwable $e) {
-    error_log('[api/reservation] mail render/send failed: ' . $e->getMessage());
+    error_log('[api/reservation] customer mail render/send failed: ' . $e->getMessage());
 }
 
-echo json_encode(['ok' => true, 'id' => $id, 'message' => 'Ďakujeme, ozveme sa do 24h.']);
+echo json_encode(['ok' => true, 'id' => $id, 'view_token' => (string) $record['view_token'], 'message' => 'Ďakujeme, ozveme sa do 24h.']);

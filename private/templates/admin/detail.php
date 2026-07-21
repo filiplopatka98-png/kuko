@@ -9,18 +9,18 @@ ob_start();
 <p><a href="/admin">&larr; Späť na zoznam</a></p>
 <h2>Rezervácia #<?= (int) $r['id'] ?></h2>
 <table class="admin-detail">
-  <tr><th>Balíček</th><td><?= e(strtoupper((string) $r['package'])) ?></td></tr>
-  <tr><th>Termín</th><td><?= e($r['wished_date']) ?> o <?= e(substr((string) $r['wished_time'], 0, 5)) ?></td></tr>
-  <tr><th>Počet detí</th><td><?= (int) $r['kids_count'] ?></td></tr>
-  <tr><th>Meno</th><td><?= e($r['name']) ?></td></tr>
-  <tr><th>Telefón</th><td><a href="tel:<?= e($r['phone']) ?>"><?= e($r['phone']) ?></a></td></tr>
-  <tr><th>E-mail</th><td><a href="mailto:<?= e($r['email']) ?>"><?= e($r['email']) ?></a></td></tr>
-  <tr><th>Poznámka</th><td><?= nl2br(e($r['note'] ?? '—')) ?></td></tr>
-  <tr><th>Vytvorené</th><td><?= e($r['created_at']) ?></td></tr>
-  <tr><th>Potvrdené</th><td><?= e($r['confirmed_at'] ?? '—') ?></td></tr>
-  <tr><th>Zrušené</th><td><?= e($r['cancelled_at'] ?? '—') ?><?php if (!empty($r['cancelled_reason'])): ?> &mdash; <em><?= e($r['cancelled_reason']) ?></em><?php endif; ?></td></tr>
-  <tr><th>reCAPTCHA</th><td><?= e($r['recaptcha_score'] ?? '—') ?></td></tr>
-  <tr><th>Status</th><td><strong><?= e($r['status']) ?></strong></td></tr>
+  <tr><th scope="row">Balíček</th><td><?= e(strtoupper((string) $r['package'])) ?></td></tr>
+  <tr><th scope="row">Termín</th><td><?= e($r['wished_date']) ?> o <?= e(substr((string) $r['wished_time'], 0, 5)) ?></td></tr>
+  <tr><th scope="row">Počet detí</th><td><?= (int) $r['kids_count'] ?></td></tr>
+  <tr><th scope="row">Meno</th><td><?= e($r['name']) ?></td></tr>
+  <tr><th scope="row">Telefón</th><td><a href="tel:<?= e($r['phone']) ?>"><?= e($r['phone']) ?></a></td></tr>
+  <tr><th scope="row">E-mail</th><td><a href="mailto:<?= e($r['email']) ?>"><?= e($r['email']) ?></a></td></tr>
+  <tr><th scope="row">Poznámka</th><td><?= nl2br(e($r['note'] ?? '—')) ?></td></tr>
+  <tr><th scope="row">Vytvorené</th><td><?= e($r['created_at']) ?></td></tr>
+  <tr><th scope="row">Potvrdené</th><td><?= e($r['confirmed_at'] ?? '—') ?></td></tr>
+  <tr><th scope="row">Zrušené</th><td><?= e($r['cancelled_at'] ?? '—') ?><?php if (!empty($r['cancelled_reason'])): ?> &mdash; <em><?= e($r['cancelled_reason']) ?></em><?php endif; ?></td></tr>
+  <tr><th scope="row">reCAPTCHA</th><td><?= e($r['recaptcha_score'] ?? '—') ?></td></tr>
+  <tr><th scope="row">Status</th><td><strong><?= e($r['status']) ?></strong></td></tr>
 </table>
 
 <?php if (!empty($gcal)): ?>
@@ -30,7 +30,7 @@ ob_start();
 <?php endif; ?>
 
 <div class="admin-actions-grid">
-  <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/status" class="admin-status-form">
+  <form method="post" action="/admin/reservation/<?= (int) $r['id'] ?>/status" class="admin-status-form" data-confirm="Uložiť zmenu statusu? Pri potvrdení alebo zrušení sa klientovi automaticky odošle e-mail.">
     <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
     <label>Zmeniť status:
       <select name="status" data-status-select>

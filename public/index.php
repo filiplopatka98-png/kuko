@@ -89,7 +89,18 @@ $router->get('/sitemap.xml', function () use ($publicIndexing) {
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     if ($indexing) {
-        $today = date('Y-m-d');
+        // lastmod reflects the newest CMS content change, not "today" — a
+        // perpetually-today lastmod is a spam signal Google learns to ignore.
+        // Degrades to a static baseline date if the DB is unavailable.
+        $lastmod = '2026-07-21';
+        try {
+            $row = \Kuko\Db::fromConfig()->one('SELECT MAX(updated_at) AS m FROM content_blocks');
+            if (!empty($row['m'])) {
+                $lastmod = substr((string) $row['m'], 0, 10);
+            }
+        } catch (\Throwable $e) {
+            error_log('[sitemap] content_blocks lastmod unavailable: ' . $e->getMessage());
+        }
         foreach ([
             ['/',                 '1.0', 'monthly'],
             ['/rezervacia',       '0.9', 'weekly'],
@@ -98,7 +109,7 @@ $router->get('/sitemap.xml', function () use ($publicIndexing) {
             ['/ochrana-udajov',   '0.3', 'yearly'],
             ['/zasady-cookies',   '0.3', 'yearly'],
         ] as [$url, $priority, $freq]) {
-            echo "  <url>\n    <loc>{$base}{$url}</loc>\n    <lastmod>{$today}</lastmod>\n    <changefreq>{$freq}</changefreq>\n    <priority>{$priority}</priority>\n  </url>\n";
+            echo "  <url>\n    <loc>{$base}{$url}</loc>\n    <lastmod>{$lastmod}</lastmod>\n    <changefreq>{$freq}</changefreq>\n    <priority>{$priority}</priority>\n  </url>\n";
         }
     }
     echo "</urlset>\n";

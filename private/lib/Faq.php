@@ -32,7 +32,7 @@ final class Faq
             ['q' => 'Kde sa KUKO nachádza?',
              'a' => 'Nájdete nás na <strong>Bratislavskej 141, 921 01 Piešťany</strong>. Pozrite si mapu v sekcii <a href="/#kontakt">Kontakt</a>.'],
             ['q' => 'Ako môžem zrušiť alebo zmeniť rezerváciu?',
-             'a' => 'Zmenu alebo zrušenie termínu vybavíme telefonicky na <a href="tel:+421915319934">+421 915 319 934</a> alebo e-mailom na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>. Cez web rezerváciu meniť nedá.'],
+             'a' => 'Zmenu alebo zrušenie termínu vybavíme telefonicky na <a href="tel:+421915319934">+421 915 319 934</a> alebo e-mailom na <a href="mailto:info@kukodetskysvet.sk">info@kukodetskysvet.sk</a>. Rezerváciu cez web zmeniť nie je možné.'],
         ];
     }
 

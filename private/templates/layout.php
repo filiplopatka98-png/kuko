@@ -1,7 +1,8 @@
 <?php /** @var string $content */ ?>
 <!doctype html>
-<html lang="sk">
+<html lang="sk" class="no-js">
 <head>
+<script nonce="<?= e(\Kuko\Csp::nonce()) ?>">document.documentElement.classList.replace('no-js','js');</script>
 <?php require __DIR__ . '/head.php'; ?>
 </head>
 <body class="page-<?= e($pageType ?? 'home') ?>">

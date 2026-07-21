@@ -32,9 +32,14 @@ final class FaviconAssetsTest extends TestCase
 
     public function testHeadReferencesIcons(): void
     {
-        $h = file_get_contents(\dirname(__DIR__, 3) . '/private/templates/head.php');
-        $this->assertStringContainsString('apple-touch-icon', $h);
-        $this->assertStringContainsString('manifest.webmanifest', $h);
-        $this->assertStringContainsString('rel="icon"', $h);
+        // Icons live in the shared _head-social.php partial, included by both
+        // head.php (full layout) and layout-minimal.php (reservation page).
+        $tpl = \dirname(__DIR__, 3) . '/private/templates';
+        $h = file_get_contents($tpl . '/head.php');
+        $this->assertStringContainsString('_head-social.php', $h, 'head.php must include the shared social/icons partial');
+        $social = file_get_contents($tpl . '/_head-social.php');
+        $this->assertStringContainsString('apple-touch-icon', $social);
+        $this->assertStringContainsString('manifest.webmanifest', $social);
+        $this->assertStringContainsString('rel="icon"', $social);
     }
 }

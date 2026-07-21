@@ -79,8 +79,11 @@ final class LlmsTxtTest extends TestCase
         );
         Content::setDb($db);
         $out = LlmsTxt::render(null);
-        $this->assertStringContainsString('+421 999 000 000', $out);
-        $this->assertStringNotContainsString('+421 915 319 934', $out, 'live DB phone must override seed fallback');
+        // The Kontakt section must use the live override, not the seed fallback.
+        // (The inline FAQ may separately reference a phone in its own answer
+        // text — a distinct, admin-editable source — so we assert on the
+        // Kontakt line specifically rather than global absence.)
+        $this->assertStringContainsString('- Telefón: +421 999 000 000', $out, 'Kontakt section must use live DB phone');
     }
 
     public function testRouterServesAndIsBypassedByMaintenance(): void

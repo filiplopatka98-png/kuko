@@ -88,12 +88,14 @@ $router->post('/admin/login', function () use ($renderer, $logAuth) {
     echo $renderer->render('login', ['error' => true, 'next' => $next]);
 });
 
-$router->get('/admin/logout', function () {
-    Auth::logout();
-    header('Location: /admin/login');
-});
-
+// Logout is a state change → POST-only, CSRF-protected. No GET route so a
+// crafted <img>/link cannot log the admin out cross-site.
 $router->post('/admin/logout', function () {
+    if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) {
+        http_response_code(403);
+        echo 'csrf';
+        return;
+    }
     Auth::logout();
     header('Location: /admin/login');
 });
@@ -224,23 +226,39 @@ $router->post('/admin/reservation/{id}/status', function (array $p) use ($repo, 
     header('Location: /admin/reservation/' . $id);
 });
 
-$router->post('/admin/reservation/{id}/move', function (array $p) use ($repo, $audit, $flash, $availability) {
+$router->post('/admin/reservation/{id}/move', function (array $p) use ($repo, $audit, $flash, $availability, $db) {
     if (!\Kuko\Csrf::verify((string) ($_POST['csrf'] ?? ''))) { http_response_code(403); echo 'csrf'; return; }
     $id = (int) $p['id'];
     $row = $repo->find($id);
     if ($row === null) { http_response_code(404); echo 'not found'; return; }
     $newDate = (string) ($_POST['wished_date'] ?? '');
     $newTime = (string) ($_POST['wished_time'] ?? '');
-    $repo->setStatus($id, 'cancelled');
-    $slots = $availability()->forDate($newDate, (string) $row['package'])->slots;
-    if (!in_array($newTime, $slots, true)) {
+
+    // Atomic: free the slot (cancel), re-check availability, then move+restore.
+    // Wrapped in a transaction so a failure mid-way never leaves the booking
+    // stranded in 'cancelled'. Mirrors the double-booking guard in
+    // public/api/reservation.php.
+    $pdo = $db->pdo();
+    $pdo->beginTransaction();
+    try {
+        $repo->setStatus($id, 'cancelled');
+        $slots = $availability()->forDate($newDate, (string) $row['package'])->slots;
+        if (!in_array($newTime, $slots, true)) {
+            $pdo->rollBack();
+            $flash('Termín nie je dostupný. Vyberte iný čas.', 'err');
+            header('Location: /admin/reservation/' . $id);
+            return;
+        }
+        $repo->moveTo($id, $newDate, $newTime);
         $repo->setStatus($id, (string) $row['status']);
-        $flash('Termín nie je dostupný. Vyberte iný čas.', 'err');
+        $pdo->commit();
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        error_log('[admin/move] failed: ' . $e->getMessage());
+        $flash('Presun zlyhal, skúste znova.', 'err');
         header('Location: /admin/reservation/' . $id);
         return;
     }
-    $repo->moveTo($id, $newDate, $newTime);
-    $repo->setStatus($id, (string) $row['status']);
     $audit('move', 'reservations', $id, ['from' => $row['wished_date'] . ' ' . $row['wished_time'], 'to' => $newDate . ' ' . $newTime]);
     $flash("Termín presunutý na $newDate o $newTime.");
     header('Location: /admin/reservation/' . $id);
@@ -534,6 +552,9 @@ $router->post('/admin/blocked-periods', function () use ($blocked, $audit, $flas
     $tf = (string) ($_POST['time_from'] ?? '');
     $tt = (string) ($_POST['time_to']   ?? '');
     if ($df === '' || $dt === '') { $flash('Dátumy sú povinné.', 'err'); header('Location: /admin/blocked-periods'); return; }
+    if ($df > $dt) { $flash("Dátum 'do' musí byť rovnaký alebo neskorší ako 'od'.", 'err'); header('Location: /admin/blocked-periods'); return; }
+    if (($tf === '') !== ($tt === '')) { $flash('Zadajte oba časy, alebo žiadny (blokácia celého dňa).', 'err'); header('Location: /admin/blocked-periods'); return; }
+    if ($tf !== '' && $tt !== '' && $tf >= $tt) { $flash("Čas 'do' musí byť neskorší ako 'od'.", 'err'); header('Location: /admin/blocked-periods'); return; }
     $id = $blocked->create(
         $df, $dt,
         $tf === '' ? null : $tf,

@@ -28,10 +28,10 @@ ob_start();
     border: 1px solid #E7D4DF; border-radius: 0.375rem;
     font: inherit; background: white; box-sizing: border-box;
   }
-  .login__field input:focus { outline: none; border-color: #D88BBE; box-shadow: 0 0 0 3px rgba(216,139,190,0.25); }
+  .login__field input:focus { outline: none; border-color: #A8478A; box-shadow: 0 0 0 3px rgba(216,139,190,0.25); }
   .login__remember { display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0 1rem; font-size: 0.9rem; color: #7A7A7A; }
   .login__btn {
-    width: 100%; padding: 0.65rem; background: #D88BBE; color: #fff;
+    width: 100%; padding: 0.65rem; background: #A8478A; color: #fff;
     border: 0; border-radius: 0.375rem; cursor: pointer; font: inherit; font-weight: 600;
   }
   .login__btn:hover { background: #c373a8; }

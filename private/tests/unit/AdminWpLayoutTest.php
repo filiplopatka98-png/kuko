@@ -116,11 +116,12 @@ final class AdminWpLayoutTest extends TestCase
     public function testLogoutStyledNavItemPinnedBottom(): void
     {
         // Odhlásiť uses the nav-item design but lives in the footer block,
-        // which the flex:1 nav pushes to the very bottom.
+        // which the flex:1 nav pushes to the very bottom. It is now a
+        // CSRF-protected POST form (button styled as the nav item), not a link.
         $this->assertMatchesRegularExpression(
-            '/href="\/admin\/logout"\s+class="admin-nav-item admin-nav-item--top admin-logout">Odhl\x{00E1}si\x{0165}/u',
+            '/<button type="submit" class="admin-nav-item admin-nav-item--top admin-logout">Odhl\x{00E1}si\x{0165}/u',
             $this->l,
-            'logout must be a nav-item-styled link'
+            'logout must be a nav-item-styled submit button'
         );
         $this->assertMatchesRegularExpression(
             '/admin-sidebar__footer[^>]*>\s*<span class="admin-user"/u',

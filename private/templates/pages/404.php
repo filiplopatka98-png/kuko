@@ -1,5 +1,6 @@
 <?php
 $title = 'Stránka nenájdená — KUKO detský svet';
+$description = 'Táto stránka neexistuje alebo bola presunutá. Prejdite na domovskú stránku KUKO detský svet.';
 $pageIndexing = false;
 ob_start();
 ?>

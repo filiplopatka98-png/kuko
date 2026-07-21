@@ -47,19 +47,25 @@ if (root) {
       if (!isoDate || !hm) return;
       const durMin  = selectedDuration > 0 ? selectedDuration : 120;
 
-      // Local Europe/Bratislava wall time → Date. toISOString() then yields the
-      // correct UTC instant for the calendar import.
-      const start = new Date(`${isoDate}T${hm}:00`);
-      const end   = new Date(start.getTime() + durMin * 60000);
-      const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-      const startU = stamp(start);
-      const endU   = stamp(end);
+      // Emit wall-clock date-times (no Z) and let Google interpret them in
+      // Europe/Bratislava via ctz — correct regardless of the visitor's own
+      // browser timezone, and DST-safe (Google applies the TZ rules).
+      const [Y, M, D] = isoDate.split('-').map(Number);
+      const [h, mi]   = hm.split(':').map(Number);
+      const startMs = Date.UTC(Y, M - 1, D, h, mi, 0);
+      const endMs   = startMs + durMin * 60000;
+      const p = (n) => String(n).padStart(2, '0');
+      const stamp = (ms) => { const d = new Date(ms);
+        return `${d.getUTCFullYear()}${p(d.getUTCMonth() + 1)}${p(d.getUTCDate())}T${p(d.getUTCHours())}${p(d.getUTCMinutes())}00`; };
+      const startU = stamp(startMs);
+      const endU   = stamp(endMs);
 
       const loc = encodeURIComponent('KUKO detský svet, Bratislavská 141, 921 01 Piešťany');
       gcalLink.href =
         'https://calendar.google.com/calendar/render?action=TEMPLATE' +
         '&text=' + encodeURIComponent('Oslava v KUKO') +
         '&dates=' + startU + '/' + endU +
+        '&ctz=Europe/Bratislava' +
         '&location=' + loc;
       gcalLink.hidden = false;
     } catch (e) { /* nice-to-have only — never break the success screen */ }
@@ -197,6 +203,15 @@ if (root) {
       else li.removeAttribute('aria-current');
     });
     if (String(step) === '4') fillSummary();
+    // Move focus to the new step's heading so keyboard/SR users don't lose
+    // context (focus would otherwise fall back to <body>). success has its own
+    // role="status" live region, so announcing it via focus is safe too.
+    const active = steps.find(s => s.classList.contains('is-active'));
+    const heading = active && active.querySelector('.step__title, h1, h2, [role="status"]');
+    if (heading) {
+      if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -302,6 +317,7 @@ if (root) {
 
     // Track the first available (or today's) cell for roving tabindex seed
     let firstFocusable = null;
+    let availableCount = 0;
 
     for (let i = 0; i < cells; i++) {
       const dayNum = i - startOffset + 1;
@@ -358,6 +374,7 @@ if (root) {
         cell.setAttribute('aria-disabled', 'false');
         cell.addEventListener('click', () => selectDay(cell, iso));
         if (firstFocusable === null) firstFocusable = cell;
+        availableCount++;
       }
 
       if (iso === todayIso) {
@@ -377,6 +394,11 @@ if (root) {
 
     // Set initial roving tabindex on the first focusable cell
     if (firstFocusable) firstFocusable.setAttribute('tabindex', '0');
+
+    // No free day this month → nudge the user to look at the next month, so an
+    // all-grey grid doesn't read as a dead end.
+    const emptyHint = document.getElementById('calendar-empty');
+    if (emptyHint) emptyHint.hidden = availableCount > 0;
   }
 
   function reasonLabel(reason) {
@@ -386,6 +408,7 @@ if (root) {
       before_lead:      'Príliš skoro',
       after_horizon:    'Príliš ďaleko',
       full:             'Plne obsadené',
+      reserved_full_day:'Plne obsadené',
     })[reason] ?? 'Nedostupné';
   }
 
@@ -702,6 +725,17 @@ if (root) {
 
       clearDraft();
       buildCalendarLinks();
+      // Show the reservation reference + a link to track its status.
+      if (json.id) {
+        const refEl = document.getElementById('success-ref');
+        const refWrap = document.querySelector('.success__ref');
+        if (refEl) refEl.textContent = '#' + json.id;
+        if (refWrap) refWrap.hidden = false;
+      }
+      if (json.view_token) {
+        const statusLink = document.getElementById('success-status');
+        if (statusLink) { statusLink.href = '/rezervacia/' + json.view_token; statusLink.hidden = false; }
+      }
       goStep('success');
     } catch (err) {
       errorBox.textContent = err.message;

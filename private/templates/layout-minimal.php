@@ -10,8 +10,10 @@ $baseUrl = rtrim((string) \Kuko\Config::get('app.url', ''), '/');
 $canonicalUrl = $baseUrl . ($canonical ?? '/');
 $globalIndexing = (bool) \Kuko\Config::get('app.public_indexing', false);
 
+$siteName = 'KUKO detský svet';
 $titleFinal = $title ?? 'KUKO detský svet';
 $descriptionFinal = $description ?? '';
+$ogImageUrl = $baseUrl . '/assets/img/og-cover.jpg';
 
 // DB-backed SEO overrides (/admin/seo editor). DB wins; passed-in values remain
 // the fallback. The site must NOT break if the DB is unavailable.
@@ -31,9 +33,12 @@ $robots = $seo['robots'];
 <meta name="theme-color" content="#FBEEF5">
 <link rel="canonical" href="<?= e($canonicalUrl) ?>">
 <link rel="alternate" hreflang="sk-SK" href="<?= e($canonicalUrl) ?>">
+<link rel="alternate" hreflang="x-default" href="<?= e($canonicalUrl) ?>">
 <?php if ($siteKey !== ''): ?>
 <meta name="recaptcha-site-key" content="<?= e($siteKey) ?>">
 <?php endif; ?>
+<?php require __DIR__ . '/_head-social.php'; ?>
+<?php require __DIR__ . '/_head-schema.php'; ?>
 <link rel="preload" href="/assets/fonts/NunitoSans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="/favicon.ico">
 <style>
@@ -43,7 +48,7 @@ $robots = $seo['robots'];
   font-weight: 100 900;
   font-display: swap;
 }
-.skip-link{position:absolute;left:8px;top:-44px;z-index:1000;background:var(--c-accent,#D88BBE);color:#fff;padding:.6rem 1rem;border-radius:6px;text-decoration:none;transition:top .15s ease}
+.skip-link{position:absolute;left:8px;top:-44px;z-index:1000;background:var(--c-accent,#A8478A);color:#fff;padding:.6rem 1rem;border-radius:6px;text-decoration:none;transition:top .15s ease}
 .skip-link:focus{top:8px}
 </style>
 <?php foreach (($stylesheets ?? []) as $href): ?>

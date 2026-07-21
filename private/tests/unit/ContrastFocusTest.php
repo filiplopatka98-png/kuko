@@ -44,6 +44,22 @@ final class ContrastFocusTest extends TestCase
         $this->assertGreaterThanOrEqual(4.5, $this->contrast('#725F56', $cream), '--c-text-soft on cream must be >= 4.5:1');
         $this->assertGreaterThanOrEqual(4.5, $this->contrast('#725F56', $white), '--c-text-soft on white must be >= 4.5:1');
     }
+    public function testAccentIsAaCompliant(): void
+    {
+        $this->assertStringContainsString('--c-accent: #A8478A', $this->css, 'accent must be the WCAG-AA darkened brand pink');
+        $this->assertStringNotContainsString('#D88BBE', $this->css, 'old sub-AA accent #D88BBE must be gone from main.css');
+        $cream = '#FEF9F3';
+        $white = '#FFFFFF';
+        // white text sits on the accent (buttons, selected slots); accent is used as link/price text on cream
+        $this->assertGreaterThanOrEqual(4.5, $this->contrast('#A8478A', $white), 'white text on accent must be >= 4.5:1');
+        $this->assertGreaterThanOrEqual(4.5, $this->contrast('#A8478A', $cream), 'accent text on cream must be >= 4.5:1');
+    }
+    public function testRevealHiddenOnlyWhenJsPresent(): void
+    {
+        // [data-reveal] must only be hidden (opacity:0) when html.js is set, so a
+        // JS failure / no-JS client still sees content instead of a blank page.
+        $this->assertStringContainsString('.js [data-reveal]', $this->css, 'reveal must be gated behind html.js');
+    }
     public function testSiteWideFocusVisibleExists(): void
     {
         // a :focus-visible rule that is NOT the calendar-gridcell one

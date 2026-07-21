@@ -6,15 +6,22 @@ const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
 const navToggle = $('.nav__toggle');
 const navMenu = $('#primary-nav');
 if (navToggle && navMenu) {
+  const setMenu = (open) => {
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Zavrieť menu' : 'Otvoriť menu');
+    navMenu.classList.toggle('is-open', open);
+  };
   navToggle.addEventListener('click', () => {
-    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', String(!expanded));
-    navMenu.classList.toggle('is-open');
+    setMenu(navToggle.getAttribute('aria-expanded') !== 'true');
   });
-  navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    navToggle.setAttribute('aria-expanded', 'false');
-    navMenu.classList.remove('is-open');
-  }));
+  navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  // Esc closes the open menu and returns focus to the toggle.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
+      setMenu(false);
+      navToggle.focus();
+    }
+  });
 }
 
 // Sticky header is now pure CSS (only the .nav__band pins on desktop; the
@@ -62,6 +69,13 @@ document.addEventListener('click', e => {
 // Versioned URLs injected by the layout (Asset::url adds ?v=<mtime>) so a
 // changed gallery.js/map.js is not served stale from the CDN/browser cache —
 // a bare './gallery.js' specifier carries no cache-busting query.
+// Only fetch a module when its target element is present on the page — both
+// modules early-return otherwise, so this just skips two dead requests on
+// pages without a gallery (no [data-lightbox]) or a map (no #map).
 const A = window.__kukoAssets || {};
-import(A.gallery || './gallery.js').catch(err => console.warn('gallery.js failed', err));
-import(A.map || './map.js').catch(err => console.warn('map.js failed', err));
+if (document.querySelector('[data-lightbox]')) {
+  import(A.gallery || './gallery.js').catch(err => console.warn('gallery.js failed', err));
+}
+if (document.getElementById('map')) {
+  import(A.map || './map.js').catch(err => console.warn('map.js failed', err));
+}

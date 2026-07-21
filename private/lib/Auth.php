@@ -53,16 +53,12 @@ final class Auth
             }
         }
 
-        // Try remember-me cookie: user|iat|sig, HMAC binds the issue time so a
-        // stolen cookie expires server-side (not just via the browser expiry).
+        // Try remember-me cookie: user|iat|sig. The HMAC binds the issue time
+        // (so a stolen cookie expires server-side) and the current password
+        // fingerprint (so a password change invalidates every old cookie).
         $cookie = (string) ($_COOKIE[self::COOKIE_NAME] ?? '');
-        if ($cookie === '') return null;
-        [$user, $iat, $sig] = array_pad(explode('|', $cookie, 3), 3, '');
-        if ($user === '' || $iat === '' || $sig === '') return null;
-        if (!ctype_digit($iat)) return null;
-        if ($now - (int) $iat > self::COOKIE_TTL) return null; // expired
-        if (!hash_equals(self::sign($user, (int) $iat), $sig)) return null;
-        if (!self::userExists($user)) return null;
+        $user = self::rememberCookieValid($cookie, $now);
+        if ($user === null) return null;
 
         // Re-establish a fresh session from the trusted cookie.
         session_regenerate_id(true);
@@ -149,10 +145,46 @@ final class Auth
         return isset(self::loadHtpasswd()[$user]);
     }
 
+    /**
+     * Validate a remember-me cookie string without touching the session.
+     * Returns the username when the cookie is authentic and unexpired, else
+     * null. Pure (no session/cookie side effects) so it is unit-testable.
+     *
+     * Fail-closed on an empty auth.secret: an HMAC keyed on '' is trivially
+     * forgeable, so a remember-me cookie must never be trusted in that case.
+     * Session-based login never reaches this path, so it is unaffected.
+     */
+    public static function rememberCookieValid(string $cookie, int $now): ?string
+    {
+        if ($cookie === '') return null;
+        if ((string) Config::get('auth.secret', '') === '') return null; // fail-closed
+        [$user, $iat, $sig] = array_pad(explode('|', $cookie, 3), 3, '');
+        if ($user === '' || $iat === '' || $sig === '') return null;
+        if (!ctype_digit($iat)) return null;
+        if ($now - (int) $iat > self::COOKIE_TTL) return null; // expired
+        if (!hash_equals(self::sign($user, (int) $iat), $sig)) return null;
+        if (!self::userExists($user)) return null;
+        return $user;
+    }
+
     private static function sign(string $user, int $iat): string
     {
         $secret = (string) Config::get('auth.secret', '');
-        return hash_hmac('sha256', 'admin|' . $user . '|' . $iat, $secret);
+        // Bind the current password fingerprint: changing the password rewrites
+        // the stored bcrypt hash, which changes this fingerprint, which makes
+        // every previously issued remember-me signature stop verifying.
+        $fp = self::passwordFingerprint($user);
+        return hash_hmac('sha256', 'admin|' . $user . '|' . $iat . '|' . $fp, $secret);
+    }
+
+    /**
+     * Short, non-reversible fingerprint of the user's current bcrypt hash.
+     * Empty string for an unknown user (keeps sign() total).
+     */
+    private static function passwordFingerprint(string $user): string
+    {
+        $hash = self::loadHtpasswd()[$user] ?? '';
+        return substr(sha1($hash), 0, 16);
     }
 
     /** Drop only the admin-identity keys (keeps CSRF token / flash intact). */
@@ -181,7 +213,6 @@ final class Auth
 
     private static function isHttps(): bool
     {
-        return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+        return App::isHttps();
     }
 }

@@ -95,6 +95,20 @@ final class LlmsTxt
         $out .= "- Online formulár: $base/rezervacia\n";
         $out .= "- Alebo telefonicky/e-mailom (kontakty vyššie).\n\n";
 
+        // Inline FAQ — AI answer engines extract answers best from Q&A text
+        // present in the brief itself, not just a link. Same structured source
+        // (Faq helper) as the visible /faq accordion and its FAQPage schema.
+        $faqItems = self::faqItems($db);
+        if ($faqItems !== []) {
+            $out .= "## Časté otázky\n";
+            foreach ($faqItems as $item) {
+                $q = trim((string) ($item['q'] ?? ''));
+                $a = trim(html_entity_decode(strip_tags((string) ($item['a'] ?? '')), ENT_QUOTES, 'UTF-8'));
+                if ($q === '') continue;
+                $out .= "### $q\n$a\n\n";
+            }
+        }
+
         $out .= "## Stránky\n";
         $out .= "- [Domov]($base/)\n";
         $out .= "- [O nás]($base/#o-nas)\n";
@@ -107,6 +121,23 @@ final class LlmsTxt
         $out .= "- [Zásady cookies]($base/zasady-cookies)\n";
 
         return $out;
+    }
+
+    /**
+     * FAQ Q&A from the live settings (same source as /faq + FAQPage schema);
+     * falls back to the seed-identical defaults on any DB fault.
+     * @return array<int,array{q:string,a:string}>
+     */
+    private static function faqItems(?Db $db): array
+    {
+        if ($db !== null) {
+            try {
+                return Faq::items(new SettingsRepo($db));
+            } catch (\Throwable $e) {
+                error_log('[LlmsTxt] FAQ load failed, using defaults: ' . $e->getMessage());
+            }
+        }
+        return Faq::defaults();
     }
 
     /**

@@ -48,7 +48,7 @@ final class CtaPanelR5Test extends TestCase
             'cta.faq.heading'         => ['private/templates/pages/faq.php',     'Plánujete oslavu pre svoje dieťa?'],
             'cta.faq.text'            => ['private/templates/pages/faq.php',     'Rezervujte si termín online za pár minút — vyberte balíček, dátum a čas.'],
             'cta.reservation.heading' => ['private/templates/pages/gallery.php', 'Páči sa vám u nás?'],
-            'cta.reservation.text'    => ['private/templates/pages/gallery.php', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 3 krokoch.'],
+            'cta.reservation.text'    => ['private/templates/pages/gallery.php', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 4 krokoch.'],
         ];
     }
 

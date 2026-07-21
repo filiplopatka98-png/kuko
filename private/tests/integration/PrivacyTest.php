@@ -18,15 +18,17 @@ final class PrivacyTest extends TestCase
              kids_count INTEGER, name TEXT, phone TEXT, email TEXT, note TEXT, status TEXT DEFAULT 'pending',
              ip_hash TEXT DEFAULT '', user_agent TEXT, created_at TEXT)"
         );
+        // Retention is anchored to wished_date (the event), so use dates
+        // relative to "now" to keep the assertions stable whenever the suite runs.
         $this->db->execStmt(
             "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
-             VALUES ('mini','2025-01-01','14:00',8,'Old Client','+421900111222','old@x.sk','poznamka','confirmed','UA1', ?)",
-            [(new \DateTimeImmutable('-7 months'))->format('Y-m-d H:i:s')]
+             VALUES ('mini',?,'14:00',8,'Old Client','+421900111222','old@x.sk','poznamka','confirmed','UA1', ?)",
+            [(new \DateTimeImmutable('-7 months'))->format('Y-m-d'), (new \DateTimeImmutable('-7 months'))->format('Y-m-d H:i:s')]
         );
         $this->db->execStmt(
             "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
-             VALUES ('maxi','2026-06-01','15:00',12,'Fresh Client','+421900333444','fresh@x.sk','','pending','UA2', ?)",
-            [(new \DateTimeImmutable('-2 months'))->format('Y-m-d H:i:s')]
+             VALUES ('maxi',?,'15:00',12,'Fresh Client','+421900333444','fresh@x.sk','','pending','UA2', ?)",
+            [(new \DateTimeImmutable('-2 months'))->format('Y-m-d'), (new \DateTimeImmutable('-2 months'))->format('Y-m-d H:i:s')]
         );
     }
 
@@ -63,14 +65,40 @@ final class PrivacyTest extends TestCase
     {
         $this->db->execStmt(
             "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
-             VALUES ('mini','2024-12-01','10:00',5,'Walkin Guest','+421900999000','','','confirmed','UA3', ?)",
-            [(new \DateTimeImmutable('-8 months'))->format('Y-m-d H:i:s')]
+             VALUES ('mini',?,'10:00',5,'Walkin Guest','+421900999000','','','confirmed','UA3', ?)",
+            [(new \DateTimeImmutable('-8 months'))->format('Y-m-d'), (new \DateTimeImmutable('-8 months'))->format('Y-m-d H:i:s')]
         );
         $p = new \Kuko\Privacy($this->db);
         $p->purgeOlderThan(6);
         $row = $this->db->all("SELECT name, phone FROM reservations WHERE id=3")[0];
         $this->assertSame('anonymizovaný', (string) $row['name']);
         $this->assertSame('', (string) $row['phone']);
+    }
+
+    public function testRetentionAnchoredToWishedDateNotCreatedAt(): void
+    {
+        // Booking CREATED long ago but for a FUTURE event date must be kept —
+        // retention counts from the event (wished_date), not created_at.
+        $this->db->execStmt(
+            "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
+             VALUES ('mini',?,'11:00',6,'Future Party','+421900555666','future@x.sk','','confirmed','UA4', ?)",
+            [(new \DateTimeImmutable('+2 months'))->format('Y-m-d'), (new \DateTimeImmutable('-9 months'))->format('Y-m-d H:i:s')]
+        );
+        $p = new Privacy($this->db);
+        $p->purgeOlderThan(6);
+        $row = $this->db->all("SELECT name, email FROM reservations WHERE id=3")[0];
+        $this->assertSame('Future Party', (string) $row['name']);
+        $this->assertSame('future@x.sk', (string) $row['email']);
+
+        // A past event (>6 months ago) IS anonymized even if created recently.
+        $this->db->execStmt(
+            "INSERT INTO reservations (package,wished_date,wished_time,kids_count,name,phone,email,note,status,user_agent,created_at)
+             VALUES ('mini',?,'12:00',6,'Past Party','+421900777888','past@x.sk','','confirmed','UA5', ?)",
+            [(new \DateTimeImmutable('-8 months'))->format('Y-m-d'), (new \DateTimeImmutable('-1 day'))->format('Y-m-d H:i:s')]
+        );
+        $p->purgeOlderThan(6);
+        $row = $this->db->all("SELECT name FROM reservations WHERE id=4")[0];
+        $this->assertSame('anonymizovaný', (string) $row['name']);
     }
 
     public function testExportByEmailCaseInsensitive(): void

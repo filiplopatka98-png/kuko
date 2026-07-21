@@ -31,24 +31,24 @@ ob_start();
                 radial-gradient(ellipse at 50% 100%, transparent 80%, #C9A8E1 81%, #C9A8E1 95%, transparent 96%);
     background-size: 100% 220%; background-position: 0 0; background-repeat: no-repeat;
   }
-  .maint h1 { font-size: clamp(1.8rem, 4vw, 2.3rem); margin: 0 0 0.5rem; color: #D88BBE; }
-  .maint__lead { color: #7A7A7A; margin: 0 0 1.5rem; font-size: 1.05rem; }
+  .maint h1 { font-size: clamp(1.8rem, 4vw, 2.3rem); margin: 0 0 0.5rem; color: #A8478A; }
+  .maint__lead { color: #6A6A6A; margin: 0 0 1.5rem; font-size: 1.05rem; }
   .maint__contact { background: #FBEEF5; border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem; }
-  .maint__contact strong { color: #D88BBE; }
+  .maint__contact strong { color: #A8478A; }
   .maint__form { display: flex; gap: 0.5rem; }
   .maint__form input {
     flex: 1; padding: 0.7rem 1rem; border: 1px solid rgba(0,0,0,0.15);
     border-radius: 999px; font: inherit; background: white;
   }
-  .maint__form input:focus { outline: none; border-color: #D88BBE; box-shadow: 0 0 0 3px rgba(216,139,190,0.2); }
+  .maint__form input:focus { outline: none; border-color: #A8478A; box-shadow: 0 0 0 3px rgba(216,139,190,0.2); }
   .maint__form button {
-    padding: 0.7rem 1.4rem; background: #D88BBE; color: white;
+    padding: 0.7rem 1.4rem; background: #A8478A; color: white;
     border: 0; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer;
     text-transform: uppercase; letter-spacing: 0.02em; font-size: 0.85rem;
   }
   .maint__form button:hover { background: #c373a8; }
   .maint__error { color: #c0392b; background: #fdecea; padding: 0.5rem 0.75rem; border-radius: 0.5rem; margin: 0 0 1rem; font-size: 0.9rem; }
-  .maint__staff { color: #aaa; font-size: 0.8rem; margin-top: 1rem; }
+  .maint__staff { color: #6A6A6A; font-size: 0.8rem; margin-top: 1rem; }
 </style>
 <div class="maint">
   <div class="maint__rainbow" aria-hidden="true"></div>

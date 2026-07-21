@@ -108,6 +108,31 @@ final class ReservationRepoTest extends TestCase
         $this->assertCount(0, $this->repo->list(['q' => 'nezhoda']));
     }
 
+    public function testSearchEscapesLikeWildcards(): void
+    {
+        // A '%' in the query must match literally, not as a wildcard.
+        $this->repo->create($this->input(['name' => '100% bavlna']));
+        $this->repo->create($this->input(['name' => '100 percent']));
+        $this->assertCount(1, $this->repo->list(['q' => '100%']), '% is literal, not wildcard');
+        $this->assertSame(1, $this->repo->count(['q' => '100%']), 'count honours escaped %');
+    }
+
+    public function testSearchEscapesUnderscoreWildcard(): void
+    {
+        // '_' matches any single char in LIKE; escaped it must be literal.
+        $this->repo->create($this->input(['name' => 'a_b']));
+        $this->repo->create($this->input(['name' => 'axb']));
+        $this->assertCount(1, $this->repo->list(['q' => 'a_b']), '_ is literal, not single-char wildcard');
+    }
+
+    public function testSearchEscapesBangEscapeChar(): void
+    {
+        // The '!' escape char itself must be escaped so a literal '!' still matches.
+        $this->repo->create($this->input(['name' => 'wow!']));
+        $this->repo->create($this->input(['name' => 'wow']));
+        $this->assertCount(1, $this->repo->list(['q' => 'wow!']));
+    }
+
     public function testCountHonoursFilters(): void
     {
         $this->repo->create($this->input(['package' => 'mini']));

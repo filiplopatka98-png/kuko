@@ -5,11 +5,18 @@
   'use strict';
 
   // form[data-confirm="message"] → native confirm() gate before submit.
+  // The message may contain {fieldName} placeholders, replaced with that named
+  // field's current value (e.g. echo "old → new" back to the admin).
   document.addEventListener('submit', function (e) {
     var form = e.target;
     if (!(form instanceof HTMLFormElement)) return;
     var msg = form.getAttribute('data-confirm');
-    if (msg && !window.confirm(msg)) {
+    if (!msg) return;
+    msg = msg.replace(/\{(\w+)\}/g, function (m, name) {
+      var field = form.elements[name];
+      return field ? String(field.value) : m;
+    });
+    if (!window.confirm(msg)) {
       e.preventDefault();
     }
   });

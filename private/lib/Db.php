@@ -4,21 +4,42 @@ namespace Kuko;
 
 final class Db
 {
+    /**
+     * Per-request connection cache. A single PHP request touches the DB from
+     * many places (Maintenance gate, page handler, Content/Seo/Social helpers,
+     * repositories) — each formerly opened its own PDO. Caching the Db here
+     * collapses those into one shared connection per request.
+     */
+    private static ?self $instance = null;
+
     public function __construct(private \PDO $pdo) {}
 
     public static function fromConfig(): self
     {
+        if (self::$instance !== null) {
+            return self::$instance;
+        }
         $cfg = Config::get('db');
         // Dev convenience: if host begins with "sqlite:" treat the full host string as a DSN
         if (is_string($cfg['host']) && str_starts_with($cfg['host'], 'sqlite:')) {
-            return self::fromDsn((string) $cfg['host']);
+            return self::$instance = self::fromDsn((string) $cfg['host']);
         }
         $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $cfg['host'], $cfg['name'], $cfg['charset'] ?? 'utf8mb4');
-        return new self(new \PDO($dsn, $cfg['user'], $cfg['pass'], [
+        return self::$instance = new self(new \PDO($dsn, $cfg['user'], $cfg['pass'], [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             \PDO::ATTR_EMULATE_PREPARES   => false,
         ]));
+    }
+
+    /**
+     * Drop the cached fromConfig() connection. Prod never needs this (one
+     * request = one connection), but tests that exercise fromConfig() call it
+     * in tearDown to stay isolated.
+     */
+    public static function resetConnection(): void
+    {
+        self::$instance = null;
     }
 
     public static function fromDsn(string $dsn): self

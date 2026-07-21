@@ -48,7 +48,11 @@ ob_start();
       $onHome  = !empty($ph['on_homepage']);
     ?>
     <div class="gal-card<?= $visible ? '' : ' gal-card--hidden' ?>" draggable="true" data-id="<?= $pid ?>">
-      <div class="gal-card__handle" title="Presunúť">⠿ #<?= $sort ?></div>
+      <div class="gal-card__handle" title="Presunúť (alebo ťahaním)">
+        <button type="button" class="gal-move" data-move="up" aria-label="Posunúť vyššie">↑</button>
+        <span class="gal-card__pos">⠿ #<?= $sort ?></span>
+        <button type="button" class="gal-move" data-move="down" aria-label="Posunúť nižšie">↓</button>
+      </div>
       <picture>
         <?php if ($webp): ?><source srcset="/assets/img/gallery/<?= e((string) $webp) ?>" type="image/webp"><?php endif; ?>
         <img src="/assets/img/gallery/<?= e($fname) ?>" width="200" loading="lazy" alt="<?= e($alt) ?>">
@@ -89,6 +93,7 @@ ob_start();
     </div>
   <?php endforeach; ?>
 </div>
+<p id="galStatus" class="gal-status" role="status" aria-live="polite" hidden></p>
 <?php endif; ?>
 
 <style>
@@ -97,7 +102,11 @@ ob_start();
 .gal-card { border: 1px solid #e3d9e6; border-radius: 10px; padding: .6rem; background: #fff; cursor: grab; display: flex; flex-direction: column; }
 .gal-card.gal-card--dragging { opacity: .4; }
 .gal-card--hidden { opacity: .5; background: #f6f4f7; }
-.gal-card__handle { font-size: .8rem; color: #999; user-select: none; margin-bottom: .4rem; }
+.gal-card__handle { font-size: .8rem; color: #777; user-select: none; margin-bottom: .4rem; display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
+.gal-move { border: 1px solid #d9c7df; background: #fff; border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-size: .9rem; line-height: 1; color: var(--c-text); }
+.gal-move:hover { background: #faf5fc; border-color: var(--c-accent); }
+.gal-status { margin-top: .75rem; padding: .5rem .8rem; border-radius: 6px; background: #eef8ee; color: #1e6b2e; font-size: .85rem; }
+.gal-status--error { background: #fdecea; color: #c0392b; }
 .gal-card img { display: block; width: 100%; height: auto; border-radius: 6px; }
 .gal-card__body { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; }
 .gal-alt { display: flex; gap: .35rem; align-items: center; }
@@ -123,7 +132,34 @@ ob_start();
   var grid = document.getElementById('galGrid');
   if (!grid) return;
   var token = <?= json_encode($csrf) ?>;
+  var statusEl = document.getElementById('galStatus');
   var dragged = null;
+
+  function say(msg, isError) {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.hidden = false;
+    statusEl.classList.toggle('gal-status--error', !!isError);
+  }
+  function renumber() {
+    grid.querySelectorAll('.gal-card__pos').forEach(function (h, i) {
+      h.textContent = '⠿ #' + (i + 1);
+    });
+  }
+  function persistOrder() {
+    var order = Array.prototype.map.call(grid.querySelectorAll('.gal-card'), function (c) {
+      return parseInt(c.getAttribute('data-id'), 10);
+    });
+    say('Ukladám poradie…', false);
+    fetch('/admin/gallery/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+      body: JSON.stringify({ order: order })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res && res.ok) { renumber(); say('Poradie uložené.', false); }
+      else { say('Poradie sa nepodarilo uložiť. Skúste znova.', true); }
+    }).catch(function () { say('Poradie sa nepodarilo uložiť (chyba siete).', true); });
+  }
 
   grid.addEventListener('dragstart', function (e) {
     var card = e.target.closest('.gal-card');
@@ -146,20 +182,23 @@ ob_start();
   });
   grid.addEventListener('drop', function (e) {
     e.preventDefault();
-    var order = Array.prototype.map.call(grid.querySelectorAll('.gal-card'), function (c) {
-      return parseInt(c.getAttribute('data-id'), 10);
-    });
-    fetch('/admin/gallery/reorder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
-      body: JSON.stringify({ order: order })
-    }).then(function (r) { return r.json(); }).then(function (res) {
-      if (res && res.ok) {
-        grid.querySelectorAll('.gal-card__handle').forEach(function (h, i) {
-          h.textContent = '⠿ #' + (i + 1);
-        });
-      }
-    }).catch(function () {});
+    persistOrder();
+  });
+
+  // Keyboard/touch reordering via the ↑/↓ buttons (drag-and-drop is unavailable
+  // on touch and to keyboard users).
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('.gal-move');
+    if (!btn) return;
+    var card = btn.closest('.gal-card');
+    if (!card) return;
+    if (btn.getAttribute('data-move') === 'up') {
+      if (card.previousElementSibling) grid.insertBefore(card, card.previousElementSibling);
+    } else {
+      if (card.nextElementSibling) grid.insertBefore(card.nextElementSibling, card);
+    }
+    btn.focus();
+    persistOrder();
   });
 })();
 (function () {

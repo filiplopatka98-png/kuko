@@ -38,7 +38,7 @@ $blocks = [
     ['cta.faq.heading', 'CTA (FAQ) — nadpis', 'text', 'Plánujete oslavu pre svoje dieťa?'],
     ['cta.faq.text', 'CTA (FAQ) — text', 'text', 'Rezervujte si termín online za pár minút — vyberte balíček, dátum a čas.'],
     ['cta.reservation.heading', 'CTA (rezervácia) — nadpis', 'text', 'Páči sa vám u nás?'],
-    ['cta.reservation.text', 'CTA (rezervácia) — text', 'text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 3 krokoch.'],
+    ['cta.reservation.text', 'CTA (rezervácia) — text', 'text', 'Rezervujte si oslavu v KUKO — vyberte balíček, dátum a čas v 4 krokoch.'],
     // Editable pages (admin "Stránky") — values copied verbatim from the
     // hardcoded fallbacks in pages/privacy.php and pages/faq.php.
     ['privacy.body', 'Ochrana údajov — text', 'html', <<<'HTML'
@@ -168,7 +168,7 @@ $seed = [
     'seo.home.title'        => 'KUKO detský svet — herňa a kaviareň v Piešťanoch',
     'seo.home.description'  => 'Detská herňa a kaviareň v Piešťanoch. Bezpečný hravý priestor pre deti, kvalitná káva pre rodičov, oslavy na mieru. Otvorené Pon–Ne 9:00 – 20:00.',
     'seo.rezervacia.title'  => 'Rezervácia oslavy — KUKO detský svet',
-    'seo.rezervacia.description' => 'Rezervujte si oslavu v KUKO detský svet. Vyberte balíček, dátum a čas v 3 krokoch.',
+    'seo.rezervacia.description' => 'Rezervujte si oslavu v KUKO detský svet. Vyberte balíček, dátum a čas v 4 krokoch.',
     'seo.faq.title'         => 'Časté otázky — KUKO detský svet',
     'seo.faq.description'   => 'Odpovede na najčastejšie otázky o detskej herni KUKO v Piešťanoch — ceny, oslavy, otváracie hodiny, vek detí, rezervácie.',
     'seo.privacy.title'     => 'Ochrana osobných údajov — KUKO detský svet',

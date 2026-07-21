@@ -46,15 +46,17 @@ $ig = \Kuko\Social::url('instagram', '');
     <a href="/" class="nav__brand nav__brand--bar" aria-label="KUKO detský svet — domov">
       <img src="<?= e(\Kuko\Asset::url('/assets/img/logo.png')) ?>" alt="KUKO detský svet" width="120" height="89">
     </a>
+    <a href="/rezervacia" class="nav__cta">Rezervovať</a>
     <button class="nav__toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Otvoriť menu">
       <span></span><span></span><span></span>
     </button>
     <nav id="primary-nav" class="nav__menu" aria-label="Hlavná navigácia">
       <a href="/#domov">Domov</a>
       <a href="/#o-nas">O detskom svete</a>
-      <a href="/#oslavy">Detské oslavy</a>
       <a href="/#cennik">Cenník služieb</a>
+      <a href="/#oslavy">Detské oslavy</a>
       <a href="/galeria">Fotogaléria</a>
+      <a href="/faq">Časté otázky</a>
       <a href="/#kontakt">Kontakt</a>
       <div class="nav__contact" aria-label="Kontakt a sociálne siete">
         <a href="mailto:info@kukodetskysvet.sk" class="nav__contact-link">
